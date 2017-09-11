@@ -26,6 +26,10 @@ body {
     background-color: #57a900;
 }
 
+div.container a.navbar-brand {
+    color: #fff;
+    font-size: 18px;
+}
 div.container a.navbar-brand > img {
     display: inline;
     margin-right: 4px;
