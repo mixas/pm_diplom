@@ -31,4 +31,5 @@ return [
     'Application',
     'Test',
     'User',
+    'Project',
 ];

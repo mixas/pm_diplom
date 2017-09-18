@@ -43,7 +43,7 @@ return [
                         'action'     => 'about',
                     ],
                 ],
-            ],            
+            ],
         ],
     ],
     'controllers' => [

@@ -34,14 +34,16 @@
         "psr-4": {
             "Application\\": "module/Application/src/",
             "Test\\": "module/Test/src/",
-            "User\\": "module/User/src/"
+            "User\\": "module/User/src/",
+            "Project\\": "module/Project/src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "ApplicationTest\\": "module/Application/test/",
             "Test\\": "module/Test/test/",
-            "User\\": "module/User/test/"
+            "User\\": "module/User/test/",
+            "Project\\": "module/Project/test/"
         }
     },
     "extra": [],

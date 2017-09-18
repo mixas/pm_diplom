@@ -1,0 +1,51 @@
+<?php
+$this->headTitle('Projects');
+
+$this->mainMenu()->setActiveItemId('projects');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home'=>$this->url('home'),
+    'Manage Projects'=>$this->url('projects'),
+]);
+?>
+
+<h1>Manage Projects</h1>
+
+<p>
+    <a class="btn btn-default" href="
+    <?= $this->url('projects', ['action'=>'add']); ?>">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Project
+    </a>
+</p>
+
+<table class="table table-striped">
+
+    <tr>
+        <th>ID</th>
+        <th>Code</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Date Created</th>
+        <th>Actions</th>
+    </tr>
+
+    <?php foreach ($projects as $project): ?>
+
+        <tr>
+            <td><?= $this->escapeHtml($project->getId()); ?></td>
+            <td><?= $this->escapeHtml($project->getCode()); ?></td>
+            <td><?= $this->escapeHtml($project->getName()); ?></td>
+            <td><?= $this->escapeHtml($project->getDescription()); ?></td>
+            <td><?= $this->escapeHtml($project->getDateCreated()); ?></td>
+            <td>
+                <a class="btn btn-info" href="<?= $this->url('projects',
+                    ['action'=>'edit', 'id'=>$project->getId()]); ?>">
+                    <span class="glyphicon glyphicon-pencil" ></span> Edit
+                </a>
+            </td>
+        </tr>
+
+    <?php endforeach; ?>
+
+</table>
+
