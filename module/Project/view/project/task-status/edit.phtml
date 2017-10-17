@@ -1,0 +1,42 @@
+<?php
+
+$this->headTitle('Edit Status');
+
+$this->mainMenu()->setActiveItemId('tasks_menu');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Manage Task Statuses' => $this->url('statuses'),
+    'Edit Task' => $this->url('statuses', ['action' => 'edit', 'id' => $status->getId()])
+]);
+
+$form->get('label')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => 'Label'
+]);
+
+$form->get('submit')
+    ->setAttributes(['class' => 'btn btn-primary'])
+    ->setValue('Save');
+
+$form->prepare();
+?>
+
+<h1>Edit Status "<?= $this->escapeHtml($status->getLabel()) ?>"</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <?= $this->form()->openTag($form); ?>
+
+        <div class="form-group">
+            <?= $this->formLabel($form->get('label')); ?>
+            <?= $this->formElement($form->get('label')); ?>
+            <?= $this->formElementErrors($form->get('label')); ?>
+        </div>
+
+        <?= $this->formElement($form->get('submit')); ?>
+
+        <?= $this->form()->closeTag(); ?>
+    </div>
+</div>   
+

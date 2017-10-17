@@ -3,6 +3,7 @@
 namespace Project\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 /**
  * This class represents a registered project.
@@ -11,6 +12,37 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Project
 {
+
+    /**
+     * @ORM\OneToMany(targetEntity="\Project\Entity\Task", mappedBy="project")
+     * @ORM\JoinColumn(name="id", referencedColumnName="project_id")
+     */
+    protected $tasks;
+
+    public function __construct()
+    {
+        $this->tasks = new ArrayCollection();
+    }
+    /**
+     * Возвращает таски проекта.
+     *
+     * @return array
+     */
+    public function getTasks()
+    {
+        return $this->tasks;
+    }
+
+    /**
+     * Adds a new task to this post.
+     * @param $task
+     */
+    public function addTask($task)
+    {
+        $this->tasks[] = $task;
+    }
+
+
     // User status constants.
     const STATUS_ACTIVE       = 1; // Active user.
     const STATUS_RETIRED      = 2; // Retired user.
@@ -186,10 +218,6 @@ class Project
         return $this;
     }
 
-    public function findOneByCode(){
-
-    }
-    
 }
 
 

@@ -53,7 +53,25 @@ class NavManager
             'label' => 'Projects',
             'link'  => $url('projects')
         ];
-        
+
+        $items[] = [
+            'id' => 'tasks_menu',
+            'label' => 'Tasks',
+            'float' => 'left',
+            'dropdown' => [
+                [
+                    'id' => 'tasks',
+                    'label' => 'Assigned tasks',
+                    'link' => $url('tasks')
+                ],
+                [
+                    'id' => 'statuses',
+                    'label' => 'Manage statuses',
+                    'link' => $url('statuses')
+                ],
+            ]
+        ];
+
         // Display "Login" menu item for not authorized user only. On the other hand,
         // display "Admin" and "Logout" menu items only for authorized users.
         if (!$this->authService->hasIdentity()) {

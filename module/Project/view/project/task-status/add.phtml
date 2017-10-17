@@ -1,0 +1,43 @@
+<?php
+
+$this->headTitle('Add Task Status');
+
+$this->mainMenu()->setActiveItemId('tasks_menu');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home'=>$this->url('home'),
+    'Manage Task Statuses'=>$this->url('statuses'),
+    'Add Status'=>$this->url('statuses', ['action'=>'add'])
+]);
+
+$form->get('label')->setAttributes([
+    'class'=>'form-control', 
+    'placeholder'=>'Status Label'
+]);
+
+$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
+
+$form->prepare();
+?>
+
+<h1>Add Status</h1>
+
+<p>
+    Please fill out the following form and click the <i>Create</i> button.
+</p>
+
+<div class="row">
+    <div class="col-md-6">
+        <?= $this->form()->openTag($form); ?>
+        
+        <div class="form-group">
+            <?= $this->formLabel($form->get('label')); ?>
+            <?= $this->formElement($form->get('label')); ?>
+            <?= $this->formElementErrors($form->get('label')); ?>
+        </div>
+        <?= $this->formElement($form->get('submit')); ?>
+        
+        <?= $this->form()->closeTag(); ?>
+    </div>    
+</div>   
+

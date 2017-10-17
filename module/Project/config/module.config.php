@@ -10,23 +10,12 @@ use Zend\Router\Http\Segment;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 return [
-//    'controllers' => [
-//        'factories' => [
-//            Controller\ProjectController::class => function($container) {
-//                $dbAdapter = $container->get('Zend\Db\Adapter\Adapter');
-//                $resultSetPrototype = new ResultSet();
-//                $tableGateway = new TableGateway('project', $dbAdapter, null, $resultSetPrototype);
-//
-//                return new Controller\ProjectController(
-//                    new \Project\Model\ProjectTable($tableGateway)
-//                );
-//            },
-//        ],
-//    ],
 
     'controllers' => [
         'factories' => [
             Controller\ProjectController::class => Controller\Factory\ProjectControllerFactory::class,
+            Controller\TaskController::class => Controller\Factory\TaskControllerFactory::class,
+            Controller\TaskStatusController::class => Controller\Factory\TaskStatusControllerFactory::class,
         ],
     ],
 
@@ -42,6 +31,34 @@ return [
                     ],
                     'defaults' => [
                         'controller'    => Controller\ProjectController::class,
+                        'action'        => 'index',
+                    ],
+                ],
+            ],
+            'tasks' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/tasks[/:action[/:id]]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[a-zA-Z0-9_-]*',
+                    ],
+                    'defaults' => [
+                        'controller'    => Controller\TaskController::class,
+                        'action'        => 'index',
+                    ],
+                ],
+            ],
+            'statuses' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/statuses[/:action[/:id]]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[a-zA-Z0-9_-]*',
+                    ],
+                    'defaults' => [
+                        'controller'    => Controller\TaskStatusController::class,
                         'action'        => 'index',
                     ],
                 ],
@@ -84,6 +101,8 @@ return [
     'service_manager' => [
         'factories' => [
             Service\ProjectManager::class => Service\Factory\ProjectManagerFactory::class,
+            Service\TaskManager::class => Service\Factory\TaskManagerFactory::class,
+            Service\TaskStatusManager::class => Service\Factory\TaskStatusManagerFactory::class,
         ],
     ],
 

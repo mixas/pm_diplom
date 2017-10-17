@@ -1,0 +1,53 @@
+<?php
+$this->headTitle('Tasks');
+
+$this->mainMenu()->setActiveItemId('tasks');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home'=>$this->url('home'),
+    'Manage Tasks'=>$this->url('tasks'),
+]);
+?>
+
+<h1>Manage Tasks</h1>
+
+<p>
+    <a class="btn btn-default" href="
+    <?= $this->url('tasks', ['action'=>'add']); ?>">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Task
+    </a>
+</p>
+
+<table class="table table-striped">
+
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Description</th>
+        <th>Date Created</th>
+        <th>Actions</th>
+    </tr>
+
+    <?php foreach ($tasks as $task): ?>
+
+        <tr>
+            <td><?= $this->escapeHtml($task->getId()); ?></td>
+            <td><?= $this->escapeHtml($task->getTaskTitle()); ?></td>
+            <td><?= $this->escapeHtml($task->getDescription()); ?></td>
+            <td><?= $this->escapeHtml($task->getDateCreated()); ?></td>
+            <td>
+                <a class="btn btn-info" href="<?= $this->url('tasks',
+                    ['action'=>'edit', 'id'=>$task->getId()]); ?>">
+                    <span class="glyphicon glyphicon-pencil" ></span> Edit
+                </a>
+                <a class="btn btn-info" href="<?= $this->url('tasks',
+                    ['action'=>'view', 'id'=>$task->getId()]); ?>">
+                    <span class="glyphicon glyphicon-pencil" ></span> View
+                </a>
+            </td>
+        </tr>
+
+    <?php endforeach; ?>
+
+</table>
+

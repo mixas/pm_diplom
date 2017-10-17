@@ -1,0 +1,50 @@
+<?php
+
+$this->headTitle('Task statuses');
+
+$this->mainMenu()->setActiveItemId('tasks_menu');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home'=>$this->url('home'),
+    'Manage Task Statuses'=>$this->url('statuses'),
+]);
+?>
+
+<h1>Manage Task Statuses</h1>
+
+<p>
+    <a class="btn btn-default" href="
+    <?= $this->url('statuses', ['action'=>'add']); ?>">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> New Status
+    </a>
+</p>
+
+<table class="table table-striped">
+
+    <tr>
+        <th>ID</th>
+        <th>Label</th>
+        <th>Actions</th>
+    </tr>
+
+    <?php foreach ($statuses as $taskStatus): ?>
+
+        <tr>
+            <td><?= $this->escapeHtml($taskStatus->getId()); ?></td>
+            <td><?= $this->escapeHtml($taskStatus->getLabel()); ?></td>
+            <td>
+                <a class="btn btn-info" href="<?= $this->url('statuses',
+                    ['action'=>'edit', 'id'=>$taskStatus->getId()]); ?>">
+                    <span class="glyphicon glyphicon-pencil" ></span> Edit
+                </a>
+                <a class="btn btn-info" href="<?= $this->url('statuses',
+                    ['action'=>'view', 'id'=>$taskStatus->getId()]); ?>">
+                    <span class="glyphicon glyphicon-pencil" ></span> View
+                </a>
+            </td>
+        </tr>
+
+    <?php endforeach; ?>
+
+</table>
+
