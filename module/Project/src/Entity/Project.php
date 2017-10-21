@@ -167,7 +167,7 @@ class Project
      * Returns possible statuses as array.
      * @return array
      */
-    public static function getStatusList() 
+    public function getStatusList()
     {
         return [
             self::STATUS_ACTIVE => 'Active',
@@ -181,7 +181,7 @@ class Project
      */
     public function getStatusAsString()
     {
-        $list = self::getStatusList();
+        $list = $this->getStatusList();
         if (isset($list[$this->status]))
             return $list[$this->status];
         

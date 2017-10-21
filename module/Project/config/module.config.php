@@ -8,6 +8,7 @@ use Zend\Db\TableGateway\TableGateway;
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Project\Entity\Task;
 
 return [
 
@@ -103,6 +104,12 @@ return [
             Service\ProjectManager::class => Service\Factory\ProjectManagerFactory::class,
             Service\TaskManager::class => Service\Factory\TaskManagerFactory::class,
             Service\TaskStatusManager::class => Service\Factory\TaskStatusManagerFactory::class,
+            'Project\Entity\Task' => 'Project\Entity\Factory\TaskFactory',
+        ],
+    ],
+    'entity_manager' => [
+        'factories' => [
+            'Project\Entity\Task' => 'Project\Entity\Factory\TaskFactory',
         ],
     ],
 

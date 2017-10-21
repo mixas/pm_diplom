@@ -36,7 +36,7 @@ class TaskForm extends Form
     /**
      * Constructor.
      */
-    public function __construct($scenario = 'create', $entityManager = null, $task = null)
+    public function __construct($scenario = 'create', $entityManager = null, $task = null, $taskManager = null)
     {
         // Define form name
         parent::__construct('project-form');
@@ -48,6 +48,7 @@ class TaskForm extends Form
         $this->scenario = $scenario;
         $this->entityManager = $entityManager;
         $this->task = $task;
+        $this->taskManager = $taskManager;
 
         $this->addElements();
         $this->addInputFilter();
@@ -87,20 +88,15 @@ class TaskForm extends Form
         ]);
 
 
+        $statuses = $this->taskManager->getStatusList();
+
         // Add "status" field
         $this->add([
             'type' => 'select',
             'name' => 'status',
             'options' => [
                 'label' => 'Status',
-                'value_options' => [
-                    Task::STATUS_TO_DO => 'To do',
-                    Task::STATUS_IN_PROCESS => 'In progress',
-                    Task::STATUS_TO_BE_CHECKED => 'To be checked',
-                    Task::STATUS_IN_QA => 'In QA',
-                    Task::STATUS_CHECKED => 'Checked',
-                    Task::STATUS_DONE => 'Done',
-                ]
+                'value_options' => $statuses
             ],
         ]);
 

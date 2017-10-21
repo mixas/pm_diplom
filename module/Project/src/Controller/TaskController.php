@@ -5,6 +5,7 @@ namespace Project\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Project\Entity\Task;
+use Project\Service\TaskManager;
 use Project\Form\TaskForm;
 //use User\Form\PasswordChangeForm;
 //use User\Form\PasswordResetForm;
@@ -107,7 +108,8 @@ class TaskController extends AbstractActionController
         }
 
         return new ViewModel([
-            'task' => $task
+            'task' => $task,
+            'status' => $this->taskManager->getStatusAsString($task->getStatus())
         ]);
     }
 
@@ -131,7 +133,7 @@ class TaskController extends AbstractActionController
         }
 
         // Create task form
-        $form = new TaskForm('update', $this->entityManager, $task);
+        $form = new TaskForm('update', $this->entityManager, $task, $this->taskManager);
 
         // Check if user has submitted the form
         if ($this->getRequest()->isPost()) {

@@ -2,7 +2,15 @@
 
 namespace Project\Entity;
 
+use Project\Service\TaskManager;
+
 use Doctrine\ORM\Mapping as ORM;
+
+use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\InvokableFactory;
+use Zend\ServiceManager\ServiceManager;
+
+use stdClass;
 
 /**
  * This class represents a registered task.
@@ -38,6 +46,54 @@ class Task
         $this->project = $project;
         $project->addTask($this);
     }
+
+//    /**
+//     * @OneToOne(targetEntity="TaskStatus", inversedBy="task")
+//     * @JoinColumn(name="status_id", referencedColumnName="id")
+//     */
+    protected $statusEntity;
+
+
+
+    /**
+     * Entity manager.
+     * @var Doctrine\ORM\EntityManager
+     */
+//    private $entityManager;
+
+//    public function __construct($entityManager)
+//    {
+//        $this->entityManager = $entityManager;
+//    }
+//
+//    protected function _construct($entityManager)
+//    {
+//        $this->entityManager = $entityManager;
+//    }
+
+
+    /**
+     * Returns associated status
+     *
+     * @return \Project\Entity\TaskStatus
+     */
+    public function getStatusEntity()
+    {
+        return $this->statusEntity;
+    }
+
+    /**
+     * Sets status entity
+     *
+     * @param $statusEntity \Project\Entity\TaskStatus
+     * @return $this
+     */
+    public function setStatusEntity($statusEntity)
+    {
+        $this->statusEntity = $statusEntity;
+        return $this;
+    }
+
 
     // User status constants.
     const STATUS_TO_DO       = 1; // To do.
@@ -202,10 +258,11 @@ class Task
         return $this;
     }
 
-    
+
     /**
-     * Returns status.
-     * @return int     
+     * Retrieve task status
+     *
+     * @return mixed
      */
     public function getStatus() 
     {
@@ -213,11 +270,22 @@ class Task
     }
 
     /**
+     * @param $status
+     * @return $this
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    /**
      * Returns possible statuses as array.
      * @return array
      */
-    public static function getStatusList() 
+    public function getStatusList()
     {
+        $taskStatuses = $this->getTaskStatuses();
         return [
             self::STATUS_TO_DO => 'To do',
             self::STATUS_IN_PROCESS => 'In process',
@@ -226,32 +294,8 @@ class Task
             self::STATUS_CHECKED => 'Checked',
             self::STATUS_DONE => 'Done'
         ];
-    }    
-    
-    /**
-     * Returns user status as string.
-     * @return string
-     */
-    public function getStatusAsString()
-    {
-        $list = self::getStatusList();
-        if (isset($list[$this->status]))
-            return $list[$this->status];
-        
-        return 'Unknown';
-    }    
-    
-    /**
-     * Sets status.
-     * @param int $status     
-     */
-    public function setStatus($status) 
-    {
-        $this->status = $status;
-        return $this;
-    }   
+    }
 
-    
     /**
      * Returns the date of user creation.
      * @return string     

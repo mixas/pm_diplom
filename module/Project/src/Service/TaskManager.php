@@ -3,8 +3,11 @@
 namespace Project\Service;
 
 use Project\Entity\Task;
+use Project\Entity\TaskStatus;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Math\Rand;
+
+use Interop\Container\ContainerInterface;
 
 /**
  * This service is responsible for adding/editing tasks
@@ -15,8 +18,8 @@ class TaskManager
      * Doctrine entity manager.
      * @var Doctrine\ORM\EntityManager
      */
-    private $entityManager;  
-    
+    private $entityManager;
+
     /**
      * Constructs the service.
      */
@@ -30,11 +33,6 @@ class TaskManager
      */
     public function addTask($data)
     {
-        // Do not allow several users with the same email address.
-//        if($this->checkProjectExists($data['code'])) {
-//            throw new \Exception("Another task with the same code " . $data['$code'] . " already exists");
-//        }
-        
         // Create new User entity.
         $task = new Task();
         $task->setTaskTitle($data['task_title']);
@@ -57,11 +55,6 @@ class TaskManager
      */
     public function updateTask($task, $data)
     {
-        // Do not allow to change user email if another user with such email already exits.
-//        if($task->getCode()!=$data['code'] && $this->checkProjectExists($data['code'])) {
-//            throw new \Exception("Another project with the same code " . $data['email'] . " already exists");
-//        }
-
         $task->setTaskTitle($data['task_title']);
         $task->setDescription($data['description']);
         $task->setStatus($data['status']);
@@ -75,15 +68,32 @@ class TaskManager
     }
 
     /**
-     * Checks whether an active user with given email address already exists in the database.     
+     * Returns possible statuses from DB as array.
+     *
+     * @return array
      */
-//    public function checkProjectExists($code) {
-//
-//        $project = $this->entityManager->getRepository(Project::class)
-//                ->findOneByCode($code);
-//
-//        return $project !== null;
-//    }
+    public function getStatusList()
+    {
+        $taskStatuses = array();
+        $statuses = $this->entityManager->getRepository(TaskStatus::class)->findAll();
+        foreach($statuses as $status){
+            $taskStatuses[$status->getId()] = $status->getLabel();
+        }
+        return $taskStatuses;
+    }
+
+    /**
+     * @param $status
+     * @return string
+     */
+    public function getStatusAsString($status)
+    {
+        $list = $this->getStatusList();
+        if (isset($list[$status]))
+            return $list[$status];
+
+        return 'Undefined';
+    }
 
 }
 
