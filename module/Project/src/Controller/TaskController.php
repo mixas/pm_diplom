@@ -5,6 +5,7 @@ namespace Project\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Project\Entity\Task;
+use Project\Entity\Project;
 use Project\Service\TaskManager;
 use Project\Form\TaskForm;
 //use User\Form\PasswordChangeForm;
@@ -57,7 +58,7 @@ class TaskController extends AbstractActionController
     public function addAction()
     {
         // Create user form
-        $form = new TaskForm('create', $this->entityManager);
+        $form = new TaskForm('create', $this->entityManager, null, $this->taskManager);
 
         // Check if user has submitted the form
         if ($this->getRequest()->isPost()) {
@@ -73,8 +74,13 @@ class TaskController extends AbstractActionController
                 // Get filtered and validated data
                 $data = $form->getData();
 
+                if($projectId = $this->getRequest()->getPost('project_id')){
+                    $project = $this->entityManager->getRepository(Project::class)
+                        ->find($projectId);
+                }
+
                 // Add user.
-                $task = $this->taskManager->addTask($data);
+                $task = $this->taskManager->addTask($data, $project);
 
                 // Redirect to "view" page
                 return $this->redirect()->toRoute('tasks',
@@ -83,7 +89,8 @@ class TaskController extends AbstractActionController
         }
 
         return new ViewModel([
-            'form' => $form
+            'form' => $form,
+            'projectId' => $this->getRequest()->getQuery('project')
         ]);
     }
 
@@ -109,6 +116,7 @@ class TaskController extends AbstractActionController
 
         return new ViewModel([
             'task' => $task,
+            'project' => $task->getProject(),
             'status' => $this->taskManager->getStatusAsString($task->getStatus())
         ]);
     }

@@ -5,6 +5,7 @@ namespace Project\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Project\Entity\Project;
+use Project\Entity\Task;
 use Project\Form\ProjectForm;
 //use User\Form\PasswordChangeForm;
 //use User\Form\PasswordResetForm;
@@ -101,13 +102,22 @@ class ProjectController extends AbstractActionController
         $project = $this->entityManager->getRepository(Project::class)
             ->find($id);
 
+        //TODO: deal with proper way to get all tasks from particular project. Like $tasks = $project->getTasks();. but it doesn't work
+        //TODO: !!!!!!!!
+        $tasks = $this->entityManager->getRepository(Task::class)
+            ->findByProjectId($id);
+
+        //all project tasks
+//        $tasks = $project->getTasks();
+
         if ($project == null) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
 
         return new ViewModel([
-            'project' => $project
+            'project' => $project,
+            'tasks' => $tasks,
         ]);
     }
 

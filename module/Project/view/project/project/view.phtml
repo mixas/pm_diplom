@@ -4,10 +4,10 @@ $this->headTitle('View Project');
 $this->mainMenu()->setActiveItemId('projects');
 
 $this->pageBreadcrumbs()->setItems([
-            'Home'=>$this->url('home'),
-            'Manage Projects'=>$this->url('projects'),
-            'View Project'=>$this->url('projects', ['action'=>'view', 'id'=>$project->getId()])
-            ]);
+    'Home'=>$this->url('home'),
+    'Manage Projects'=>$this->url('projects'),
+    'View Project'=>$this->url('projects', ['action'=>'view', 'id'=>$project->getId()])
+]);
 ?>
 
 <?= $this->flashMessenger()->render('error', ['alert', 'alert-warning']); ?>
@@ -46,3 +46,24 @@ $this->pageBreadcrumbs()->setItems([
         </table>
     </div>
 </div>
+
+<h2>Project tasks:</h2>
+<?php if(count($tasks)): ?>
+    <?php foreach ($tasks as $task): ?>
+        <div class="task-wrapper">
+            <div class="task-title"><?= $task->getTaskTitle(); ?></div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
+
+<button type="button" class="btn btn-default" onclick="addTask(<?= $project->getId(); ?>)">Add task</button>
+
+<script type="text/javascript">
+    function addTask(project){
+        var params = '';
+        if(typeof(project) != 'undefined'){
+            params = '?project=' + project;
+        }
+        document.location = '<?= $this->url('tasks', ['action'=>'add']); ?>'+params;
+    }
+</script>

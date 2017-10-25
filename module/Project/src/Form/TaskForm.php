@@ -59,7 +59,14 @@ class TaskForm extends Form
      */
     protected function addElements()
     {
-        // Add "task_title" field
+        $this->add([
+            'type' => 'hidden',
+            'name' => 'project_id',
+            'options' => [
+                'label' => 'Project ID',
+            ],
+        ]);
+
         $this->add([
             'type' => 'text',
             'name' => 'task_title',
@@ -68,8 +75,6 @@ class TaskForm extends Form
             ],
         ]);
 
-
-        // Add "password" field
         $this->add([
             'type' => 'text',
             'name' => 'description',

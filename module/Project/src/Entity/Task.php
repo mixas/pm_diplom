@@ -6,6 +6,8 @@ use Project\Service\TaskManager;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Project\Entity\Project;
+
 use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\InvokableFactory;
 use Zend\ServiceManager\ServiceManager;
@@ -21,7 +23,7 @@ class Task
 {
 
     /**
-     * @ORM\ManyToOne(targetEntity="\Project\Entity\Project", inversedBy="tasks")
+     * @ORM\ManyToOne(targetEntity="Project\Entity\Project", inversedBy="tasks")
      * @ORM\JoinColumn(name="project_id", referencedColumnName="id")
      */
     protected $project;
@@ -39,48 +41,29 @@ class Task
     /**
      * Sets associated project.
      *
-     * @param \Project\Entity\Project $project
+     * @param Project $project
      */
-    public function setProject($project)
+    public function setProject(\Project\Entity\Project $project)
     {
         $this->project = $project;
-        $project->addTask($this);
+//        $project->addTask($this);
     }
 
 //    /**
 //     * @OneToOne(targetEntity="TaskStatus", inversedBy="task")
 //     * @JoinColumn(name="status_id", referencedColumnName="id")
 //     */
-    protected $statusEntity;
-
-
-
-    /**
-     * Entity manager.
-     * @var Doctrine\ORM\EntityManager
-     */
-//    private $entityManager;
-
-//    public function __construct($entityManager)
-//    {
-//        $this->entityManager = $entityManager;
-//    }
-//
-//    protected function _construct($entityManager)
-//    {
-//        $this->entityManager = $entityManager;
-//    }
-
+//    protected $statusEntity;
 
     /**
      * Returns associated status
      *
      * @return \Project\Entity\TaskStatus
      */
-    public function getStatusEntity()
-    {
-        return $this->statusEntity;
-    }
+//    public function getStatusEntity()
+//    {
+//        return $this->statusEntity;
+//    }
 
     /**
      * Sets status entity
@@ -88,20 +71,20 @@ class Task
      * @param $statusEntity \Project\Entity\TaskStatus
      * @return $this
      */
-    public function setStatusEntity($statusEntity)
-    {
-        $this->statusEntity = $statusEntity;
-        return $this;
-    }
+//    public function setStatusEntity($statusEntity)
+//    {
+//        $this->statusEntity = $statusEntity;
+//        return $this;
+//    }
 
 
     // User status constants.
-    const STATUS_TO_DO       = 1; // To do.
-    const STATUS_IN_PROCESS      = 2; // In process.
-    const STATUS_TO_BE_CHECKED      = 3; // To be checked.
-    const STATUS_IN_QA      = 4; // In QA.
-    const STATUS_CHECKED      = 5; // Checked by QA.
-    const STATUS_DONE      = 6; // Done.
+//    const STATUS_TO_DO       = 1; // To do.
+//    const STATUS_IN_PROCESS      = 2; // In process.
+//    const STATUS_TO_BE_CHECKED      = 3; // To be checked.
+//    const STATUS_IN_QA      = 4; // In QA.
+//    const STATUS_CHECKED      = 5; // Checked by QA.
+//    const STATUS_DONE      = 6; // Done.
 
     /**
      * @ORM\Id
@@ -283,18 +266,18 @@ class Task
      * Returns possible statuses as array.
      * @return array
      */
-    public function getStatusList()
-    {
-        $taskStatuses = $this->getTaskStatuses();
-        return [
-            self::STATUS_TO_DO => 'To do',
-            self::STATUS_IN_PROCESS => 'In process',
-            self::STATUS_TO_BE_CHECKED => 'To be checked',
-            self::STATUS_IN_QA => 'In QA',
-            self::STATUS_CHECKED => 'Checked',
-            self::STATUS_DONE => 'Done'
-        ];
-    }
+//    public function getStatusList()
+//    {
+//        $taskStatuses = $this->getStatusEntity();
+//        return [
+//            self::STATUS_TO_DO => 'To do',
+//            self::STATUS_IN_PROCESS => 'In process',
+//            self::STATUS_TO_BE_CHECKED => 'To be checked',
+//            self::STATUS_IN_QA => 'In QA',
+//            self::STATUS_CHECKED => 'Checked',
+//            self::STATUS_DONE => 'Done'
+//        ];
+//    }
 
     /**
      * Returns the date of user creation.

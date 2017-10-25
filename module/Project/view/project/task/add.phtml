@@ -24,6 +24,11 @@ $form->get('status')->setAttributes([
     'class'=>'form-control'
 ]);
 
+$form->get('project_id')->setAttributes([
+    'value' => $projectId,
+    'id' => 'project_id'
+]);
+
 $form->get('estimate')->setAttributes([
     'class'=>'form-control',
     'placeholder'=>'Task estimate'
@@ -44,6 +49,9 @@ $form->prepare();
     <div class="col-md-6">
         <?= $this->form()->openTag($form); ?>
         
+        <?= $this->formElement($form->get('project_id')); ?>
+<!--        <input type="hidden" name="project_id" value="--><?//= $projectId; ?><!--">-->
+
         <div class="form-group">
             <?= $this->formLabel($form->get('task_title')); ?>
             <?= $this->formElement($form->get('task_title')); ?>

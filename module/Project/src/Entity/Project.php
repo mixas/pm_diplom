@@ -4,6 +4,7 @@ namespace Project\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Project\Entity\Task;
 
 /**
  * This class represents a registered project.
@@ -14,8 +15,7 @@ class Project
 {
 
     /**
-     * @ORM\OneToMany(targetEntity="\Project\Entity\Task", mappedBy="project")
-     * @ORM\JoinColumn(name="id", referencedColumnName="project_id")
+     * @ORM\OneToMany(targetEntity="Task", mappedBy="project")
      */
     protected $tasks;
 
@@ -23,6 +23,7 @@ class Project
     {
         $this->tasks = new ArrayCollection();
     }
+
     /**
      * Возвращает таски проекта.
      *
@@ -35,6 +36,7 @@ class Project
 
     /**
      * Adds a new task to this post.
+     *
      * @param $task
      */
     public function addTask($task)

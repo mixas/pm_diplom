@@ -29,15 +29,18 @@ class TaskManager
     }
     
     /**
-     * This method adds a new user.
+     * This method adds a new task to DB.
      */
-    public function addTask($data)
+    public function addTask($data, $project = null)
     {
-        // Create new User entity.
+        // Create new Task entity.
         $task = new Task();
         $task->setTaskTitle($data['task_title']);
         $task->setDescription($data['description']);
         $task->setStatus($data['status']);
+        if($project){
+            $task->setProject($project);
+        }
         $currentDate = date('Y-m-d H:i:s');
         $task->setDateCreated($currentDate);
                 

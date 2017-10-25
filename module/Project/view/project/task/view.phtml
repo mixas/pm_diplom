@@ -14,7 +14,7 @@ $this->pageBreadcrumbs()->setItems([
 <?= $this->flashMessenger()->render('success', ['alert', 'alert-success']); ?>
 <?= $this->flashMessenger()->render('info', ['alert', 'alert-info']); ?>
 
-<h1>View Project</h1>
+<h1>View Task</h1>
 
 <div class="row">
     <div class="col-md-6">
@@ -52,3 +52,8 @@ $this->pageBreadcrumbs()->setItems([
         </table>
     </div>
 </div>
+
+<? if($project): ?>
+    <h2>Project:</h2>
+    <?= $project->getName();?>
+<? endif; ?>
