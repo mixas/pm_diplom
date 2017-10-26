@@ -161,6 +161,9 @@ class TaskForm extends Form
         ]);
 
 
+        $statuses = $this->taskManager->getStatusList();
+        $statusesKeys = array_keys($statuses);
+
         // Add input for "status" field
         $inputFilter->add([
             'name' => 'status',
@@ -169,7 +172,7 @@ class TaskForm extends Form
                 ['name' => 'ToInt'],
             ],
             'validators' => [
-                ['name' => 'InArray', 'options' => ['haystack' => [1, 2, 3, 4, 5]]]
+                ['name' => 'InArray', 'options' => ['haystack' => $statusesKeys]]
             ],
         ]);
     }

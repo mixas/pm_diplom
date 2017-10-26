@@ -6,9 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Project\Entity\Comment;
 use Project\Entity\Task;
-use Project\Entity\Project;
 use Project\Service\TaskManager;
-use Project\Form\TaskForm;
 use Project\Form\CommentForm;
 //use User\Form\PasswordChangeForm;
 //use User\Form\PasswordResetForm;
@@ -17,7 +15,7 @@ use Project\Form\CommentForm;
  * This controller is responsible for user management (adding, editing,
  * viewing users and changing user's password).
  */
-class TaskController extends AbstractActionController
+class CommentController extends AbstractActionController
 {
     /**
      * Entity manager.
@@ -26,18 +24,19 @@ class TaskController extends AbstractActionController
     private $entityManager;
 
     /**
-     * Task manager.
-     * @var Project\Service\TaskManager
+     * Comment manager.
+     * @var Project\Service\CommentManager
      */
-    private $taskManager;
+    private $commentManager;
 
     /**
      * Constructor.
      */
-    public function __construct($entityManager, $taskManager)
+    public function __construct($entityManager, $commentManager, $rendererInterface)
     {
         $this->entityManager = $entityManager;
-        $this->taskManager = $taskManager;
+        $this->commentManager = $commentManager;
+        $this->rendererInterface = $rendererInterface;
     }
 
     /**
@@ -46,11 +45,11 @@ class TaskController extends AbstractActionController
      */
     public function indexAction()
     {
-        $tasks = $this->entityManager->getRepository(Task::class)
+        $comments = $this->entityManager->getRepository(Comment::class)
             ->findBy([], ['id'=>'ASC']);
 
         return new ViewModel([
-            'tasks' => $tasks
+            'tasks' => $comments
         ]);
     }
 
@@ -59,8 +58,10 @@ class TaskController extends AbstractActionController
      */
     public function addAction()
     {
+        $response = $this->getResponse();
+
         // Create user form
-        $form = new TaskForm('create', $this->entityManager, null, $this->taskManager);
+        $form = new CommentForm('create', $this->entityManager, null, null);
 
         // Check if user has submitted the form
         if ($this->getRequest()->isPost()) {
@@ -76,67 +77,48 @@ class TaskController extends AbstractActionController
                 // Get filtered and validated data
                 $data = $form->getData();
 
-                $project = null;
-
-                if($projectId = $this->getRequest()->getPost('project_id')){
-                    $project = $this->entityManager->getRepository(Project::class)
-                        ->find($projectId);
+                $task = null;
+                if($taskId = $this->getRequest()->getPost('task_id')){
+                    $task = $this->entityManager->getRepository(Task::class)
+                        ->find($taskId);
                 }
 
-                // Add user.
-                $task = $this->taskManager->addTask($data, $project);
+                // Add comment.
+                try {
+                    $comment = $this->commentManager->addComment($data, $task);
 
-                $this->flashMessenger()->addMessage('Task has been successfully created', 'success');
+                    $viewModel = new ViewModel(
+                        ['comment' => $comment]
+                    );
+                    $viewModel->setTemplate('comment');
+                    $renderer = $this->rendererInterface;
+                    $html = $renderer->render($viewModel);
 
-                // Redirect to "view" page
-                return $this->redirect()->toRoute('tasks',
-                    ['action'=>'view', 'id'=>$task->getId()]);
+                    //todo: russian translation should be here but json can't encode russian characters.
+                    $response->setContent(\Zend\Json\Json::encode(
+                        array(
+                            'response' => true,
+                            'message' => 'Your comment has been successfully added',
+                            'comment_html' => $html
+                        )
+                    ));
+                }catch (\Exception $e){
+                    $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => $e->getMessage())));
+                }
+
+            }else{
+                $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Invalid data. Please try again')));
             }
+        }else{
+            $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Invalid request. Please try again')));
         }
 
-        return new ViewModel([
-            'form' => $form,
-            'projectId' => $this->getRequest()->getQuery('project')
-        ]);
+        return $response;
     }
 
-    /**
-     * The "view" action displays a page allowing to view user's details.
-     */
-    public function viewAction()
-    {
-//        $this->flashMessenger()->addMessage('Task has been successfully created', 'success');
-
-        $id = (int)$this->params()->fromRoute('id', -1);
-        if ($id<1) {
-            $this->getResponse()->setStatusCode(404);
-            return;
-        }
-
-        $commentForm = new CommentForm('create', $this->entityManager, $id);
-
-        // Find a user with such ID.
-        $task = $this->entityManager->getRepository(Task::class)
-            ->find($id);
-
-        // Find all task comments
-        $comments = $this->entityManager->getRepository(Comment::class)
-            ->findByTaskId($id);
-
-        if ($task == null) {
-            $this->getResponse()->setStatusCode(404);
-            return;
-        }
 
 
-        return new ViewModel([
-            'commentForm' => $commentForm,
-            'task' => $task,
-            'project' => $task->getProject(),
-            'comments' => $comments,
-            'status' => $this->taskManager->getStatusAsString($task->getStatus())
-        ]);
-    }
+
 
     /**
      * The "edit" action displays a page allowing to edit user.

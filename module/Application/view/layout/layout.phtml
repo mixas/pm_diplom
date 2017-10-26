@@ -21,6 +21,7 @@
         <?= $this->headScript()
             ->prependFile($this->basePath('js/bootstrap.min.js'))
             ->prependFile($this->basePath('js/jquery-3.1.0.min.js'))
+            ->prependFile($this->basePath('js/project-helper.js'))
         ?>
     </head>
     <body>
@@ -54,13 +55,22 @@
             </div>
             <div class="row">
                 <div class="col-md-12">
+                    <!-- Notifications -->
+                    <div class="application-messages-wrapper" id="application-messages-wrapper">
+<!--                    <div class="alert alert-success">-->
+                        <?= $this->flashMessenger()->render('error', ['alert', 'alert-warning']); ?>
+                        <?= $this->flashMessenger()->render('success', ['alert', 'alert-success', 'fade', 'in', 'alert-dismissable']); ?>
+                        <?= $this->flashMessenger()->render('info', ['alert', 'alert-info']); ?>
+<!--                        <strong>Success!</strong> Indicates a successful or positive action.-->
+<!--                    </div>-->
+                    </div>
                     <!-- Page content placeholder -->
                     <?= $this->content; ?>
                 </div>
             </div>
             <hr>
             <footer>
-                <p>&copy; 2005 - <?= date('Y') ?> by Your Company. All rights reserved.</p>
+                <p>&copy; <?= date('Y') ?> by Your Company. All rights reserved.</p>
             </footer>
         </div>
         <?= $this->inlineScript() ?>

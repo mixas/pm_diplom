@@ -17,6 +17,7 @@ return [
             Controller\ProjectController::class => Controller\Factory\ProjectControllerFactory::class,
             Controller\TaskController::class => Controller\Factory\TaskControllerFactory::class,
             Controller\TaskStatusController::class => Controller\Factory\TaskStatusControllerFactory::class,
+            Controller\CommentController::class => Controller\Factory\CommentControllerFactory::class,
         ],
     ],
 
@@ -46,6 +47,20 @@ return [
                     ],
                     'defaults' => [
                         'controller'    => Controller\TaskController::class,
+                        'action'        => 'index',
+                    ],
+                ],
+            ],
+            'comments' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/comments[/:action[/:id]]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[a-zA-Z0-9_-]*',
+                    ],
+                    'defaults' => [
+                        'controller'    => Controller\CommentController::class,
                         'action'        => 'index',
                     ],
                 ],
@@ -97,6 +112,9 @@ return [
         'template_path_stack' => [
             'test' => __DIR__ . '/../view',
         ],
+        'template_map' => [
+            'comment' => __DIR__ . '/../view/project/task/comment.phtml',
+        ]
     ],
 
     'service_manager' => [
@@ -104,7 +122,7 @@ return [
             Service\ProjectManager::class => Service\Factory\ProjectManagerFactory::class,
             Service\TaskManager::class => Service\Factory\TaskManagerFactory::class,
             Service\TaskStatusManager::class => Service\Factory\TaskStatusManagerFactory::class,
-            'Project\Entity\Task' => 'Project\Entity\Factory\TaskFactory',
+            Service\CommentManager::class => Service\Factory\CommentManagerFactory::class,
         ],
     ],
     'entity_manager' => [

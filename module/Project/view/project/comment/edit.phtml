@@ -1,0 +1,75 @@
+<?php
+
+$this->headTitle('Edit Task');
+
+$this->mainMenu()->setActiveItemId('tasks');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Manage Tasks' => $this->url('tasks'),
+    'Edit Task' => $this->url('tasks', ['action' => 'edit', 'id' => $task->getId()])
+]);
+
+$form->get('task_title')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => 'Title'
+]);
+
+$form->get('description')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => 'Description'
+]);
+
+$form->get('status')->setAttributes([
+    'class' => 'form-control'
+]);
+
+$form->get('estimate')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => 'Estimate'
+]);
+
+
+$form->get('submit')
+    ->setAttributes(['class' => 'btn btn-primary'])
+    ->setValue('Save');
+
+$form->prepare();
+?>
+
+<h1>Edit Task <?= $this->escapeHtml($task->getTaskTitle()) ?></h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <?= $this->form()->openTag($form); ?>
+
+        <div class="form-group">
+            <?= $this->formLabel($form->get('task_title')); ?>
+            <?= $this->formElement($form->get('task_title')); ?>
+            <?= $this->formElementErrors($form->get('task_title')); ?>
+        </div>
+
+        <div class="form-group">
+            <?= $this->formLabel($form->get('description')); ?>
+            <?= $this->formElement($form->get('description')); ?>
+            <?= $this->formElementErrors($form->get('description')); ?>
+        </div>
+
+        <div class="form-group">
+            <?= $this->formLabel($form->get('status')); ?>
+            <?= $this->formElement($form->get('status')); ?>
+            <?= $this->formElementErrors($form->get('status')); ?>
+        </div>
+
+        <div class="form-group">
+            <?= $this->formLabel($form->get('estimate')); ?>
+            <?= $this->formElement($form->get('estimate')); ?>
+            <?= $this->formElementErrors($form->get('estimate')); ?>
+        </div>
+
+        <?= $this->formElement($form->get('submit')); ?>
+
+        <?= $this->form()->closeTag(); ?>
+    </div>
+</div>   
+

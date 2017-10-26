@@ -1,0 +1,84 @@
+<?php
+
+$this->headTitle('Add Task');
+
+$this->mainMenu()->setActiveItemId('projects');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home'=>$this->url('home'),
+    'Manage Projects'=>$this->url('tasks'),
+    'Add Project'=>$this->url('tasks', ['action'=>'add'])
+]);
+
+$form->get('task_title')->setAttributes([
+    'class'=>'form-control', 
+    'placeholder'=>'Title'
+]);
+
+$form->get('description')->setAttributes([
+    'class'=>'form-control',
+    'placeholder'=>'Description'
+]);
+
+$form->get('status')->setAttributes([
+    'class'=>'form-control'
+]);
+
+$form->get('project_id')->setAttributes([
+    'value' => $projectId,
+    'id' => 'project_id'
+]);
+
+$form->get('estimate')->setAttributes([
+    'class'=>'form-control',
+    'placeholder'=>'Task estimate'
+]);
+
+$form->get('submit')->setAttributes(['class'=>'btn btn-primary']);
+
+$form->prepare();
+?>
+
+<h1>Add Task</h1>
+
+<p>
+    Please fill out the following form and click the <i>Create</i> button.
+</p>
+
+<div class="row">
+    <div class="col-md-6">
+        <?= $this->form()->openTag($form); ?>
+        
+        <?= $this->formElement($form->get('project_id')); ?>
+<!--        <input type="hidden" name="project_id" value="--><?//= $projectId; ?><!--">-->
+
+        <div class="form-group">
+            <?= $this->formLabel($form->get('task_title')); ?>
+            <?= $this->formElement($form->get('task_title')); ?>
+            <?= $this->formElementErrors($form->get('task_title')); ?>
+        </div>
+
+        <div class="form-group">
+            <?= $this->formLabel($form->get('description')); ?>
+            <?= $this->formElement($form->get('description')); ?>
+            <?= $this->formElementErrors($form->get('description')); ?>
+        </div>
+
+        <div class="form-group">
+            <?= $this->formLabel($form->get('status')); ?>
+            <?= $this->formElement($form->get('status')); ?>
+            <?= $this->formElementErrors($form->get('status')); ?>                  
+        </div>
+
+        <div class="form-group">
+            <?= $this->formLabel($form->get('estimate')); ?>
+            <?= $this->formElement($form->get('estimate')); ?>
+            <?= $this->formElementErrors($form->get('estimate')); ?>
+        </div>
+
+        <?= $this->formElement($form->get('submit')); ?>
+        
+        <?= $this->form()->closeTag(); ?>
+    </div>    
+</div>   
+
