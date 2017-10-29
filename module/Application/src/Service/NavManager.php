@@ -40,24 +40,25 @@ class NavManager
      */
     public function getMenuItems() 
     {
+        $url = $this->urlHelper;
         $items = [];
         
         $items[] = [
             'id' => 'home',
             'label' => 'Home',
-            'link'  => $this->urlHelper('home')
+            'link'  => $url('home')
         ];
         
         $items[] = [
             'id' => 'about',
             'label' => 'About',
-            'link'  => $this->urlHelper('about')
+            'link'  => $url('about')
         ];
 
         $items[] = [
             'id' => 'projects',
             'label' => 'Projects',
-            'link'  => $this->urlHelper('projects')
+            'link'  => $url('projects')
         ];
 
         $items[] = [
@@ -68,12 +69,12 @@ class NavManager
                 [
                     'id' => 'tasks',
                     'label' => 'Assigned tasks',
-                    'link' => $this->urlHelper('tasks')
+                    'link' => $url('tasks')
                 ],
                 [
                     'id' => 'statuses',
                     'label' => 'Manage statuses',
-                    'link' => $this->urlHelper('statuses')
+                    'link' => $url('statuses')
                 ],
             ]
         ];
@@ -84,7 +85,7 @@ class NavManager
             $items[] = [
                 'id' => 'login',
                 'label' => 'Sign in',
-                'link'  => $this->urlHelper('login'),
+                'link'  => $url('login'),
                 'float' => 'right'
             ];
         } else {
@@ -96,7 +97,7 @@ class NavManager
                 $adminDropdownItems[] = [
                             'id' => 'users',
                             'label' => 'Manage Users',
-                            'link' => $this->urlHelper('users')
+                            'link' => $url('users')
                         ];
             }
 
@@ -104,7 +105,7 @@ class NavManager
                 $adminDropdownItems[] = [
                             'id' => 'permissions',
                             'label' => 'Manage Permissions',
-                            'link' => $this->urlHelper('permissions')
+                            'link' => $url('permissions')
                         ];
             }
 
@@ -112,7 +113,7 @@ class NavManager
                 $adminDropdownItems[] = [
                             'id' => 'roles',
                             'label' => 'Manage Roles',
-                            'link' => $this->urlHelper('roles')
+                            'link' => $url('roles')
                         ];
             }
 
@@ -132,12 +133,12 @@ class NavManager
                     [
                         'id' => 'settings',
                         'label' => 'Settings',
-                        'link' => $this->urlHelper('application', ['action'=>'settings'])
+                        'link' => $url('application', ['action'=>'settings'])
                     ],
                     [
                         'id' => 'logout',
                         'label' => 'Sign out',
-                        'link' => $this->urlHelper('logout')
+                        'link' => $url('logout')
                     ],
                 ]
             ];
