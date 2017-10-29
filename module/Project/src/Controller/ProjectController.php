@@ -140,6 +140,12 @@ class ProjectController extends AbstractActionController
             return;
         }
 
+
+        if (!$this->access('projects.manage.all') &&
+            !$this->access('project.manage.own', ['project' => $project])) {
+            return $this->redirect()->toRoute('not-authorized');
+        }
+
         // Create project form
         $form = new ProjectForm('update', $this->entityManager, $project);
 

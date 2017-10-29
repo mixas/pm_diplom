@@ -13,10 +13,6 @@ $this->pageBreadcrumbs()->setItems([
 
 <h1>View Role</h1>
 
-<?= $this->flashMessenger()->render('error', ['alert', 'alert-warning']); ?>
-<?= $this->flashMessenger()->render('success', ['alert', 'alert-success']); ?>
-<?= $this->flashMessenger()->render('info', ['alert', 'alert-info']); ?>
-
 <p>
 <a class="btn btn-default" href="<?= $this->url('roles', 
                     ['action'=>'edit', 'id'=>$role->getId()]); ?>">

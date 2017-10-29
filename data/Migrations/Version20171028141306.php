@@ -80,6 +80,7 @@ class Version20171028141306 extends AbstractMigration
         $schema->dropTable('user_role');
         $schema->dropTable('role_permission');
         $schema->dropTable('permission');
+        $schema->dropTable('role_hierarchy');
         $schema->dropTable('role');
 
     }

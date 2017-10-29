@@ -2,8 +2,6 @@
 
 namespace Project;
 
-use Zend\Db\ResultSet\ResultSet;
-use Zend\Db\TableGateway\TableGateway;
 
 use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
@@ -21,6 +19,36 @@ return [
         ],
     ],
 
+    // The 'access_filter' key is used by the User module to restrict or permit
+    // access to certain controller actions for unauthorized visitors.
+    'access_filter' => [
+        'options' => [
+            // The access filter can work in 'restrictive' (recommended) or 'permissive'
+            // mode. In restrictive mode all controller actions must be explicitly listed
+            // under the 'access_filter' config key, and access is denied to any not listed
+            // action for not logged in users. In permissive mode, if an action is not listed
+            // under the 'access_filter' key, access to it is permitted to anyone (even for
+            // not logged in users. Restrictive mode is more secure and recommended to use.
+            'mode' => 'restrictive'
+        ],
+        'controllers' => [
+            Controller\ProjectController::class => [
+                ['actions' => ['index', 'view', 'edit', 'add'], 'allow' => '+projects.view'],
+//                ['actions' => ['edit', 'add'], 'allow' => '+projects.manage.all']
+            ],
+            Controller\TaskController::class => [
+                ['actions' => ['index', 'view'], 'allow' => '+projects.view'],
+//                ['actions' => ['edit', 'add'], 'allow' => '+projects.manage.all']
+            ],
+        ]
+    ],
+
+    // This key stores configuration for RBAC manager.
+    'rbac_manager' => [
+        'assertions' => [Service\RbacProjectAssertionManager::class],
+    ],
+
+    // This key stores configuration for RBAC manager.
     'router' => [
         'routes' => [
             'projects' => [
@@ -123,6 +151,8 @@ return [
             Service\TaskManager::class => Service\Factory\TaskManagerFactory::class,
             Service\TaskStatusManager::class => Service\Factory\TaskStatusManagerFactory::class,
             Service\CommentManager::class => Service\Factory\CommentManagerFactory::class,
+            Service\RbacProjectAssertionManager::class => Service\Factory\RbacProjectAssertionManagerFactory::class,
+            Service\RbacManager::class => Service\Factory\RbacManagerFactory::class,
         ],
     ],
     'entity_manager' => [

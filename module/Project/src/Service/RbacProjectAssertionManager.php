@@ -1,13 +1,14 @@
 <?php
-namespace Application\Service;
+namespace Project\Service;
 
 use Zend\Permissions\Rbac\Rbac;
 use User\Entity\User;
+use Project\Entity\Project;
 
 /**
  * This service is used for invoking user-defined RBAC dynamic assertions.
  */
-class RbacAssertionManager
+class RbacProjectAssertionManager
 {
     /**
      * Entity manager.
@@ -35,12 +36,20 @@ class RbacAssertionManager
      */
     public function assert(Rbac $rbac, $permission, $params)
     {
+        uniqid();
         $currentUser = $this->entityManager->getRepository(User::class)
                 ->findOneByEmail($this->authService->getIdentity());
 
-        //check profile view permissions
-        if ($permission=='profile.own.view' && $params['user']->getId() == $currentUser->getId())
-            return true;
+        //check project manage permissions
+        if($permission=='project.manage.own') {
+            $userProjects = $currentUser->getProjects();
+            $userProjects->initialize();
+            foreach ($userProjects as $project) {
+                if ($project->getId() == $params['project']->getId()) {
+                    return true;
+                }
+            }
+        }
 
         return false;
     }

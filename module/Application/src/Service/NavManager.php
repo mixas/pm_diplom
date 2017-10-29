@@ -42,42 +42,53 @@ class NavManager
     {
         $url = $this->urlHelper;
         $items = [];
-        
+
         $items[] = [
             'id' => 'home',
             'label' => 'Home',
             'link'  => $url('home')
         ];
-        
+
         $items[] = [
             'id' => 'about',
             'label' => 'About',
             'link'  => $url('about')
         ];
 
-        $items[] = [
-            'id' => 'projects',
-            'label' => 'Projects',
-            'link'  => $url('projects')
-        ];
+        if ($this->rbacManager->isGranted(null, 'projects.view')) {
+            $items[] = [
+                'id' => 'projects',
+                'label' => 'Projects',
+                'link' => $url('projects')
+            ];
+        }
 
-        $items[] = [
-            'id' => 'tasks_menu',
-            'label' => 'Tasks',
-            'float' => 'left',
-            'dropdown' => [
-                [
-                    'id' => 'tasks',
-                    'label' => 'Assigned tasks',
-                    'link' => $url('tasks')
-                ],
-                [
-                    'id' => 'statuses',
-                    'label' => 'Manage statuses',
-                    'link' => $url('statuses')
-                ],
-            ]
-        ];
+
+        $manageTaskStatuses = [];
+
+        if ($this->rbacManager->isGranted(null, 'status.manage')) {
+            $manageTaskStatuses = [
+                'id' => 'statuses',
+                'label' => 'Manage statuses',
+                'link' => $url('statuses')
+            ];
+        }
+
+        if ($this->rbacManager->isGranted(null, 'projects.view')) {
+            $items[] = [
+                'id' => 'tasks_menu',
+                'label' => 'Tasks',
+                'float' => 'left',
+                'dropdown' => [
+                    [
+                        'id' => 'tasks',
+                        'label' => 'Assigned tasks',
+                        'link' => $url('tasks')
+                    ],
+                    $manageTaskStatuses
+                ]
+            ];
+        }
 
         // Display "Login" menu item for not authorized user only. On the other hand,
         // display "Admin" and "Logout" menu items only for authorized users.
@@ -89,7 +100,7 @@ class NavManager
                 'float' => 'right'
             ];
         } else {
-            
+
             // Determine which items must be displayed in Admin dropdown.
             $adminDropdownItems = [];
 
@@ -124,7 +135,7 @@ class NavManager
                     'dropdown' => $adminDropdownItems
                 ];
             }
-            
+
             $items[] = [
                 'id' => 'logout',
                 'label' => $this->authService->getIdentity(),

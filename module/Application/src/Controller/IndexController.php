@@ -39,8 +39,8 @@ class IndexController extends AbstractActionController
      */
     public function aboutAction() 
     {              
-        $appName = 'User Demo';
-        $appDescription = 'This demo shows how to implement user management with Zend Framework 3';
+        $appName = 'Role Demo';
+        $appDescription = 'This demo shows how to implement role-based access control with Zend Framework 3';
         
         // Return variables to view script with the help of
         // ViewObject variable container
@@ -55,11 +55,23 @@ class IndexController extends AbstractActionController
      */
     public function settingsAction()
     {
-        $user = $this->entityManager->getRepository(User::class)
-                ->findOneByEmail($this->identity());
+        $id = $this->params()->fromRoute('id');
+        
+        if ($id!=null) {
+            $user = $this->entityManager->getRepository(User::class)
+                    ->find($id);
+        } else {
+            $user = $this->currentUser();
+        }
         
         if ($user==null) {
-            throw new \Exception('Not found user with such email');
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+        //!$this->access('profile.any.view') &&
+        if (
+            !$this->access('profile.own.view', ['user'=>$user])) {
+            return $this->redirect()->toRoute('not-authorized');
         }
         
         return new ViewModel([

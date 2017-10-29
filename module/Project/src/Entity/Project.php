@@ -19,9 +19,20 @@ class Project
      */
     protected $tasks;
 
+    /**
+     * @ORM\ManyToMany(targetEntity="User\Entity\User")
+     * @ORM\JoinTable(name="user_project",
+     *      joinColumns={@ORM\JoinColumn(name="project_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     *      )
+     */
+    private $users;
+
+
     public function __construct()
     {
         $this->tasks = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     /**
@@ -218,6 +229,15 @@ class Project
     {
         $this->dateCreated = $dateCreated;
         return $this;
+    }
+
+    /**
+     * Returns the array of users allowed to this projects.
+     * @return array
+     */
+    public function getUsers()
+    {
+        return $this->users;
     }
 
 }

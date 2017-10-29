@@ -65,6 +65,15 @@ class User
      *      )
      */
     private $roles;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="Project\Entity\Project")
+     * @ORM\JoinTable(name="user_project",
+     *      joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="project_id", referencedColumnName="id")}
+     *      )
+     */
+    private $projects;
     
     /**
      * Constructor.
@@ -72,6 +81,7 @@ class User
     public function __construct() 
     {
         $this->roles = new ArrayCollection();
+        $this->projects = new ArrayCollection();
     }
     
     /**
@@ -277,6 +287,23 @@ class User
     public function addRole($role)
     {
         $this->roles->add($role);
+    }
+
+    /**
+     * Returns the array of project allowed to this user.
+     * @return array
+     */
+    public function getProjects()
+    {
+        return $this->projects;
+    }
+
+    /**
+     * Assigns a project to user.
+     */
+    public function addProject($project)
+    {
+        $this->projects->add($project);
     }
 }
 
