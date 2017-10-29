@@ -33,6 +33,6 @@ class Version20171025182647 extends AbstractMigration
     public function down(Schema $schema)
     {
         // this down() migration is auto-generated, please modify it to your needs
-
+        $schema->dropTable('comment');
     }
 }

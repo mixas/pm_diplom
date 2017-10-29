@@ -11,6 +11,7 @@
  * This should be an array of module namespaces used in the application.
  */
 return [
+    'Zend\Serializer',
     'Zend\I18n',
     'Zend\Cache',
     'Zend\Paginator',

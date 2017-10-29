@@ -49,18 +49,18 @@ class Module
         $controller = $event->getTarget();
         $controllerName = $event->getRouteMatch()->getParam('controller', null);
         $actionName = $event->getRouteMatch()->getParam('action', null);
-        
+
         // Convert dash-style action name to camel-case.
         $actionName = str_replace('-', '', lcfirst(ucwords($actionName, '-')));
-        
+
         // Get the instance of AuthManager service.
         $authManager = $event->getApplication()->getServiceManager()->get(AuthManager::class);
-        
+
         // Execute the access filter on every controller except AuthController
         // (to avoid infinite redirect).
-        if ($controllerName!=AuthController::class && 
+        if ($controllerName!=AuthController::class &&
             !$authManager->filterAccess($controllerName, $actionName)) {
-            
+
             // Remember the URL of the page the user tried to access. We will
             // redirect the user to that URL after successful login.
             $uri = $event->getApplication()->getRequest()->getUri();
@@ -71,10 +71,10 @@ class Module
                 ->setPort(null)
                 ->setUserInfo(null);
             $redirectUrl = $uri->toString();
-            
+
             // Redirect the user to the "Login" page.
-            return $controller->redirect()->toRoute('login', [], 
-                    ['query'=>['redirectUrl'=>$redirectUrl]]);
+            return $controller->redirect()->toRoute('login', [],
+                ['query'=>['redirectUrl'=>$redirectUrl]]);
         }
     }
 }

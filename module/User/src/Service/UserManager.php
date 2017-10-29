@@ -2,6 +2,7 @@
 namespace User\Service;
 
 use User\Entity\User;
+use User\Entity\Role;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Math\Rand;
 
@@ -18,11 +19,25 @@ class UserManager
     private $entityManager;  
     
     /**
+     * Role manager.
+     * @var User\Service\RoleManager
+     */
+    private $roleManager;
+    
+    /**
+     * Permission manager.
+     * @var User\Service\PermissionManager
+     */
+    private $permissionManager;
+    
+    /**
      * Constructs the service.
      */
-    public function __construct($entityManager) 
+    public function __construct($entityManager, $roleManager, $permissionManager) 
     {
         $this->entityManager = $entityManager;
+        $this->roleManager = $roleManager;
+        $this->permissionManager = $permissionManager;
     }
     
     /**
@@ -49,10 +64,13 @@ class UserManager
         
         $currentDate = date('Y-m-d H:i:s');
         $user->setDateCreated($currentDate);        
-                
+        
+        // Assign roles to user.
+        $this->assignRoles($user, $data['roles']);        
+        
         // Add the entity to the entity manager.
         $this->entityManager->persist($user);
-        
+                       
         // Apply changes to database.
         $this->entityManager->flush();
         
@@ -71,12 +89,35 @@ class UserManager
         
         $user->setEmail($data['email']);
         $user->setFullName($data['full_name']);        
-        $user->setStatus($data['status']);        
+        $user->setStatus($data['status']); 
+        
+        // Assign roles to user.
+        $this->assignRoles($user, $data['roles']);
         
         // Apply changes to database.
         $this->entityManager->flush();
 
         return true;
+    }
+    
+    /**
+     * A helper method which assigns new roles to the user.
+     */
+    private function assignRoles($user, $roleIds)
+    {
+        // Remove old user role(s).
+        $user->getRoles()->clear();
+        
+        // Assign new role(s).
+        foreach ($roleIds as $roleId) {
+            $role = $this->entityManager->getRepository(Role::class)
+                    ->find($roleId);
+            if ($role==null) {
+                throw new \Exception('Not found role by ID');
+            }
+            
+            $user->addRole($role);
+        }
     }
     
     /**
@@ -87,6 +128,10 @@ class UserManager
     {
         $user = $this->entityManager->getRepository(User::class)->findOneBy([]);
         if ($user==null) {
+            
+            $this->permissionManager->createDefaultPermissionsIfNotExist();
+            $this->roleManager->createDefaultRolesIfNotExist();
+            
             $user = new User();
             $user->setEmail('admin@example.com');
             $user->setFullName('Admin');
@@ -95,6 +140,15 @@ class UserManager
             $user->setPassword($passwordHash);
             $user->setStatus(User::STATUS_ACTIVE);
             $user->setDateCreated(date('Y-m-d H:i:s'));
+            
+            // Assign user Administrator role
+            $adminRole = $this->entityManager->getRepository(Role::class)
+                    ->findOneByName('Administrator');
+            if ($adminRole==null) {
+                throw new \Exception('Administrator role doesn\'t exist');
+            }
+
+            $user->getRoles()->add($adminRole);
             
             $this->entityManager->persist($user);
             $this->entityManager->flush();
@@ -192,7 +246,7 @@ class UserManager
         $user = $this->entityManager->getRepository(User::class)
                 ->findOneByPasswordResetToken($passwordResetToken);
         
-        if ($user==null) {
+        if ($user===null) {
             return false;
         }
                 
