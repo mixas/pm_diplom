@@ -41,7 +41,7 @@ class RbacProjectAssertionManager
                 ->findOneByEmail($this->authService->getIdentity());
 
         //check project manage permissions
-        if($permission=='project.manage.own') {
+        if($permission=='projects.manage.own') {
             $userProjects = $currentUser->getProjects();
             $userProjects->initialize();
             foreach ($userProjects as $project) {

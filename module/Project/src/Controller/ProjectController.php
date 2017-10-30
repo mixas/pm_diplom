@@ -152,7 +152,7 @@ class ProjectController extends AbstractActionController
 
 
         if (!$this->access('projects.manage.all') &&
-            !$this->access('project.manage.own', ['project' => $project])) {
+            !$this->access('projects.manage.own', ['project' => $project])) {
             return $this->redirect()->toRoute('not-authorized');
         }
 
