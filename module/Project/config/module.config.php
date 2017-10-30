@@ -31,14 +31,21 @@ return [
             // not logged in users. Restrictive mode is more secure and recommended to use.
             'mode' => 'restrictive'
         ],
+        //TODO:: We should add dynamic assertions for editPermissions action
         'controllers' => [
             Controller\ProjectController::class => [
                 ['actions' => ['index', 'view', 'edit', 'add'], 'allow' => '+projects.view'],
-//                ['actions' => ['edit', 'add'], 'allow' => '+projects.manage.all']
+                ['actions' => ['assignUsers'], 'allow' => '+projects.assign.users.all']
             ],
             Controller\TaskController::class => [
-                ['actions' => ['index', 'view'], 'allow' => '+projects.view'],
+                ['actions' => ['index', 'view', 'edit', 'add'], 'allow' => '+projects.view'],
 //                ['actions' => ['edit', 'add'], 'allow' => '+projects.manage.all']
+            ],
+            Controller\TaskStatusController::class => [
+                ['actions' => ['index', 'view', 'edit', 'add'], 'allow' => '+status.manage'],
+            ],
+            Controller\CommentController::class => [
+                ['actions' => ['index', 'edit', 'add'], 'allow' => '+projects.view'],
             ],
         ]
     ],

@@ -5,10 +5,14 @@ namespace Project\Controller;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Project\Entity\Project;
+use User\Entity\User;
 use Project\Entity\Task;
 use Project\Form\ProjectForm;
+use Project\Form\ProjectUsersAssignmentForm;
 //use User\Form\PasswordChangeForm;
 //use User\Form\PasswordResetForm;
+
+use Doctrine\Common\Collections\Criteria;
 
 /**
  * This controller is responsible for user management (adding, editing,
@@ -104,8 +108,13 @@ class ProjectController extends AbstractActionController
 
         //TODO: deal with proper way to get all tasks from particular project. Like $tasks = $project->getTasks();. but it doesn't work
         //TODO: !!!!!!!!
-        $tasks = $this->entityManager->getRepository(Task::class)
-            ->findByProjectId($id);
+
+        $tasks = $project->getTasks();
+        $tasks->initialize();
+
+
+        $assignedUsers = $project->getUsers();
+        $assignedUsers->initialize();
 
         //all project tasks
 //        $tasks = $project->getTasks();
@@ -118,6 +127,7 @@ class ProjectController extends AbstractActionController
         return new ViewModel([
             'project' => $project,
             'tasks' => $tasks,
+            'assignedUsers' => $assignedUsers,
         ]);
     }
 
@@ -183,6 +193,88 @@ class ProjectController extends AbstractActionController
             'project' => $project,
             'form' => $form
         ));
+    }
+
+    function assignUsersAction(){
+        $id = (int)$this->params()->fromRoute('id', -1);
+        if ($id<1) {
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+
+        $project = $this->entityManager->getRepository(Project::class)
+            ->find($id);
+
+        if ($project == null) {
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+
+        $allUsers = $this->entityManager->getRepository(User::class)
+            ->findBy([], ['email'=>'ASC']);
+
+//        $assignedUsers = $this->roleManager->getEffectivePermissions($project);
+        $assignedUsers = $project->getUsers();
+        $assignedUsers->initialize();
+
+        // Create form
+        $form = new ProjectUsersAssignmentForm($this->entityManager);
+        foreach ($allUsers as $user) {
+            $label = $user->getFullName();
+            $checked = false;
+//            $criteria = Criteria::create()->where(Criteria::expr()->in("id", [$user->getId()]));
+            //TODO: get $assigned users ids array and find current user in this array instead of foreach collection
+            foreach ($assignedUsers as $assignedUser) {
+                if($assignedUser->getId() == $user->getId()){
+                    $label .= ' (assigned)';
+                    $checked = 'checked';
+                    break;
+                }
+            }
+            $form->addUsersField($user->getId(), $label, $checked);
+        }
+
+        // Check if user has submitted the form
+        if ($this->getRequest()->isPost()) {
+
+            // Fill in the form with POST data
+            $data = $this->params()->fromPost();
+
+            $form->setData($data);
+
+            // Validate form
+            if($form->isValid()) {
+
+                // Get filtered and validated data
+                $data = $form->getData();
+
+                // Update permissions.
+                $this->projectManager->updateProjectUsers($project, $data);
+
+                // Add a flash message.
+                $this->flashMessenger()->addSuccessMessage('User were successfully assignment.');
+
+                // Redirect to "index" page
+                return $this->redirect()->toRoute('projects', ['action' => 'view', 'id' => $project->getId()]);
+            }
+        } else {
+
+            $data = [];
+            foreach ($assignedUsers as $name=>$inherited) {
+                $data['users'][$name] = 1;
+            }
+
+            $form->setData($data);
+        }
+
+        $errors = $form->getMessages();
+
+        return new ViewModel([
+            'form' => $form,
+            'project' => $project,
+            'allUsers' => $allUsers,
+            'assignedUsers' => $assignedUsers
+        ]);
     }
 
 }

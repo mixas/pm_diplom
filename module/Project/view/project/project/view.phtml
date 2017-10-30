@@ -52,7 +52,9 @@ $this->pageBreadcrumbs()->setItems([
     <?php endforeach; ?>
 <?php endif; ?>
 
-<button type="button" class="btn btn-default" onclick="addTask(<?= $project->getId(); ?>)">Add task</button>
+<button type="button" class="btn btn-default" onclick="addTask(<?= $project->getId(); ?>)">
+    <span class="glyphicon glyphicon-plus"></span> Add Task
+</button>
 
 <script type="text/javascript">
     function addTask(project){
@@ -62,4 +64,26 @@ $this->pageBreadcrumbs()->setItems([
         }
         document.location = '<?= $this->url('tasks', ['action'=>'add']); ?>'+params;
     }
+    function addUser(project){
+        var params = '';
+        if(typeof(project) != 'undefined'){
+            params = '?project=' + project;
+        }
+        document.location = '<?= $this->url('projects', ['action'=>'assignUsers', 'id' => $project->getId()]); ?>';
+    }
 </script>
+
+
+<h2>Assigned users:</h2>
+<?php if(count($assignedUsers)): ?>
+    <?php foreach ($assignedUsers as $user): ?>
+        <div class="user-wrapper">
+            <div class="user-name"><?= $user->getFullName(); ?></div>
+        </div>
+    <?php endforeach; ?>
+<?php endif; ?>
+
+<button type="button" class="btn btn-default" onclick="addUser(<?= $project->getId(); ?>)">
+    <span class="glyphicon glyphicon-plus"></span> Assign Users To Project
+</button>
+

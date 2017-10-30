@@ -4,6 +4,7 @@ namespace Project\Service;
 use Project\Entity\Project;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Math\Rand;
+use User\Entity\User;
 
 /**
  * This service is responsible for adding/editing projects
@@ -14,8 +15,14 @@ class ProjectManager
      * Doctrine entity manager.
      * @var Doctrine\ORM\EntityManager
      */
-    private $entityManager;  
-    
+    private $entityManager;
+
+    /**
+     * RBAC manager.
+     * @var User\Service\RbacManager
+     */
+    private $rbacManager;
+
     /**
      * Constructs the service.
      */
@@ -84,6 +91,36 @@ class ProjectManager
                 ->findOneByCode($code);
         
         return $project !== null;
+    }
+
+
+    /**
+     * Updates permissions of a role.
+     */
+    public function updateProjectUsers($project, $data)
+    {
+        // Remove old users.
+        $project->getUsers()->clear();
+
+        // Assign new permissions to role
+        foreach ($data['users'] as $userId => $isChecked) {
+            if (!$isChecked)
+                continue;
+
+            $user = $this->entityManager->getRepository(User::class)->find($userId);
+            if ($user == null) {
+                throw new \Exception('User with such id doesn\'t exist');
+            }
+
+            $project->getUsers()->add($user);
+        }
+
+        // Apply changes to database.
+        $this->entityManager->flush();
+
+        // Reload RBAC container.
+        //TODO: RBAC
+//        $this->rbacManager->init(true);
     }
 
 }
