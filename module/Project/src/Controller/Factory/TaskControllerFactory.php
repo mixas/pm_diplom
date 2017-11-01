@@ -17,8 +17,9 @@ class TaskControllerFactory implements FactoryInterface
     {
         $entityManager = $container->get('doctrine.entitymanager.orm_default');
         $taskManager = $container->get(TaskManager::class);
+        $authService = $container->get(\Zend\Authentication\AuthenticationService::class);
         
         // Instantiate the controller and inject dependencies
-        return new TaskController($entityManager, $taskManager);
+        return new TaskController($entityManager, $taskManager, $authService);
     }
 }

@@ -36,7 +36,6 @@ class RbacProjectAssertionManager
      */
     public function assert(Rbac $rbac, $permission, $params)
     {
-        uniqid();
         $currentUser = $this->entityManager->getRepository(User::class)
                 ->findOneByEmail($this->authService->getIdentity());
 

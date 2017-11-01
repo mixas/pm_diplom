@@ -7,6 +7,7 @@ use Zend\View\Model\ViewModel;
 use Project\Entity\Comment;
 use Project\Entity\Task;
 use Project\Entity\Project;
+use User\Entity\User;
 use Project\Service\TaskManager;
 use Project\Form\TaskForm;
 use Project\Form\CommentForm;
@@ -32,22 +33,31 @@ class TaskController extends AbstractActionController
     private $taskManager;
 
     /**
+     * Auth service.
+     * @var Zend\Authentication\AuthenticationService
+     */
+    private $authService;
+
+    /**
      * Constructor.
      */
-    public function __construct($entityManager, $taskManager)
+    public function __construct($entityManager, $taskManager, $authService)
     {
         $this->entityManager = $entityManager;
         $this->taskManager = $taskManager;
+        $this->authService = $authService;
     }
 
     /**
-     * This is the default "index" action of the controller. It displays the
-     * list of users.
+     * renders list of assigned to current user tasks.
      */
     public function indexAction()
     {
+        $currentUser = $this->entityManager->getRepository(User::class)
+            ->findOneByEmail($this->authService->getIdentity());
+
         $tasks = $this->entityManager->getRepository(Task::class)
-            ->findBy([], ['id'=>'ASC']);
+            ->findByAssignedUserId($currentUser->getId(), ['id'=>'ASC']);
 
         return new ViewModel([
             'tasks' => $tasks
