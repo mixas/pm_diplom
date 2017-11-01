@@ -49,42 +49,6 @@ class Task
 //        $project->addTask($this);
     }
 
-//    /**
-//     * @OneToOne(targetEntity="TaskStatus", inversedBy="task")
-//     * @JoinColumn(name="status_id", referencedColumnName="id")
-//     */
-//    protected $statusEntity;
-
-    /**
-     * Returns associated status
-     *
-     * @return \Project\Entity\TaskStatus
-     */
-//    public function getStatusEntity()
-//    {
-//        return $this->statusEntity;
-//    }
-
-    /**
-     * Sets status entity
-     *
-     * @param $statusEntity \Project\Entity\TaskStatus
-     * @return $this
-     */
-//    public function setStatusEntity($statusEntity)
-//    {
-//        $this->statusEntity = $statusEntity;
-//        return $this;
-//    }
-
-
-    // User status constants.
-//    const STATUS_TO_DO       = 1; // To do.
-//    const STATUS_IN_PROCESS      = 2; // In process.
-//    const STATUS_TO_BE_CHECKED      = 3; // To be checked.
-//    const STATUS_IN_QA      = 4; // In QA.
-//    const STATUS_CHECKED      = 5; // Checked by QA.
-//    const STATUS_DONE      = 6; // Done.
 
     /**
      * @ORM\Id
@@ -98,6 +62,48 @@ class Task
      * @ORM\GeneratedValue
      */
     protected $status;
+
+    /**
+     * @ORM\Column(name="priority")
+     * @ORM\GeneratedValue
+     */
+    protected $priority;
+
+    /**
+     * @return mixed
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param $priority
+     * @return $this
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = $priority;
+        return $this;
+    }
+
+    const PRIORITY_MINOR = 'minor';
+    const PRIORITY_CRITICAL = 'critical';
+
+    /**
+     * Returns possible priorities as array.
+     *
+     * @return array
+     */
+    public static function getPriorityList()
+    {
+        return [
+            self::PRIORITY_MINOR => 'Minor',
+            self::PRIORITY_CRITICAL => 'Critical'
+        ];
+    }
+
+
 
     /**
      * @ORM\Column(name="task_title")
@@ -123,15 +129,30 @@ class Task
      */
     protected $assignedUserId;
 
+
+    /**
+     * @ORM\OneToOne(targetEntity="\User\Entity\User", mappedBy="task")
+     * @ORM\JoinColumn(name="assigned_user_id", referencedColumnName="id")
+     */
+    protected $assignedUser;
+
+    public function getAssignedUser()
+    {
+        return $this->assignedUser;
+    }
+
+    public function setAssignedUser($assignedUser)
+    {
+        $this->assignedUser = $assignedUser;
+        return $this;
+    }
+
     /**
      * @ORM\Column(name="project_id")
      * @ORM\GeneratedValue
      */
     protected $projectId;
 
-    /**
-     * @return mixed
-     */
     public function getAssignedUserId()
     {
         return $this->assignedUserId;

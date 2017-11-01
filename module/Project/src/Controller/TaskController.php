@@ -55,10 +55,28 @@ class TaskController extends AbstractActionController
     }
 
     /**
-     * This action displays a page allowing to add a new user.
+     * This action displays a page allowing to add a new task.
      */
     public function addAction()
     {
+        $projectId = (int)$this->params()->fromRoute('id', -1);
+        if ($projectId < 1) {
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+        $project = $this->entityManager->getRepository(Project::class)
+            ->find($projectId);
+
+        if(!$project){
+            return $this->redirect()->toRoute('projects',
+                ['action' => 'view', 'id' => $projectId]);
+        }
+
+        if (!$this->access('projects.manage.all') &&
+            !$this->access('projects.manage.own', ['project' => $project])) {
+            return $this->redirect()->toRoute('not-authorized');
+        }
+
         // Create user form
         $form = new TaskForm('create', $this->entityManager, null, $this->taskManager);
 
@@ -75,13 +93,6 @@ class TaskController extends AbstractActionController
 
                 // Get filtered and validated data
                 $data = $form->getData();
-
-                $project = null;
-
-                if($projectId = $this->getRequest()->getPost('project_id')){
-                    $project = $this->entityManager->getRepository(Project::class)
-                        ->find($projectId);
-                }
 
                 // Add user.
                 $task = $this->taskManager->addTask($data, $project);
@@ -151,6 +162,12 @@ class TaskController extends AbstractActionController
 
         $task = $this->entityManager->getRepository(Task::class)
             ->find($id);
+
+        $project = $task->getProject();
+        if (!$this->access('projects.manage.all') &&
+            !$this->access('projects.manage.own', ['project' => $project])) {
+            return $this->redirect()->toRoute('not-authorized');
+        }
 
         if ($task == null) {
             $this->getResponse()->setStatusCode(404);

@@ -72,7 +72,7 @@ class CommentForm extends Form
             ]
         ]);
 
-        $taskId = $this->taskId;
+//        $taskId = $this->taskId;
 
         // Add the Submit button
         $this->add([
@@ -81,7 +81,7 @@ class CommentForm extends Form
             'attributes' => [
                 'value' => 'Add Comment',
                 'class' => 'btn btn-default',
-                'onclick' => "addComment($taskId)"
+                'onclick' => "addComment()"
             ],
         ]);
     }

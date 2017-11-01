@@ -29,6 +29,16 @@ $form->get('estimate')->setAttributes([
     'placeholder' => 'Estimate'
 ]);
 
+$form->get('priority')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => 'Priority'
+]);
+
+$form->get('assigned_user_id')->setAttributes([
+    'class' => 'form-control',
+    'placeholder' => 'Assigned user'
+]);
+
 
 $form->get('submit')
     ->setAttributes(['class' => 'btn btn-primary'])
@@ -65,6 +75,18 @@ $form->prepare();
             <?= $this->formLabel($form->get('estimate')); ?>
             <?= $this->formElement($form->get('estimate')); ?>
             <?= $this->formElementErrors($form->get('estimate')); ?>
+        </div>
+
+        <div class="form-group">
+            <?= $this->formLabel($form->get('priority')); ?>
+            <?= $this->formElement($form->get('priority')); ?>
+            <?= $this->formElementErrors($form->get('priority')); ?>
+        </div>
+
+        <div class="form-group">
+            <?= $this->formLabel($form->get('assigned_user_id')); ?>
+            <?= $this->formElement($form->get('assigned_user_id')); ?>
+            <?= $this->formElementErrors($form->get('assigned_user_id')); ?>
         </div>
 
         <?= $this->formElement($form->get('submit')); ?>

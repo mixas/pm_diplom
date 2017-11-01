@@ -83,12 +83,22 @@ class TaskForm extends Form
             ],
         ]);
 
-        // Add "password" field
         $this->add([
             'type' => 'text',
             'name' => 'estimate',
             'options' => [
                 'label' => 'Estimate',
+            ],
+        ]);
+
+        $priorities = $this->task->getPriorityList();
+        // Add "priorities" field
+        $this->add([
+            'type' => 'select',
+            'name' => 'priority',
+            'options' => [
+                'label' => 'Priority',
+                'value_options' => $priorities
             ],
         ]);
 
@@ -102,6 +112,18 @@ class TaskForm extends Form
             'options' => [
                 'label' => 'Status',
                 'value_options' => $statuses
+            ],
+        ]);
+
+
+        $users = $this->taskManager->getAllUsersList();
+
+        $this->add([
+            'type' => 'select',
+            'name' => 'assigned_user_id',
+            'options' => [
+                'label' => 'Assigned user',
+                'value_options' => $users
             ],
         ]);
 

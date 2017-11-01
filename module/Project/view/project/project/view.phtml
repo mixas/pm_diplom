@@ -52,7 +52,7 @@ $this->pageBreadcrumbs()->setItems([
     <?php endforeach; ?>
 <?php endif; ?>
 
-<button type="button" class="btn btn-default" onclick="addTask(<?= $project->getId(); ?>)">
+<button type="button" class="btn btn-default" onclick="addTask()">
     <span class="glyphicon glyphicon-plus"></span> Add Task
 </button>
 
@@ -62,7 +62,7 @@ $this->pageBreadcrumbs()->setItems([
         if(typeof(project) != 'undefined'){
             params = '?project=' + project;
         }
-        document.location = '<?= $this->url('tasks', ['action'=>'add']); ?>'+params;
+        document.location = '<?= $this->url('tasks', ['action' => 'add', 'id' => $project->getId()]); ?>';
     }
     function addUser(project){
         var params = '';

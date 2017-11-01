@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Project\Entity\Comment;
 use Project\Entity\Task;
+use Project\Entity\Project;
 use Project\Service\TaskManager;
 use Project\Form\CommentForm;
 //use User\Form\PasswordChangeForm;
@@ -60,6 +61,22 @@ class CommentController extends AbstractActionController
     {
         $response = $this->getResponse();
 
+        $taskId = (int)$this->params()->fromRoute('id', -1);
+        if ($taskId < 1) {
+            $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Task was not found')));
+            return $response;
+        }
+
+        $task = $this->entityManager->getRepository(Task::class)
+            ->find($taskId);
+
+        $project = $task->getProject();
+
+        if (!$this->access('projects.manage.all') &&
+            !$this->access('projects.manage.own', ['project' => $project])) {
+            return $this->redirect()->toRoute('not-authorized');
+        }
+
         // Create user form
         $form = new CommentForm('create', $this->entityManager, null, null);
 
@@ -76,12 +93,6 @@ class CommentController extends AbstractActionController
 
                 // Get filtered and validated data
                 $data = $form->getData();
-
-                $task = null;
-                if($taskId = $this->getRequest()->getPost('task_id')){
-                    $task = $this->entityManager->getRepository(Task::class)
-                        ->find($taskId);
-                }
 
                 // Add comment.
                 try {
@@ -115,10 +126,6 @@ class CommentController extends AbstractActionController
 
         return $response;
     }
-
-
-
-
 
     /**
      * The "edit" action displays a page allowing to edit user.

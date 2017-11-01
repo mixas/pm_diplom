@@ -60,6 +60,10 @@ class ProjectController extends AbstractActionController
      */
     public function addAction()
     {
+        if (!$this->access('projects.manage.all')) {
+            return $this->redirect()->toRoute('not-authorized');
+        }
+
         // Create user form
         $form = new ProjectForm('create', $this->entityManager);
 

@@ -4,6 +4,7 @@ namespace Project\Service;
 
 use Project\Entity\Task;
 use Project\Entity\TaskStatus;
+use User\Entity\User;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Math\Rand;
 
@@ -36,6 +37,8 @@ class TaskManager
         // Create new Task entity.
         $task = new Task();
         $task->setTaskTitle($data['task_title']);
+        $task->setEstimate($data['estimate']);
+        $task->setPriority($data['priority']);
         $task->setDescription($data['description']);
         $task->setStatus($data['status']);
         if($project){
@@ -60,6 +63,9 @@ class TaskManager
     {
         $task->setTaskTitle($data['task_title']);
         $task->setDescription($data['description']);
+        $task->setEstimate($data['estimate']);
+        $task->setPriority($data['priority']);
+        $task->setAssignedUserId($data['assigned_user_id']);
         $task->setStatus($data['status']);
         $currentDate = date('Y-m-d H:i:s');
         $task->setDateCreated($currentDate);
@@ -83,6 +89,22 @@ class TaskManager
             $taskStatuses[$status->getId()] = $status->getLabel();
         }
         return $taskStatuses;
+    }
+
+
+    /**
+     * Returns possible statuses from DB as array.
+     *
+     * @return array
+     */
+    public function getAllUsersList()
+    {
+        $allUsers = array();
+        $users = $this->entityManager->getRepository(User::class)->findAll();
+        foreach($users as $user){
+            $allUsers[$user->getId()] = $user->getFullName();
+        }
+        return $allUsers;
     }
 
     /**

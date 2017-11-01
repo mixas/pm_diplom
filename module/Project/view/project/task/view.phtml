@@ -17,6 +17,7 @@ $this->pageBreadcrumbs()->setItems([
 
 
 <h1>View Task</h1>
+<a href="<?php echo $this->url('tasks', ['action' => 'edit', 'id' => $task->getId()]); ?>">Edit</a>
 
 <div class="row">
     <div class="col-md-6">
@@ -51,13 +52,21 @@ $this->pageBreadcrumbs()->setItems([
                 <td>
                 <?= $this->escapeHtml($status) ?></th>
             </tr>
+            <tr>
+                <th>Priority:</th>
+                <td>
+                <?= $this->escapeHtml($task->getPriority()) ?></th>
+            </tr>
+            <tr>
+                <th>Assigned user:</th>
+                <td>
+                <?= $this->escapeHtml($task->getAssignedUser()->getFullName()) ?></th>
+            </tr>
         </table>
     </div>
 </div>
 
 <? if($comments): ?>
-
-
     <div class="comments-wrapper" id="comments-wrapper">
         <div class="comments-title"><strong>Comments</strong></div>
         <?php foreach ($comments as $comment): ?>
@@ -73,18 +82,13 @@ $this->pageBreadcrumbs()->setItems([
 </div>
 
 <script type="text/javascript">
-    function addComment(task){
-        var params = '';
-        if(typeof(task) != 'undefined'){
-            params = '?task=' + task;
-        }
+    function addComment(){
         var data = {};
         data.comment_text = $('#comment-text').val();
-        data.task_id = task;
         $.ajax({
             type:'POST',
             dataType: 'json',
-            url:'/comments/add/',
+            url:'/comments/add/<?php echo $task->getId(); ?>',
             data: data,
             success: function(data){
                 console.log(data);
