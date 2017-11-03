@@ -6,6 +6,7 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Project\Entity\Comment;
 use Project\Entity\Task;
+use User\Entity\User;
 use Project\Entity\Project;
 use Project\Service\TaskManager;
 use Project\Form\CommentForm;
@@ -30,14 +31,18 @@ class CommentController extends AbstractActionController
      */
     private $commentManager;
 
+
+    private $authService;
+
     /**
      * Constructor.
      */
-    public function __construct($entityManager, $commentManager, $rendererInterface)
+    public function __construct($entityManager, $commentManager, $rendererInterface, $authService)
     {
         $this->entityManager = $entityManager;
         $this->commentManager = $commentManager;
         $this->rendererInterface = $rendererInterface;
+        $this->authService = $authService;
     }
 
     /**
@@ -96,7 +101,10 @@ class CommentController extends AbstractActionController
 
                 // Add comment.
                 try {
-                    $comment = $this->commentManager->addComment($data, $task);
+                    $currentUser = $this->entityManager->getRepository(User::class)
+                        ->findOneByEmail($this->authService->getIdentity());
+
+                    $comment = $this->commentManager->addComment($data, $task, $currentUser);
 
                     $viewModel = new ViewModel(
                         ['comment' => $comment]
@@ -132,24 +140,16 @@ class CommentController extends AbstractActionController
      */
     public function editAction()
     {
-        $id = (int)$this->params()->fromRoute('id', -1);
-        if ($id<1) {
-            $this->getResponse()->setStatusCode(404);
-            return;
+        $response = $this->getResponse();
+
+        $commentId = (int)$this->params()->fromRoute('id', -1);
+        if ($commentId < 1) {
+            $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Comment was not found')));
+            return $response;
         }
 
-        $task = $this->entityManager->getRepository(Task::class)
-            ->find($id);
+        $form = new CommentForm('create', $this->entityManager, null, null);
 
-        if ($task == null) {
-            $this->getResponse()->setStatusCode(404);
-            return;
-        }
-
-        // Create task form
-        $form = new TaskForm('update', $this->entityManager, $task, $this->taskManager);
-
-        // Check if user has submitted the form
         if ($this->getRequest()->isPost()) {
 
             // Fill in the form with POST data
@@ -160,30 +160,52 @@ class CommentController extends AbstractActionController
             // Validate form
             if($form->isValid()) {
 
-                // Get filtered and validated data
-                $data = $form->getData();
+                try {
+                    // Get filtered and validated data
+                    $data = $form->getData();
 
-                // Update the user.
-                $this->taskManager->updateTask($task, $data);
+                    $comment = $this->entityManager->getRepository(Comment::class)
+                        ->find($commentId);
 
-                // Redirect to "view" page
-                return $this->redirect()->toRoute('tasks',
-                    ['action'=>'view', 'id'=>$task->getId()]);
+                    if (!$comment->getId()) {
+                        $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Comment was not found')));
+                        return $response;
+                    }
+
+                    if (!$this->access('comments.manage.own', ['comment' => $comment])) {
+                        $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'You are not allowed to manage this comment')));
+                        return $response;
+                    }
+
+                    // Update the user.
+                    $this->commentManager->updateComment($comment, $data);
+
+                    $viewModel = new ViewModel(
+                        ['comment' => $comment]
+                    );
+                    $viewModel->setTemplate('comment');
+                    $renderer = $this->rendererInterface;
+                    $html = $renderer->render($viewModel);
+
+                    //todo: russian translation should be here but json can't encode russian characters.
+                    $response->setContent(\Zend\Json\Json::encode(
+                        array(
+                            'response' => true,
+                            'message' => 'Your comment has been successfully updated',
+                            'comment_html' => $html
+                        )
+                    ));
+                }catch (\Exception $e){
+                    $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => $e->getMessage())));
+                }
+            }else{
+                $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Invalid data. Please try again.')));
             }
         } else {
-            $form->setData(array(
-                'assigned_user_id'=>$task->getAssignedUserId(),
-                'estimate'=>$task->getEstimate(),
-                'task_title'=>$task->getTaskTitle(),
-                'status'=>$task->getStatus(),
-                'description'=>$task->getDescription(),
-            ));
+            $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Invalid Request')));
         }
 
-        return new ViewModel(array(
-            'task' => $task,
-            'form' => $form
-        ));
+        return $response;
     }
 
 }

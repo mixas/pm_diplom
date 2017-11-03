@@ -140,9 +140,14 @@ class TaskController extends AbstractActionController
         $task = $this->entityManager->getRepository(Task::class)
             ->find($id);
 
-        // Find all task comments
-        $comments = $this->entityManager->getRepository(Comment::class)
-            ->findByTaskId($id);
+        $comments = $task->getComments();
+
+        $timeLogs = $task->getTimeLogs();
+        $spentTime = 0;
+        foreach ($timeLogs as $timeLog) {
+            $spentTime += $timeLog->getSpentTime();
+        }
+
 
         if ($task == null) {
             $this->getResponse()->setStatusCode(404);
@@ -155,6 +160,7 @@ class TaskController extends AbstractActionController
             'task' => $task,
             'project' => $task->getProject(),
             'comments' => $comments,
+            'spentTime' => $spentTime,
             'status' => $this->taskManager->getStatusAsString($task->getStatus())
         ]);
     }

@@ -31,13 +31,16 @@ class CommentManager
     /**
      * This method adds a new comment to DB.
      */
-    public function addComment($data, $task = null)
+    public function addComment($data, $task = null, $user = null)
     {
         // Create new Comment entity.
         $comment = new Comment();
         $comment->setCommentText($data['comment_text']);
         if($task){
             $comment->setTask($task);
+        }
+        if($user){
+            $comment->setUser($user);
         }
         $currentDate = date('Y-m-d H:i:s');
         $comment->setCreatedDate($currentDate);

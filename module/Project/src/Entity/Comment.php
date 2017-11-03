@@ -41,6 +41,32 @@ class Comment
         return $this;
     }
 
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User\Entity\User", inversedBy="comments")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     */
+    protected $user;
+
+    /**
+     * @return mixed
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param \User\Entity\User $user
+     * @return $this
+     */
+    public function setUser(\User\Entity\User $user)
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+
     /**
      * @ORM\Id
      * @ORM\Column(name="id")
@@ -158,6 +184,30 @@ class Comment
         return $this;
     }
 
+
+    /**
+     * @ORM\Column(name="user_id")
+     * @ORM\GeneratedValue
+     */
+    protected $userId;
+
+    /**
+     * @return mixed
+     */
+    public function getUserId()
+    {
+        return $this->userId;
+    }
+
+    /**
+     * @param $userId
+     * @return $this
+     */
+    public function setUserId($userId)
+    {
+        $this->userId = $userId;
+        return $this;
+    }
 
 }
 

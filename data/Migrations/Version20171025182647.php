@@ -23,7 +23,12 @@ class Version20171025182647 extends AbstractMigration
         $table->addColumn('comment_text', 'string', ['notnull'=>true]);
         $table->addColumn('created_date', 'datetime', ['notnull'=>true]);
         $table->addColumn('updated_date', 'datetime', ['notnull'=>false]);
+        $table->addColumn('user_id', 'integer', ['notnull'=>true]);
         $table->setPrimaryKey(['id']);
+        $table->addForeignKeyConstraint('user', ['user_id'], ['id'],
+            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'comment_user_id_fk');
+        $table->addForeignKeyConstraint('task', ['task_id'], ['id'],
+            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'comment_task_id_fk');
         $table->addOption('engine' , 'InnoDB');
     }
 

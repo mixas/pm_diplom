@@ -50,6 +50,64 @@ class Task
     }
 
 
+
+    /**
+     * @ORM\OneToMany(targetEntity="Comment", mappedBy="task")
+     */
+    protected $comments;
+
+    public function __construct()
+    {
+        $this->comments = new ArrayCollection();
+        $this->timeLogs = new ArrayCollection();
+    }
+    /**
+     * Возвращает таски проекта.
+     *
+     * @return array
+     */
+    public function getComments()
+    {
+        return $this->comments;
+    }
+
+    /**
+     * Adds a new task to this post.
+     *
+     * @param $comment
+     */
+    public function addComment($comment)
+    {
+        $this->comments[] = $comment;
+    }
+
+
+    /**
+     * @ORM\OneToMany(targetEntity="TimeLog", mappedBy="task")
+     */
+    protected $timeLogs;
+
+    /**
+     * Возвращает таски проекта.
+     *
+     * @return array
+     */
+    public function getTimeLogs()
+    {
+        return $this->timeLogs;
+    }
+
+    /**
+     * Adds a new task to this post.
+     *
+     * @param $timeLog
+     */
+    public function addTimeLog($timeLog)
+    {
+        $this->timeLogs[] = $timeLog;
+    }
+
+
     /**
      * @ORM\Id
      * @ORM\Column(name="id")

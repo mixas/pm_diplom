@@ -1,5 +1,16 @@
-<div class="comment-block">
-    <div class="comment-text"><?= $comment->getCommentText(); ?></div>
-    <div class="comment-created-date"><?= $comment->getCreatedDate(); ?></div>
-    <div class="comment-updated-date"><?= $comment->getUpdatedDate(); ?></div>
+<?php $user = $comment->getUser(); ?>
+<div class="comment-block" id="comment-block-<?= $comment->getId(); ?>">
+    <div class="comment-header">
+        <span class="comment-user-name"><strong><?= $user->getFullName(); ?></strong></span>
+        <span class="comment-label"> added a comment on </span>
+        <span class="comment-date"><?= date('d F Y', strtotime($comment->getCreatedDate())); ?></span>
+        <span class="comment-label"> at </span>
+        <span class="comment-time"><?= date('H:i:s', strtotime($comment->getCreatedDate())); ?></span>
+        <span class="edit-button comment-button" id="edit-button-<?= $comment->getId(); ?>" onclick="editComment(<?php echo $comment->getId(); ?>); return false;"><a href="#" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span></a></span>
+        <span class="cancel-edit-button comment-button" id="cancel-edit-button-<?= $comment->getId(); ?>" onclick="cancelEditComment(<?php echo $comment->getId(); ?>); return false;"><a href="#" class="btn btn-default"><span class="	glyphicon glyphicon-remove"></span></a></span>
+    </div>
+    <div class="comment-text" id="comment-text-<?= $comment->getId(); ?>"><?= $comment->getCommentText(); ?></div>
+    <textarea class="comment-textarea" id="comment-textarea-<?= $comment->getId(); ?>"><?= $comment->getCommentText(); ?></textarea>
+    <button onclick="editCommentPost(<?= $comment->getId(); ?>)" id="comment-save-button-<?= $comment->getId(); ?>" class="comment-save-button btn btn-default" type="button"><span class="glyphicon glyphicon-ok"></span> Save</button>
+    <div class="clearer"></div>
 </div>

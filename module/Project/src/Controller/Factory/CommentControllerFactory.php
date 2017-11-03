@@ -18,8 +18,9 @@ class CommentControllerFactory implements FactoryInterface
         $entityManager = $container->get('doctrine.entitymanager.orm_default');
         $commentManager = $container->get(CommentManager::class);
         $rendererInterface = $container->get('Zend\View\Renderer\RendererInterface');
+        $authService = $container->get(\Zend\Authentication\AuthenticationService::class);
 
         // Instantiate the controller and inject dependencies
-        return new CommentController($entityManager, $commentManager, $rendererInterface);
+        return new CommentController($entityManager, $commentManager, $rendererInterface, $authService);
     }
 }

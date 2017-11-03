@@ -76,7 +76,7 @@ class TaskForm extends Form
         ]);
 
         $this->add([
-            'type' => 'text',
+            'type' => 'textarea',
             'name' => 'description',
             'options' => [
                 'label' => 'Description',
@@ -91,7 +91,7 @@ class TaskForm extends Form
             ],
         ]);
 
-        $priorities = $this->task->getPriorityList();
+        $priorities = Task::getPriorityList();
         // Add "priorities" field
         $this->add([
             'type' => 'select',

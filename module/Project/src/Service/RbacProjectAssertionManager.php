@@ -50,6 +50,13 @@ class RbacProjectAssertionManager
             }
         }
 
+        //check comment manage permissions (only user who created comment is able to manage it)
+        if($permission=='comments.manage.own') {
+            if ($currentUser->getId() == $params['comment']->getUserId()) {
+                return true;
+            }
+        }
+
         return false;
     }
 }
