@@ -6,7 +6,7 @@ $this->mainMenu()->setActiveItemId('projects');
 $this->pageBreadcrumbs()->setItems([
     'Home'=>$this->url('home'),
     'Manage Projects'=>$this->url('projects'),
-    'View Project'=>$this->url('projects', ['action'=>'view', 'id'=>$project->getId()])
+    'View Project'=>$this->url('projects', ['action'=>'view', 'code' => $project->getCode()])
 ]);
 ?>
 
@@ -19,7 +19,7 @@ $this->pageBreadcrumbs()->setItems([
 </div>
 
 
-<div class="general-info-wrapper">
+<div class="general-info-wrapper general-info-wrapper-3">
     <dl class="general-info-attribute-block">
         <dt>Code:</dt>
         <dd><?= $this->escapeHtml($project->getCode()) ?></dd>
@@ -41,6 +41,22 @@ $this->pageBreadcrumbs()->setItems([
             <a target="_blank" href="<?= $this->url('users', ['action' => 'view', 'id' => $participant->getId()]); ?>"><?= $participant->getFullName(); ?><?= ($participantsCount != $i)?',':''; ?></a>
         <?php endforeach; ?>
     </dl>
+    <?php if($technicalAssignment): ?>
+        <dl class="general-info-attribute-block">
+            <dt>Deadline Date:</dt>
+            <dd><?= date('d F Y', strtotime($technicalAssignment->getDeadlineDate())) ?></dd>
+        </dl>
+        <dl class="general-info-attribute-block">
+            <dt>Technical Assignment:</dt>
+            <dd>
+                <a href="<?= $this->url('projects', ['action' => 'viewTechnicalAssignment', 'code' => $project->getCode()]); ?>">View</a></dd>
+        </dl>
+    <?php else: ?>
+        <dl class="general-info-attribute-block">
+            <dt>Technical Assignment:</dt>
+            <dd><a href="<?= $this->url('projects', ['action' => 'createTechnicalAssignment', 'code' => $project->getCode()]); ?>">Create</a></dd>
+        </dl>
+    <?php endif; ?>
 </div>
 
 
@@ -60,7 +76,7 @@ $this->pageBreadcrumbs()->setItems([
         if(typeof(project) != 'undefined'){
             params = '?project=' + project;
         }
-        document.location = '<?= $this->url('tasks', ['action' => 'add', 'id' => $project->getId()]); ?>';
+        document.location = '<?= $this->url('tasks', ['action' => 'add', 'project' => $project->getCode()]); ?>';
     }
     function assignUsers(project){
         var params = '';

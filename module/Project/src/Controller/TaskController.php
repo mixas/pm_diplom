@@ -69,17 +69,17 @@ class TaskController extends AbstractActionController
      */
     public function addAction()
     {
-        $projectId = (int)$this->params()->fromRoute('id', -1);
-        if ($projectId < 1) {
+        $projectCode = $this->params()->fromRoute('project', -1);
+        if ($projectCode == -1 || $projectCode == null) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
         $project = $this->entityManager->getRepository(Project::class)
-            ->find($projectId);
+            ->findOneByCode($projectCode);
 
         if(!$project){
             return $this->redirect()->toRoute('projects',
-                ['action' => 'view', 'id' => $projectId]);
+                ['action' => 'view', 'id' => $projectCode]);
         }
 
         if (!$this->access('projects.manage.all') &&

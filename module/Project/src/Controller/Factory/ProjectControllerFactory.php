@@ -5,6 +5,7 @@ use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use Project\Controller\ProjectController;
 use Project\Service\ProjectManager;
+use Project\Service\TechnicalAssignmentManager;
 
 /**
  * This is the factory for IndexController. Its purpose is to instantiate the
@@ -16,8 +17,9 @@ class ProjectControllerFactory implements FactoryInterface
     {
         $entityManager = $container->get('doctrine.entitymanager.orm_default');
         $projectManager = $container->get(ProjectManager::class);
-        
+        $technicalAssignmentManager = $container->get(TechnicalAssignmentManager::class);
+
         // Instantiate the controller and inject dependencies
-        return new ProjectController($entityManager, $projectManager);
+        return new ProjectController($entityManager, $projectManager, $technicalAssignmentManager);
     }
 }

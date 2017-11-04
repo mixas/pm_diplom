@@ -5,6 +5,15 @@ namespace Project\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 use Project\Entity\Task;
+use Project\Entity\TechnicalAssignment;
+
+
+
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\Table;
+use Doctrine\ORM\Mapping\Id;
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\GeneratedValue;
 
 /**
  * This class represents a registered project.
@@ -220,10 +229,10 @@ class Project
     {
         return $this->dateCreated;
     }
-    
+
     /**
-     * Sets the date when this user was created.
-     * @param string $dateCreated     
+     * @param $dateCreated
+     * @return $this
      */
     public function setDateCreated($dateCreated) 
     {
@@ -239,6 +248,32 @@ class Project
     {
         return $this->users;
     }
+
+
+    /**
+     * One Customer has One Cart.
+     * @ORM\OneToOne(targetEntity="Project\Entity\TechnicalAssignment", mappedBy="project")
+     */
+    protected $technicalAssignment;
+
+    /**
+     * @return mixed
+     */
+    public function getTechnicalAssignment()
+    {
+        return $this->technicalAssignment;
+    }
+
+    /**
+     * @param $technicalAssignment
+     * @return $this
+     */
+    public function setTechnicalAssignment($technicalAssignment)
+    {
+        $this->technicalAssignment = $technicalAssignment;
+        return $this;
+    }
+
 
 }
 

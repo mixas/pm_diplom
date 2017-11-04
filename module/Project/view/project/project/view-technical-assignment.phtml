@@ -1,0 +1,57 @@
+<?php
+$this->headTitle('View Technical Assignment');
+
+$this->mainMenu()->setActiveItemId('projects');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Manage Projects' => $this->url('projects'),
+    'View Project' => $this->url('projects', ['action' => 'view', 'code' => $project->getCode()]),
+    'View Technical Assignment' => $this->url('projects', ['action' => 'viewTechnicalAssignment', 'code' => $project->getId()])
+]);
+?>
+
+<div class="col-md-9">
+
+
+<div class="project-header">
+    <h2>Technical Assignment for <?= $project->getName(); ?></h2>
+    <a class="edit=link" href="<?= $this->url('projects', ['action' => 'editTechnicalAssignment', 'code' => $project->getCode()]); ?>">Edit</a>
+</div>
+
+<div class="general-info-wrapper">
+    <dl class="general-info-attribute-block">
+        <dt>Deadline Date:</dt>
+        <dd><?= date('d F Y', strtotime($technicalAssignment->getDeadlineDate())) ?></dd>
+    </dl>
+    <dl class="general-info-attribute-block">
+        <dt>Created Date:</dt>
+        <dd><?= date('d F Y', strtotime($technicalAssignment->getDateCreated())) ?></dd>
+    </dl>
+    <?php if($technicalAssignment->getDateUpdated()): ?>
+        <dl class="general-info-attribute-block">
+            <dt>Updated Date:</dt>
+            <dd><?= date('d F Y', strtotime($technicalAssignment->getDateUpdated())) ?></dd>
+        </dl>
+    <?php endif; ?>
+
+</div>
+
+
+<div class="description-wrapper">
+    <div class="description-label"><strong>Description:</strong></div>
+    <div class="description-text"><?= $this->escapeHtml($project->getDescription()) ?></div>
+</div>
+
+
+<div class="attachments-wrapper">
+    <div class="attachments-label"><strong>Attachments:</strong></div>
+    <div class="attachments-text"></div>
+</div>
+
+
+</div>
+
+<div class="col-md-3">
+
+</div>

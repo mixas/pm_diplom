@@ -34,7 +34,7 @@ return [
         //TODO:: We should add dynamic assertions for editPermissions action
         'controllers' => [
             Controller\ProjectController::class => [
-                ['actions' => ['index', 'view', 'edit', 'add'], 'allow' => '+projects.view'],
+                ['actions' => ['index', 'view', 'edit', 'add', 'createTechnicalAssignment', 'editTechnicalAssignment', 'viewTechnicalAssignment'], 'allow' => '+projects.view'],
                 ['actions' => ['assignUsers'], 'allow' => '+projects.assign.users.all']
             ],
             Controller\TaskController::class => [
@@ -159,7 +159,7 @@ return [
             Service\TaskStatusManager::class => Service\Factory\TaskStatusManagerFactory::class,
             Service\CommentManager::class => Service\Factory\CommentManagerFactory::class,
             Service\RbacProjectAssertionManager::class => Service\Factory\RbacProjectAssertionManagerFactory::class,
-            Service\RbacManager::class => Service\Factory\RbacManagerFactory::class,
+            Service\TechnicalAssignmentManager::class => Service\Factory\TechnicalAssignmentManagerFactory::class,
         ],
     ],
     'entity_manager' => [

@@ -41,9 +41,14 @@ div.container a.navbar-brand > img {
 
 
 .general-info-wrapper{
-    width: 600px;
+    width: 60%;
     column-count: 2;
     margin-top: 20px;
+}
+.general-info-wrapper-3{
+    column-count: 3;
+    width: 100%;
+    margin-bottom: 20px;
 }
 .general-info-attribute-block dt,
 .left-attribute-block dt{
