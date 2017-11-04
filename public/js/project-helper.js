@@ -5,4 +5,9 @@ function addMessage(message, type){
     html += '</div>';
 
     $('#application-messages-wrapper').append(html);
+
+    $('html, body').animate({
+        scrollTop: $("#application-messages-wrapper").offset().top
+    }, 1000);
+
 }

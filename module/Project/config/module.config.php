@@ -61,7 +61,7 @@ return [
             'projects' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/projects[/:action[/:id]]',
+                    'route'    => '/projects[/:action[/:code]]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id' => '[a-zA-Z0-9_-]*',
@@ -75,7 +75,7 @@ return [
             'tasks' => [
                 'type'    => Segment::class,
                 'options' => [
-                    'route'    => '/tasks[/:action[/:id]]',
+                    'route'    => '/tasks[/:action[/:project[/:task]]]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
                         'id' => '[a-zA-Z0-9_-]*',

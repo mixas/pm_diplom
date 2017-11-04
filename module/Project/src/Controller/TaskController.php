@@ -128,7 +128,7 @@ class TaskController extends AbstractActionController
     {
 //        $this->flashMessenger()->addMessage('Task has been successfully created', 'success');
 
-        $id = (int)$this->params()->fromRoute('id', -1);
+        $id = (int)$this->params()->fromRoute('task', -1);
         if ($id<1) {
             $this->getResponse()->setStatusCode(404);
             return;

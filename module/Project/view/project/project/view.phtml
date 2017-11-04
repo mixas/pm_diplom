@@ -10,47 +10,45 @@ $this->pageBreadcrumbs()->setItems([
 ]);
 ?>
 
-<h1>View Project</h1>
+<div class="col-md-9">
 
-<div class="row">
-    <div class="col-md-6">
-        <table class="table table-striped table-bordered">
-             <tr>
-                <th>ID:</th>
-                <td><?= $this->escapeHtml($project->getId()) ?></th>
-            </tr>
-            <tr>
-                <th>Code:</th>
-                <td><?= $this->escapeHtml($project->getCode()) ?></th>
-            </tr>
-            <tr>
-                <th>Name:</th>
-                <td><?= $this->escapeHtml($project->getName()) ?></th>
-            </tr>
-            <tr>
-                <th>Description:</th>
-                <td><?= $this->escapeHtml($project->getDescription()) ?></th>
-            </tr>
-            <tr>
-                <th>Date Created:</th>
-                <td><?= $this->escapeHtml($project->getDateCreated()) ?></th>
-            </tr>
-            <tr>
-                <th>Status:</th>
-                <td><?= $this->escapeHtml($project->getStatusAsString()) ?></th>
-            </tr>
-        </table>
-    </div>
+
+<div class="project-header">
+    <h2><?= $project->getName(); ?></h2>
+    <a class="edit=link" href="<?= $this->url('projects', ['action' => 'edit', 'code' => $project->getCode()]); ?>">Edit</a>
 </div>
 
-<h2>Project tasks:</h2>
-<?php if(count($tasks)): ?>
-    <?php foreach ($tasks as $task): ?>
-        <div class="task-wrapper">
-            <div class="task-title"><?= $task->getTaskTitle(); ?></div>
-        </div>
-    <?php endforeach; ?>
-<?php endif; ?>
+
+<div class="general-info-wrapper">
+    <dl class="general-info-attribute-block">
+        <dt>Code:</dt>
+        <dd><?= $this->escapeHtml($project->getCode()) ?></dd>
+    </dl>
+    <dl class="general-info-attribute-block">
+        <dt>Status:</dt>
+        <dd><?= $this->escapeHtml($project->getStatusAsString()) ?></dd>
+    </dl>
+    <dl class="general-info-attribute-block">
+        <dt>Created Date:</dt>
+        <dd><?= date('d F Y', strtotime($project->getDateCreated())) ?></dd>
+    </dl>
+    <dl class="general-info-attribute-block">
+        <dt>Participants:</dt>
+        <?php $i = 0; ?>
+        <?php $participantsCount = count($participants); ?>
+        <?php foreach ($participants as $participant): ?>
+            <?php $i++; ?>
+            <a target="_blank" href="<?= $this->url('users', ['action' => 'view', 'id' => $participant->getId()]); ?>"><?= $participant->getFullName(); ?><?= ($participantsCount != $i)?',':''; ?></a>
+        <?php endforeach; ?>
+    </dl>
+</div>
+
+
+<div class="description-wrapper">
+    <div class="description-label"><strong>Description:</strong></div>
+    <div class="description-text"><?= $this->escapeHtml($project->getDescription()) ?></div>
+</div>
+
 
 <button type="button" class="btn btn-default" onclick="addTask()">
     <span class="glyphicon glyphicon-plus"></span> Add Task
@@ -64,26 +62,28 @@ $this->pageBreadcrumbs()->setItems([
         }
         document.location = '<?= $this->url('tasks', ['action' => 'add', 'id' => $project->getId()]); ?>';
     }
-    function addUser(project){
+    function assignUsers(project){
         var params = '';
         if(typeof(project) != 'undefined'){
             params = '?project=' + project;
         }
-        document.location = '<?= $this->url('projects', ['action'=>'assignUsers', 'id' => $project->getId()]); ?>';
+        document.location = '<?= $this->url('projects', ['action' => 'assignUsers', 'code' => $project->getCode()]); ?>';
     }
 </script>
 
-
-<h2>Assigned users:</h2>
-<?php if(count($assignedUsers)): ?>
-    <?php foreach ($assignedUsers as $user): ?>
-        <div class="user-wrapper">
-            <div class="user-name"><?= $user->getFullName(); ?></div>
-        </div>
-    <?php endforeach; ?>
-<?php endif; ?>
-
-<button type="button" class="btn btn-default" onclick="addUser(<?= $project->getId(); ?>)">
-    <span class="glyphicon glyphicon-plus"></span> Assign Users To Project
+<button type="button" class="btn btn-default" onclick="assignUsers(<?= $project->getId(); ?>)">
+    <span class="glyphicon glyphicon-plus"></span><span class="glyphicon glyphicon-user"></span> Assign Users To Project
 </button>
 
+</div>
+
+<div class="col-md-3">
+    <h2>Tasks:</h2>
+    <?php if(count($tasks)): ?>
+        <?php foreach ($tasks as $task): ?>
+            <div class="task-wrapper">
+                <a href="<?= $this->url('tasks', ['action' => 'view', 'project' => $project->getCode(), 'task' => $task->getId()]); ?>"><?= $task->getTaskTitle(); ?></a>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>

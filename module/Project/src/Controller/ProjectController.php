@@ -48,7 +48,7 @@ class ProjectController extends AbstractActionController
     public function indexAction()
     {
         $projects = $this->entityManager->getRepository(Project::class)
-            ->findBy([], ['id'=>'ASC']);
+            ->findBy([], ['code'=>'ASC']);
 
         return new ViewModel([
             'projects' => $projects
@@ -86,7 +86,7 @@ class ProjectController extends AbstractActionController
 
                 // Redirect to "view" page
                 return $this->redirect()->toRoute('projects',
-                    ['action'=>'view', 'id'=>$project->getId()]);
+                    ['action'=>'view', 'code' => $project->getCode()]);
             }
         }
 
@@ -100,38 +100,30 @@ class ProjectController extends AbstractActionController
      */
     public function viewAction()
     {
-        $id = (int)$this->params()->fromRoute('id', -1);
-        if ($id<1) {
+        $code = $this->params()->fromRoute('code', -1);
+        if ($code == -1 || $code == null) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
 
         // Find a user with such ID.
         $project = $this->entityManager->getRepository(Project::class)
-            ->find($id);
-
-        //TODO: deal with proper way to get all tasks from particular project. Like $tasks = $project->getTasks();. but it doesn't work
-        //TODO: !!!!!!!!
+            ->findOneByCode($code);
 
         $tasks = $project->getTasks();
         $tasks->initialize();
-
-
-        $assignedUsers = $project->getUsers();
-        $assignedUsers->initialize();
-
-        //all project tasks
-//        $tasks = $project->getTasks();
 
         if ($project == null) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
 
+        $participants = $project->getUsers();
+
         return new ViewModel([
             'project' => $project,
             'tasks' => $tasks,
-            'assignedUsers' => $assignedUsers,
+            'participants' => $participants,
         ]);
     }
 
@@ -140,14 +132,14 @@ class ProjectController extends AbstractActionController
      */
     public function editAction()
     {
-        $id = (int)$this->params()->fromRoute('id', -1);
-        if ($id<1) {
+        $code = $this->params()->fromRoute('code', -1);
+        if ($code == -1 || $code == null) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
 
         $project = $this->entityManager->getRepository(Project::class)
-            ->find($id);
+            ->findOneByCode($code);
 
         if ($project == null) {
             $this->getResponse()->setStatusCode(404);
@@ -182,7 +174,7 @@ class ProjectController extends AbstractActionController
 
                 // Redirect to "view" page
                 return $this->redirect()->toRoute('projects',
-                    ['action'=>'view', 'id'=>$project->getId()]);
+                    ['action'=>'view', 'code'=>$project->getCode()]);
             }
         } else {
             $form->setData(array(
@@ -200,14 +192,14 @@ class ProjectController extends AbstractActionController
     }
 
     function assignUsersAction(){
-        $id = (int)$this->params()->fromRoute('id', -1);
-        if ($id<1) {
+        $code = $this->params()->fromRoute('code', -1);
+        if ($code == -1 || $code == null) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
 
         $project = $this->entityManager->getRepository(Project::class)
-            ->find($id);
+            ->findOneByCode($code);
 
         if ($project == null) {
             $this->getResponse()->setStatusCode(404);
@@ -259,7 +251,7 @@ class ProjectController extends AbstractActionController
                 $this->flashMessenger()->addSuccessMessage('User were successfully assignment.');
 
                 // Redirect to "index" page
-                return $this->redirect()->toRoute('projects', ['action' => 'view', 'id' => $project->getId()]);
+                return $this->redirect()->toRoute('projects', ['action' => 'view', 'code' => $project->getCode()]);
             }
         } else {
 

@@ -39,11 +39,11 @@ $this->pageBreadcrumbs()->setItems([
             <td><?= $this->escapeHtml($project->getDateCreated()); ?></td>
             <td>
                 <a class="btn btn-info" href="<?= $this->url('projects',
-                    ['action'=>'edit', 'id'=>$project->getId()]); ?>">
+                    ['action'=>'edit', 'code'=>$project->getCode()]); ?>">
                     <span class="glyphicon glyphicon-pencil" ></span> Edit
                 </a>
                 <a class="btn btn-info" href="<?= $this->url('projects',
-                    ['action'=>'view', 'id'=>$project->getId()]); ?>">
+                    ['action'=>'view', 'code'=>$project->getCode()]); ?>">
                     <span class="glyphicon glyphicon-pencil" ></span> View
                 </a>
             </td>

@@ -7,7 +7,7 @@ $this->mainMenu()->setActiveItemId('projects');
 $this->pageBreadcrumbs()->setItems([
     'Home' => $this->url('home'),
     'Manage Projects' => $this->url('projects'),
-    'Edit Project' => $this->url('projects', ['action' => 'edit', 'id' => $project->getId()])
+    'Edit Project' => $this->url('projects', ['action' => 'edit', 'code' => $project->getCode()])
 ]);
 
 $form->get('code')->setAttributes([

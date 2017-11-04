@@ -79,7 +79,7 @@ class ProjectForm extends Form
 
         // Add "password" field
         $this->add([
-            'type' => 'text',
+            'type' => 'textarea',
             'name' => 'description',
             'options' => [
                 'label' => 'Description',

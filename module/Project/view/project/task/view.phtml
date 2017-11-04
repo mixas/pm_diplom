@@ -14,7 +14,7 @@ $estimate = $task->getEstimate();
 <div class="col-md-9">
 
 <? if($project): ?>
-    <h4><a href="<?= $this->url('projects', ['action' => 'view', 'id' => $project->getId()]);?>"><?= $project->getName();?></a></h4>
+    <h4><a href="<?= $this->url('projects', ['action' => 'view', 'code' => $project->getCode()]);?>"><?= $project->getName();?></a></h4>
 <? endif; ?>
 
 
@@ -82,7 +82,7 @@ $estimate = $task->getEstimate();
                     addMessage(data.message, 'success');
                     $('#comment-text').val('');
                 }else{
-                    addMessage(data.message, 'error')
+                    addMessage(data.message, 'danger')
                 }
                 if(data.comment_html){
                     $(".comments-wrapper").append(data.comment_html);
@@ -130,7 +130,7 @@ $estimate = $task->getEstimate();
                     addMessage(data.message, 'success');
                     cancelEditComment(commentId);
                 }else{
-                    addMessage(data.message, 'error')
+                    addMessage(data.message, 'danger')
                 }
                 if(data.comment_html){
                     $("#comment-block-" + commentId).replaceWith(data.comment_html);
@@ -143,27 +143,29 @@ $estimate = $task->getEstimate();
 </div>
 
 <div class="col-md-3">
-    <!-- Estimate line -->
-    <dl class="left-attribute-block">
-        <dt>Estimate:</dt>
-        <dd><?= $task->getEstimate() ?></dd>
-    </dl>
-    <div class="progress progress-estimate">
-        <div class="progress-bar" role="progressbar" aria-valuenow="<?= $task->getEstimate() ?>"
-             aria-valuemin="0" aria-valuemax="<?= $task->getEstimate() ?>" style="width:100%">
+    <?php if($estimate != null): ?>
+        <!-- Estimate line -->
+        <dl class="left-attribute-block">
+            <dt>Estimate:</dt>
+            <dd><?= $task->getEstimate() ?></dd>
+        </dl>
+        <div class="progress progress-estimate">
+            <div class="progress-bar" role="progressbar" aria-valuenow="<?= $task->getEstimate() ?>"
+                 aria-valuemin="0" aria-valuemax="<?= $task->getEstimate() ?>" style="width:100%">
+            </div>
         </div>
-    </div>
 
-    <!-- Spent time line -->
-    <?php $percentValue = $spentTime * 100 / $estimate; ?>
-    <?php $class = ($spentTime > $estimate)? 'progress-bar-danger': 'progress-bar-success'; ?>
-    <dl class="left-attribute-block">
-        <dt>Spent time:</dt>
-        <dd><?= $spentTime ?></dd>
-    </dl>
-    <div class="progress progress-estimate">
-        <div class="progress-bar <?= $class; ?>" role="progressbar" aria-valuenow="<?= $spentTime; ?>"
-             aria-valuemin="0" aria-valuemax="<?= $estimate ?>" style="width:<?= $percentValue; ?>%">
+        <!-- Spent time line -->
+        <?php $percentValue = $spentTime * 100 / $estimate; ?>
+        <?php $class = ($spentTime > $estimate)? 'progress-bar-danger': 'progress-bar-success'; ?>
+        <dl class="left-attribute-block">
+            <dt>Spent time:</dt>
+            <dd><?= $spentTime ?></dd>
+        </dl>
+        <div class="progress progress-estimate">
+            <div class="progress-bar <?= $class; ?>" role="progressbar" aria-valuenow="<?= $spentTime; ?>"
+                 aria-valuemin="0" aria-valuemax="<?= $estimate ?>" style="width:<?= $percentValue; ?>%">
+            </div>
         </div>
-    </div>
+    <?php endif; ?>
 </div>
