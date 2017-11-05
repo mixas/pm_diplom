@@ -5,6 +5,7 @@ namespace Project\Entity;
 use Project\Service\TaskManager;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Project\Entity\Project;
 
@@ -145,8 +146,8 @@ class Task
         return $this;
     }
 
-    const PRIORITY_MINOR = 'minor';
-    const PRIORITY_CRITICAL = 'critical';
+    const PRIORITY_MINOR = 1;
+    const PRIORITY_CRITICAL = 2;
 
     /**
      * Returns possible priorities as array.

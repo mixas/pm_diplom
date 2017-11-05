@@ -79,7 +79,7 @@ class TaskController extends AbstractActionController
 
         if(!$project){
             return $this->redirect()->toRoute('projects',
-                ['action' => 'view', 'id' => $projectCode]);
+                ['action' => 'view', 'code' => $projectCode]);
         }
 
         if (!$this->access('projects.manage.all') &&
@@ -104,14 +104,17 @@ class TaskController extends AbstractActionController
                 // Get filtered and validated data
                 $data = $form->getData();
 
-                // Add user.
-                $task = $this->taskManager->addTask($data, $project);
+                $assignedUser = $this->entityManager->getRepository(User::class)
+                    ->findOneById($data['assigned_user_id']);
+
+                // Add task.
+                $task = $this->taskManager->addTask($data, $project, $assignedUser);
 
                 $this->flashMessenger()->addMessage('Task has been successfully created', 'success');
 
                 // Redirect to "view" page
                 return $this->redirect()->toRoute('tasks',
-                    ['action'=>'view', 'id'=>$task->getId()]);
+                    ['action' => 'view', 'task' => $task->getId(), 'project' => $project->getId()]);
             }
         }
 
@@ -170,7 +173,7 @@ class TaskController extends AbstractActionController
      */
     public function editAction()
     {
-        $id = (int)$this->params()->fromRoute('id', -1);
+        $id = (int)$this->params()->fromRoute('task', -1);
         if ($id<1) {
             $this->getResponse()->setStatusCode(404);
             return;
@@ -210,9 +213,11 @@ class TaskController extends AbstractActionController
                 // Update the user.
                 $this->taskManager->updateTask($task, $data);
 
+                $project = $task->getProject();
+
                 // Redirect to "view" page
                 return $this->redirect()->toRoute('tasks',
-                    ['action'=>'view', 'id'=>$task->getId()]);
+                    ['action'=>'view', 'task' => $task->getId(), 'project' => $project->getCode()]);
             }
         } else {
             $form->setData(array(

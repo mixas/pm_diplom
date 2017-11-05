@@ -17,7 +17,7 @@ class Version20171031190120 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $table = $schema->getTable('task');
-        $table->addColumn('priority', 'string', ['notnull'=>true, 'length'=>128]);
+        $table->addColumn('priority', 'integer', ['notnull' => true]);
     }
 
     /**

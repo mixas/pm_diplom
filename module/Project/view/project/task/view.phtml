@@ -5,8 +5,8 @@ $this->mainMenu()->setActiveItemId('tasks');
 
 $this->pageBreadcrumbs()->setItems([
     'Home' => $this->url('home'),
-    'Manage Tasks' => $this->url('tasks'),
-    'View Task' => $this->url('tasks', ['action' => 'view', 'id' => $task->getId()])
+    $project->getName() => $this->url('projects', ['action' => 'view', 'code' => $project->getCode()]),
+    'View Task' => $this->url('tasks', ['action' => 'view', 'task' => $task->getId(), 'project' => $project->getCode()])
 ]);
 $estimate = $task->getEstimate();
 ?>
@@ -19,7 +19,7 @@ $estimate = $task->getEstimate();
 
 
 <h3><?= $this->escapeHtml($task->getTaskTitle()); ?></h3>
-<a class="btn btn-default" href="<?php echo $this->url('tasks', ['action' => 'edit', 'id' => $task->getId()]); ?>"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
+<a class="btn btn-default" href="<?php echo $this->url('tasks', ['action' => 'edit', 'task' => $task->getId(), 'project' => $project->getCode()]); ?>"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
 
 <div class="general-info-wrapper">
     <dl class="general-info-attribute-block">
