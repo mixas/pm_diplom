@@ -32,6 +32,11 @@ class User
      */
     protected $fullName;
 
+    /**
+     * @ORM\Column(name="salary_rate")
+     */
+    protected $salaryRate;
+
     /** 
      * @ORM\Column(name="password")  
      */
@@ -136,6 +141,24 @@ class User
     public function setFullName($fullName) 
     {
         $this->fullName = $fullName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getSalaryRate()
+    {
+        return $this->salaryRate;
+    }
+
+    /**
+     * @param $salaryRate
+     * @return $this
+     */
+    public function setSalaryRate($salaryRate)
+    {
+        $this->salaryRate = $salaryRate;
+        return $this;
     }
     
     /**

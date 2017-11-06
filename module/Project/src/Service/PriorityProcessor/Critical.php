@@ -27,10 +27,17 @@ class Critical extends PriorityAbstract
      */
     public function __construct($entityManager)
     {
-        $this->entityManager = $entityManager;
+        parent::__construct($entityManager);
         $this->type = Task::PRIORITY_CRITICAL;
     }
 
+    /**
+     * The main auto assign logic for Critical tasks
+     *
+     * @param $userType
+     * @return array
+     * @throws \Exception
+     */
     public function process($userType){
         $userRole = $this->entityManager->getRepository(Role::class)
             ->findOneById($userType, ['name'=>'ASC']);
