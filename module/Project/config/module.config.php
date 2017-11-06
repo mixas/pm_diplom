@@ -16,6 +16,7 @@ return [
             Controller\TaskController::class => Controller\Factory\TaskControllerFactory::class,
             Controller\TaskStatusController::class => Controller\Factory\TaskStatusControllerFactory::class,
             Controller\CommentController::class => Controller\Factory\CommentControllerFactory::class,
+            Controller\SystemController::class => Controller\Factory\SystemControllerFactory::class,
         ],
     ],
 
@@ -34,8 +35,7 @@ return [
         //TODO:: We should add dynamic assertions for editPermissions action
         'controllers' => [
             Controller\ProjectController::class => [
-                ['actions' => ['index', 'view', 'edit', 'add', 'createTechnicalAssignment', 'editTechnicalAssignment', 'viewTechnicalAssignment'], 'allow' => '+projects.view'],
-                ['actions' => ['assignUsers'], 'allow' => '+projects.assign.users.all']
+                ['actions' => ['index', 'view', 'edit', 'add', 'createTechnicalAssignment', 'editTechnicalAssignment', 'viewTechnicalAssignment', 'assignUsers'], 'allow' => '+projects.view'],
             ],
             Controller\TaskController::class => [
                 ['actions' => ['index', 'view', 'edit', 'add'], 'allow' => '+projects.view'],
@@ -46,6 +46,9 @@ return [
             ],
             Controller\CommentController::class => [
                 ['actions' => ['index', 'edit', 'add'], 'allow' => '+projects.view'],
+            ],
+            Controller\SystemController::class => [
+                ['actions' => ['chooseUserAutomatically'], 'allow' => '+projects.view'],
             ],
         ]
     ],
@@ -114,6 +117,20 @@ return [
                     ],
                 ],
             ],
+            'system' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/system[/:action[/:id]]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[a-zA-Z0-9_-]*',
+                    ],
+                    'defaults' => [
+                        'controller'    => Controller\SystemController::class,
+                        'action'        => 'index',
+                    ],
+                ],
+            ],
         ],
     ],
 //    'access_filter' => [
@@ -160,6 +177,8 @@ return [
             Service\CommentManager::class => Service\Factory\CommentManagerFactory::class,
             Service\RbacProjectAssertionManager::class => Service\Factory\RbacProjectAssertionManagerFactory::class,
             Service\TechnicalAssignmentManager::class => Service\Factory\TechnicalAssignmentManagerFactory::class,
+            Service\SolutionProcessor::class => Service\Factory\SolutionProcessorFactory::class,
+            Service\PriorityProcessor\PriorityAbstract::class => Service\PriorityProcessor\Factory\PriorityAbstractFactory::class,
         ],
     ],
     'entity_manager' => [

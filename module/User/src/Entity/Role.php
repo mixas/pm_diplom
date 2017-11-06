@@ -59,6 +59,15 @@ class Role
      *      )
      */
     private $permissions;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="User\Entity\User")
+     * @ORM\JoinTable(name="user_role",
+     *      joinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id")},
+     *      inverseJoinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")}
+     *      )
+     */
+    private $users;
     
     /**
      * Constructor.
@@ -68,6 +77,11 @@ class Role
         $this->parentRoles = new ArrayCollection();
         $this->childRoles = new ArrayCollection();
         $this->permissions = new ArrayCollection();
+        $this->users = new ArrayCollection();
+    }
+
+    public function getUsers(){
+        return $this->users;
     }
     
     /**

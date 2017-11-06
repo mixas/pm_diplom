@@ -84,8 +84,8 @@ $estimate = $task->getEstimate();
                 }else{
                     addMessage(data.message, 'danger')
                 }
-                if(data.comment_html){
-                    $(".comments-wrapper").append(data.comment_html);
+                if(data.html){
+                    $(".comments-wrapper").append(data.html);
                 }
             }
         });
@@ -132,8 +132,8 @@ $estimate = $task->getEstimate();
                 }else{
                     addMessage(data.message, 'danger')
                 }
-                if(data.comment_html){
-                    $("#comment-block-" + commentId).replaceWith(data.comment_html);
+                if(data.hhtm){
+                    $("#comment-block-" + commentId).replaceWith(data.html);
                 }
             }
         });

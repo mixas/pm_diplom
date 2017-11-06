@@ -118,7 +118,7 @@ class CommentController extends AbstractActionController
                         array(
                             'response' => true,
                             'message' => 'Your comment has been successfully added',
-                            'comment_html' => $html
+                            'html' => $html
                         )
                     ));
                 }catch (\Exception $e){
@@ -192,7 +192,7 @@ class CommentController extends AbstractActionController
                         array(
                             'response' => true,
                             'message' => 'Your comment has been successfully updated',
-                            'comment_html' => $html
+                            'html' => $html
                         )
                     ));
                 }catch (\Exception $e){

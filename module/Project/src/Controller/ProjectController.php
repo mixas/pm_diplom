@@ -215,6 +215,11 @@ class ProjectController extends AbstractActionController
             return;
         }
 
+        if (!$this->access('projects.assign.users.all') &&
+            !$this->access('projects.assign.users.own', ['project' => $project])) {
+            return $this->redirect()->toRoute('not-authorized');
+        }
+
         $allUsers = $this->entityManager->getRepository(User::class)
             ->findBy([], ['email'=>'ASC']);
 

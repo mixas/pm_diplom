@@ -135,6 +135,17 @@ class TaskForm extends Form
                 'value' => 'Create'
             ],
         ]);
+
+        // Add the Choose user button
+        $this->add([
+            'type' => 'button',
+            'name' => 'choose_user',
+            'label' => 'blabla',
+            'attributes' => [
+                'value' => 'Choose user automatically',
+                'label' => 'Choose user automatically'
+            ],
+        ]);
     }
 
     /**

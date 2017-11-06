@@ -14,7 +14,7 @@ class User
     // User status constants.
     const STATUS_ACTIVE       = 1; // Active user.
     const STATUS_RETIRED      = 2; // Retired user.
-    
+
     /**
      * @ORM\Id
      * @ORM\Column(name="id")
@@ -56,7 +56,7 @@ class User
      * @ORM\Column(name="pwd_reset_token_creation_date")  
      */
     protected $passwordResetTokenCreationDate;
-    
+
     /**
      * @ORM\ManyToMany(targetEntity="User\Entity\Role")
      * @ORM\JoinTable(name="user_role",

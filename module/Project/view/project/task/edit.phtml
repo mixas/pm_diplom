@@ -30,11 +30,13 @@ $form->get('estimate')->setAttributes([
 ]);
 
 $form->get('priority')->setAttributes([
+    'id' => 'priority',
     'class' => 'form-control',
     'value' => $task->getPriority()
 ]);
 
 $form->get('assigned_user_id')->setAttributes([
+    'id' => 'assigned-user-id',
     'class' => 'form-control',
     'placeholder' => 'Assigned user'
 ]);
@@ -91,9 +93,27 @@ $form->prepare();
             <?= $this->formElementErrors($form->get('assigned_user_id')); ?>
         </div>
 
+        <div class="choose-user-wrapper">
+            <div class="form-group">
+                <div class="result-block" id="result-block"></div>
+                <label for="">Choose user type and press button:</label>
+                <div class="clearer"></div>
+                <?php foreach ($roles as $role): ?>
+                    <input type="radio" name="user_type" value="<?= $role->getId(); ?>" id="choose-<?= $role->getId(); ?>">
+                    <label for="choose-<?= $role->getId(); ?>"><?= $role->getName(); ?></label>
+                    <div class="clearer"></div>
+                <?php endforeach; ?>
+            </div>
+
+            <button type="button" class="btn btn-default" onclick="chooseUserAutomatically(<?= $task->getId(); ?>); return false;">
+                <span class="glyphicon glyphicon-retweet"></span>
+                Choose automatically
+            </button>
+
+        </div>
+
         <?= $this->formElement($form->get('submit')); ?>
 
         <?= $this->form()->closeTag(); ?>
     </div>
-</div>   
-
+</div>

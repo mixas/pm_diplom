@@ -150,11 +150,24 @@ class Task
     const PRIORITY_CRITICAL = 2;
 
     /**
-     * Returns possible priorities as array.
+     * Returns priorities as array.
      *
      * @return array
      */
     public static function getPriorityList()
+    {
+        return [
+            self::PRIORITY_MINOR => 'Minor',
+            self::PRIORITY_CRITICAL => 'Critical'
+        ];
+    }
+
+    /**
+     * Returns priorities classes names.
+     *
+     * @return array
+     */
+    public static function getPriorityClassesConformity()
     {
         return [
             self::PRIORITY_MINOR => 'Minor',

@@ -8,6 +8,7 @@ use Project\Entity\Comment;
 use Project\Entity\Task;
 use Project\Entity\Project;
 use User\Entity\User;
+use User\Entity\Role;
 use Project\Service\TaskManager;
 use Project\Form\TaskForm;
 use Project\Form\CommentForm;
@@ -90,6 +91,9 @@ class TaskController extends AbstractActionController
         // Create user form
         $form = new TaskForm('create', $this->entityManager, null, $this->taskManager);
 
+        $allRoles = $this->entityManager->getRepository(Role::class)
+            ->findBy([], ['name'=>'ASC']);
+
         // Check if user has submitted the form
         if ($this->getRequest()->isPost()) {
 
@@ -120,7 +124,8 @@ class TaskController extends AbstractActionController
 
         return new ViewModel([
             'form' => $form,
-            'projectId' => $this->getRequest()->getQuery('project')
+            'roles' => $allRoles,
+            'projectId' => $project->getId()
         ]);
     }
 
@@ -196,6 +201,9 @@ class TaskController extends AbstractActionController
         // Create task form
         $form = new TaskForm('update', $this->entityManager, $task, $this->taskManager);
 
+        $allRoles = $this->entityManager->getRepository(Role::class)
+            ->findBy([], ['name'=>'ASC']);
+
         // Check if user has submitted the form
         if ($this->getRequest()->isPost()) {
 
@@ -231,7 +239,8 @@ class TaskController extends AbstractActionController
 
         return new ViewModel(array(
             'task' => $task,
-            'form' => $form
+            'form' => $form,
+            'roles'=>$allRoles
         ));
     }
 
