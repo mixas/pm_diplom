@@ -54,6 +54,7 @@ class UserManager
         $user = new User();
         $user->setEmail($data['email']);
         $user->setFullName($data['full_name']);        
+        $user->setSalaryRate($data['salary_rate']);
 
         // Encrypt password and store the password in encrypted state.
         $bcrypt = new Bcrypt();
@@ -90,7 +91,8 @@ class UserManager
         $user->setEmail($data['email']);
         $user->setFullName($data['full_name']);        
         $user->setStatus($data['status']); 
-        
+        $user->setSalaryRate($data['salary_rate']);
+
         // Assign roles to user.
         $this->assignRoles($user, $data['roles']);
         

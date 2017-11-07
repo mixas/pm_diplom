@@ -19,6 +19,10 @@ $form->get('full_name')->setAttributes([
     'placeholder'=>'John Doe'
     ]);
 
+$form->get('salary_rate')->setAttributes([
+    'class'=>'form-control',
+    ]);
+
 $form->get('status')->setAttributes([
     'class'=>'form-control'
     ]);
@@ -50,6 +54,12 @@ $form->prepare();
             <?= $this->formLabel($form->get('full_name')); ?>
             <?= $this->formElement($form->get('full_name')); ?>
             <?= $this->formElementErrors($form->get('full_name')); ?>                  
+        </div>
+
+        <div class="form-group">
+            <?= $this->formLabel($form->get('salary_rate')); ?>
+            <?= $this->formElement($form->get('salary_rate')); ?>
+            <?= $this->formElementErrors($form->get('salary_rate')); ?>
         </div>
         
         <div class="form-group">

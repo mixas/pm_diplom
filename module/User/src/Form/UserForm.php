@@ -74,6 +74,15 @@ class UserForm extends Form
                 'label' => 'Full Name',
             ],
         ]);
+
+        // Add "password" field
+        $this->add([
+            'type'  => 'text',
+            'name' => 'salary_rate',
+            'options' => [
+                'label' => 'Salary Rate',
+            ],
+        ]);
         
         if ($this->scenario == 'create') {
         

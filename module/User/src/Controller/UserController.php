@@ -191,6 +191,7 @@ class UserController extends AbstractActionController
                     'full_name'=>$user->getFullName(),
                     'email'=>$user->getEmail(),
                     'status'=>$user->getStatus(), 
+                    'salary_rate'=>$user->getSalaryRate(),
                     'roles' => $userRoleIds
                 ));
         }
