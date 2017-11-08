@@ -38,7 +38,7 @@ return [
                 ['actions' => ['index', 'view', 'edit', 'add', 'createTechnicalAssignment', 'editTechnicalAssignment', 'viewTechnicalAssignment', 'assignUsers'], 'allow' => '+projects.view'],
             ],
             Controller\TaskController::class => [
-                ['actions' => ['index', 'view', 'edit', 'add'], 'allow' => '+projects.view'],
+                ['actions' => ['index', 'view', 'edit', 'add', 'reassign'], 'allow' => '+projects.view'],
 //                ['actions' => ['edit', 'add'], 'allow' => '+projects.manage.all']
             ],
             Controller\TaskStatusController::class => [
@@ -67,7 +67,7 @@ return [
                     'route'    => '/projects[/:action[/:code]]',
                     'constraints' => [
                         'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
-                        'id' => '[a-zA-Z0-9_-]*',
+                        'code' => '[a-zA-Z0-9_-]*',
                     ],
                     'defaults' => [
                         'controller'    => Controller\ProjectController::class,
@@ -166,6 +166,7 @@ return [
         ],
         'template_map' => [
             'comment' => __DIR__ . '/../view/project/task/comment.phtml',
+            'all_users' => __DIR__ . '/../view/project/task/all-users.phtml',
         ]
     ],
 

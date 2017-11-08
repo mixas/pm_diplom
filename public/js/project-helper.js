@@ -52,3 +52,8 @@ function chooseUserAutomatically(identifier, isNew){
         }
     });
 }
+
+
+
+
+

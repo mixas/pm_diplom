@@ -12,6 +12,7 @@ use User\Entity\Role;
 use Project\Service\TaskManager;
 use Project\Form\TaskForm;
 use Project\Form\CommentForm;
+use Project\Form\ReassignForm;
 //use User\Form\PasswordChangeForm;
 //use User\Form\PasswordResetForm;
 
@@ -42,11 +43,12 @@ class TaskController extends AbstractActionController
     /**
      * Constructor.
      */
-    public function __construct($entityManager, $taskManager, $authService)
+    public function __construct($entityManager, $taskManager, $authService, $rendererInterface)
     {
         $this->entityManager = $entityManager;
         $this->taskManager = $taskManager;
         $this->authService = $authService;
+        $this->rendererInterface = $rendererInterface;
     }
 
     /**
@@ -242,6 +244,92 @@ class TaskController extends AbstractActionController
             'form' => $form,
             'roles'=>$allRoles
         ));
+    }
+
+
+    /**
+     *
+     * @return \Zend\Http\Response|\Zend\Stdlib\ResponseInterface
+     */
+    public function reassignAction(){
+        $response = $this->getResponse();
+
+        // Check if user has submitted the form
+        if ($this->getRequest()->isPost()) {
+
+            $task = $this->entityManager->getRepository(Task::class)
+                ->find($taskId);
+
+            $project = $task->getProject();
+
+            if (!$this->access('projects.manage.all') &&
+                !$this->access('projects.manage.own', ['project' => $project])) {
+                return $this->redirect()->toRoute('not-authorized');
+            }
+
+            // Fill in the form with POST data
+            $data = $this->params()->fromPost();
+
+            $form->setData($data);
+
+            // Validate form
+            if($form->isValid()) {
+
+                // Get filtered and validated data
+                $data = $form->getData();
+
+                // Add comment.
+                try {
+                    $currentUser = $this->entityManager->getRepository(User::class)
+                        ->findOneByEmail($this->authService->getIdentity());
+
+                    $comment = $this->commentManager->addComment($data, $task, $currentUser);
+
+                    $viewModel = new ViewModel(
+                        ['comment' => $comment]
+                    );
+                    $viewModel->setTemplate('comment');
+                    $renderer = $this->rendererInterface;
+                    $html = $renderer->render($viewModel);
+
+                    //todo: russian translation should be here but json can't encode russian characters.
+                    $response->setContent(\Zend\Json\Json::encode(
+                        array(
+                            'response' => true,
+                            'message' => 'Your comment has been successfully added',
+                            'html' => $html
+                        )
+                    ));
+                }catch (\Exception $e){
+                    $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => $e->getMessage())));
+                }
+
+            }else{
+                $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Invalid data. Please try again')));
+            }
+        }else{
+            $allUsers = $this->entityManager->getRepository(User::class)
+                ->findBy([], ['id'=>'ASC']);
+
+            $viewModel = new ViewModel(
+                ['allUsers' => $allUsers]
+            );
+            $viewModel->setTemplate('all_users');
+            $renderer = $this->rendererInterface;
+            $html = $renderer->render($viewModel);
+
+            //todo: russian translation should be here but json can't encode russian characters.
+            $response->setContent(\Zend\Json\Json::encode(
+                array(
+                    'response' => true,
+                    'html' => $html
+                )
+            ));
+        }
+
+
+        return $response;
+
     }
 
 }

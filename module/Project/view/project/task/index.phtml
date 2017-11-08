@@ -22,6 +22,7 @@ $this->pageBreadcrumbs()->setItems([
     </tr>
 
     <?php foreach ($tasks as $task): ?>
+        <?php $project = $task->getProject(); ?>
 
         <tr>
             <td><?= $this->escapeHtml($task->getId()); ?></td>
@@ -30,11 +31,11 @@ $this->pageBreadcrumbs()->setItems([
             <td><?= $this->escapeHtml($task->getDateCreated()); ?></td>
             <td>
                 <a class="btn btn-info" href="<?= $this->url('tasks',
-                    ['action'=>'edit', 'id'=>$task->getId()]); ?>">
+                    ['action'=>'edit', 'task' => $task->getId(), 'project' => $project->getCode()]); ?>">
                     <span class="glyphicon glyphicon-pencil" ></span> Edit
                 </a>
                 <a class="btn btn-info" href="<?= $this->url('tasks',
-                    ['action'=>'view', 'id'=>$task->getId()]); ?>">
+                    ['action'=>'view', 'task' => $task->getId(), 'project' => $project->getCode()]); ?>">
                     <span class="glyphicon glyphicon-pencil" ></span> View
                 </a>
             </td>

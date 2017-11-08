@@ -20,6 +20,19 @@ $estimate = $task->getEstimate();
 
 <h3><?= $this->escapeHtml($task->getTaskTitle()); ?></h3>
 <a class="btn btn-default" href="<?php echo $this->url('tasks', ['action' => 'edit', 'task' => $task->getId(), 'project' => $project->getCode()]); ?>"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
+<a class="btn btn-default" href="#" data-modal-id="reassign-user-popup" onclick="reassign(); return false;"><span class="glyphicon glyphicon-share-alt"></span> Re-assign</a>
+
+
+    <div id="reassign-user-popup" class="modal-box">
+        <header>
+            <a href="#" class="js-modal-close close">x</a>
+            <h3>Assign another user</h3>
+        </header>
+        <div class="modal-body" id="reassign-modal-popup-body">
+        </div>
+        <footer><a href="#" class="btn btn-default"  onclick="reassignPost(<?= $task->getId(); ?>); return false;"><span class="glyphicon glyphicon-check"></span> Assign</a></footer>
+    </div>
+
 
 <div class="general-info-wrapper">
     <dl class="general-info-attribute-block">
@@ -132,12 +145,89 @@ $estimate = $task->getEstimate();
                 }else{
                     addMessage(data.message, 'danger')
                 }
-                if(data.hhtm){
+                if(data.html){
                     $("#comment-block-" + commentId).replaceWith(data.html);
                 }
             }
         });
     }
+
+    function reassign(){
+        var data = {};
+        $.ajax({
+            type:'GET',
+            dataType: 'json',
+            url:'/tasks/reassign',
+            data: data,
+            success: function(data){
+                console.log(data);
+                if(data.response) {
+//                    addMessage(data.message, 'success');
+                }else{
+                    addMessage(data.message, 'danger')
+                }
+                if(data.html){
+                    $("#reassign-modal-popup-body").append(data.html);
+                }
+            }
+        });
+    }
+
+    function reassignPost(taskId){
+        var data = {};
+        var data.task_id = taskId;
+        $.ajax({
+            type:'GET',
+            dataType: 'json',
+            url:'/tasks/reassign',
+            data: data,
+            success: function(data){
+                console.log(data);
+                if(data.response) {
+//                    addMessage(data.message, 'success');
+                }else{
+                    addMessage(data.message, 'danger')
+                }
+                $("#reassign-modal-popup-body").html('');
+            }
+        });
+    }
+
+
+    /**
+     * jQuery popup js logic
+     */
+    $(function(){
+        var appendthis =  ("<div class='modal-overlay js-modal-close'></div>");
+
+        $('a[data-modal-id]').click(function(e) {
+            e.preventDefault();
+            $("body").append(appendthis);
+            $(".modal-overlay").fadeTo(500, 0.7);
+            //$(".js-modalbox").fadeIn(500);
+            var modalBox = $(this).attr('data-modal-id');
+            $('#'+modalBox).fadeIn($(this).data());
+        });
+
+
+        $(".js-modal-close, .modal-overlay").click(function() {
+            $(".modal-box, .modal-overlay").fadeOut(500, function() {
+                $(".modal-overlay").remove();
+            });
+        });
+
+        $(window).resize(function() {
+            $(".modal-box").css({
+                top: ($(window).height() - $(".modal-box").outerHeight()) / 2,
+                left: ($(window).width() - $(".modal-box").outerWidth()) / 2
+            });
+        });
+
+        $(window).resize();
+
+    });
+
+
 </script>
 
 </div>
