@@ -64,14 +64,21 @@ class TaskManager
      */
     public function updateTask($task, $data)
     {
-        $task->setTaskTitle($data['task_title']);
-        $task->setDescription($data['description']);
-        $task->setEstimate($data['estimate']);
-        $task->setPriority($data['priority']);
-        $task->setAssignedUserId($data['assigned_user_id']);
-        $task->setStatus($data['status']);
+        if(isset($data['task_title']))
+            $task->setTaskTitle($data['task_title']);
+        if(isset($data['description']))
+            $task->setDescription($data['description']);
+        if(isset($data['estimate']))
+            $task->setEstimate($data['estimate']);
+        if(isset($data['priority']))
+            $task->setPriority($data['priority']);
+        if(isset($data['assigned_user_id']))
+            $task->setAssignedUserId($data['assigned_user_id']);
+        if(isset($data['status']))
+            $task->setStatus($data['status']);
+
         $currentDate = date('Y-m-d H:i:s');
-        $task->setDateCreated($currentDate);
+        $task->setDateUpdated($currentDate);
 
         // Apply changes to database.
         $this->entityManager->flush();

@@ -196,6 +196,12 @@ class Task
     protected $dateCreated;
 
     /**
+     * @ORM\Column(name="date_updated")
+     * @ORM\GeneratedValue
+     */
+    protected $dateUpdated;
+
+    /**
      * @ORM\Column(name="assigned_user_id")
      * @ORM\GeneratedValue
      */
@@ -388,6 +394,24 @@ class Task
     public function setDateCreated($dateCreated) 
     {
         $this->dateCreated = $dateCreated;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateUpdated()
+    {
+        return $this->dateUpdated;
+    }
+
+    /**
+     * @param $dateUpdated
+     * @return $this
+     */
+    public function setDateUpdated($dateUpdated)
+    {
+        $this->dateUpdated = $dateUpdated;
         return $this;
     }
 

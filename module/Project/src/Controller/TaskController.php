@@ -257,6 +257,9 @@ class TaskController extends AbstractActionController
         // Check if user has submitted the form
         if ($this->getRequest()->isPost()) {
 
+            $data = $this->params()->fromPost();
+            $taskId = $data['task_id'];
+
             $task = $this->entityManager->getRepository(Task::class)
                 ->find($taskId);
 
@@ -267,46 +270,27 @@ class TaskController extends AbstractActionController
                 return $this->redirect()->toRoute('not-authorized');
             }
 
-            // Fill in the form with POST data
-            $data = $this->params()->fromPost();
+            try {
+                $userId = $data['user_id'];
+                $user = $this->entityManager->getRepository(User::class)
+                    ->find($userId);
 
-            $form->setData($data);
+                $taskData = ['assigned_user_id' => $userId];
 
-            // Validate form
-            if($form->isValid()) {
+                $this->taskManager->updateTask($task, $taskData);
 
-                // Get filtered and validated data
-                $data = $form->getData();
-
-                // Add comment.
-                try {
-                    $currentUser = $this->entityManager->getRepository(User::class)
-                        ->findOneByEmail($this->authService->getIdentity());
-
-                    $comment = $this->commentManager->addComment($data, $task, $currentUser);
-
-                    $viewModel = new ViewModel(
-                        ['comment' => $comment]
-                    );
-                    $viewModel->setTemplate('comment');
-                    $renderer = $this->rendererInterface;
-                    $html = $renderer->render($viewModel);
-
-                    //todo: russian translation should be here but json can't encode russian characters.
-                    $response->setContent(\Zend\Json\Json::encode(
-                        array(
-                            'response' => true,
-                            'message' => 'Your comment has been successfully added',
-                            'html' => $html
-                        )
-                    ));
-                }catch (\Exception $e){
-                    $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => $e->getMessage())));
-                }
-
-            }else{
-                $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Invalid data. Please try again')));
+                //todo: russian translation should be here but json can't encode russian characters.
+                $response->setContent(\Zend\Json\Json::encode(
+                    array(
+                        'response' => true,
+                        'message' => 'User was successfully assigned to the task',
+                        'user_name' => $user->getFullName()
+                    )
+                ));
+            }catch (\Exception $e){
+                $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => $e->getMessage())));
             }
+
         }else{
             $allUsers = $this->entityManager->getRepository(User::class)
                 ->findBy([], ['id'=>'ASC']);
