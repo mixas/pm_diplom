@@ -167,25 +167,6 @@ class ProjectForm extends Form
             ],
         ]);
 
-
-        // Add input for "password" field
-        $inputFilter->add([
-            'name' => 'description',
-            'required' => true,
-            'filters' => [
-            ],
-            'validators' => [
-                [
-                    'name' => 'StringLength',
-                    'options' => [
-                        'min' => 6,
-                        'max' => 1000
-                    ],
-                ],
-            ],
-        ]);
-
-
         // Add input for "status" field
         $inputFilter->add([
             'name' => 'status',
