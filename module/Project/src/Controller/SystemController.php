@@ -72,7 +72,7 @@ class SystemController extends AbstractActionController
 
                 $data = $this->params()->fromPost();
 
-                if($data['is_new']) {
+                if(isset($data['is_new']) && $data['is_new']) {
                     $task = $this->entityManager->getRepository(Task::class)
                         ->find($entityIdentifier);
                     if (!$task->getId()) {

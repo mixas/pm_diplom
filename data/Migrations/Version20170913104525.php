@@ -20,7 +20,7 @@ class Version20170913104525 extends AbstractMigration
         $table->addColumn('id', 'integer', ['autoincrement'=>true]);
         $table->addColumn('name', 'string', ['notnull'=>true, 'length'=>128]);
         $table->addColumn('code', 'string', ['notnull'=>true, 'length'=>10]);
-        $table->addColumn('description', 'string', ['notnull'=>true, 'length'=>512]);
+        $table->addColumn('description', 'text', ['notnull'=>true]);
         $table->addColumn('status', 'integer', ['notnull'=>true]);
         $table->addColumn('date_created', 'datetime', ['notnull'=>true]);
         $table->setPrimaryKey(['id']);
