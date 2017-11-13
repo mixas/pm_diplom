@@ -272,8 +272,8 @@ document.addEventListener("DOMContentLoaded", function(event){
 
         $(window).resize(function() {
             $(".modal-box").css({
-                top: ($(window).height() - $(".modal-box").outerHeight()) / 2,
-                left: ($(window).width() - $(".modal-box").outerWidth()) / 2
+                top: (($(window).height()/2) - ($(".modal-box").outerHeight()/2)) + 'px',
+                left: (($(window).width()/2) - ($(".modal-box").outerWidth()/2)) + 'px'
             });
         });
 

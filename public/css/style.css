@@ -179,9 +179,10 @@ div.container a.navbar-brand > img {
 
 .modal-box {
     display: none;
-    position: absolute;
+    position: fixed;
     z-index: 1000;
-    width: 98%;
+    width: 90%;
+    max-width: 400px;
     background: white;
     border-bottom: 1px solid #aaa;
     border-radius: 4px;
