@@ -293,6 +293,7 @@ function addMessage(message, type, scrollTo){
     html += message;
     html += '</div>';
 
+    $('#application-messages-wrapper').html('');
     $('#application-messages-wrapper').append(html);
 
     if(scrollTo != false) {
