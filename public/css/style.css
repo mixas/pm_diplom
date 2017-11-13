@@ -62,17 +62,17 @@ div.container a.navbar-brand > img {
 .left-attribute-block{
     margin-bottom: 5px;
 }
-.description-wrapper{
+.block-wrapper{
     margin-bottom: 30px;
 }
-.description-label{
+.block-label{
     margin-bottom: 10px;
 }
 .description-text{
     padding-left: 10px;
 }
 
-.comments-title{
+.block-title{
     margin-bottom: 10px;
 }
 .comment-block{
@@ -121,6 +121,31 @@ div.container a.navbar-brand > img {
 .comment-text textarea{
     width: 100%;
     height: 135px;
+}
+
+.time-log-block{
+    position: relative;
+}
+.time-log-edit-input{
+    display: none;
+    margin-top: 10px;
+    max-width: 220px;
+}
+.time-log-label{
+
+}
+.time-log-time{
+    font-weight: 900;
+}
+.time-log-save-button{
+    display: none;
+    float: right;
+}
+.cancel-time-log-edit-button{
+    display: none;
+}
+.buttons-wrapper{
+    max-width: 220px;
 }
 
 

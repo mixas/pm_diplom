@@ -2,6 +2,7 @@
 
 namespace Project\Controller;
 
+use Project\Entity\TimeLog;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Project\Entity\Comment;
@@ -43,10 +44,11 @@ class TaskController extends AbstractActionController
     /**
      * Constructor.
      */
-    public function __construct($entityManager, $taskManager, $authService, $rendererInterface)
+    public function __construct($entityManager, $taskManager, $timeLogManager, $authService, $rendererInterface)
     {
         $this->entityManager = $entityManager;
         $this->taskManager = $taskManager;
+        $this->timeLogManager = $timeLogManager;
         $this->authService = $authService;
         $this->rendererInterface = $rendererInterface;
     }
@@ -170,6 +172,7 @@ class TaskController extends AbstractActionController
             'task' => $task,
             'project' => $task->getProject(),
             'comments' => $comments,
+            'timeLogs' => $timeLogs,
             'spentTime' => $spentTime,
             'status' => $this->taskManager->getStatusAsString($task->getStatus())
         ]);
@@ -248,6 +251,7 @@ class TaskController extends AbstractActionController
 
 
     /**
+     * Reassign user for particular task action
      *
      * @return \Zend\Http\Response|\Zend\Stdlib\ResponseInterface
      */
@@ -314,6 +318,140 @@ class TaskController extends AbstractActionController
 
         return $response;
 
+    }
+
+
+    /**
+     * Add time log ajax action
+     *
+     * @return \Zend\Http\Response|\Zend\Stdlib\ResponseInterface
+     */
+    public function addtimelogAction(){
+        $response = $this->getResponse();
+
+        // Check if user has submitted the form
+        if ($this->getRequest()->isPost()) {
+
+            $data = $this->params()->fromPost();
+            $taskId = $data['task_id'];
+
+            $task = $this->entityManager->getRepository(Task::class)
+                ->find($taskId);
+
+            $currentUser = $this->entityManager->getRepository(User::class)
+                ->findOneByEmail($this->authService->getIdentity());
+
+            try {
+
+                $timeLogData = ['spent_time' => $data['spent_time']];
+
+                $timeLog = $this->timeLogManager->addTimeLog($timeLogData, $task, $currentUser);
+
+                $viewModel = new ViewModel(
+                    ['timeLog' => $timeLog]
+                );
+                $viewModel->setTemplate('time_log');
+                $renderer = $this->rendererInterface;
+                $html = $renderer->render($viewModel);
+
+
+                $timeLogs = $task->getTimeLogs();
+                $spentTime = 0;
+                foreach ($timeLogs as $timeLog) {
+                    $spentTime += $timeLog->getSpentTime();
+                }
+                $spentTimeViewModel = new ViewModel(
+                    ['task' => $task,
+                    'spentTime' => $spentTime]
+                );
+                $spentTimeViewModel->setTemplate('spent_time');
+                $spentTimeHtml = $renderer->render($spentTimeViewModel);
+
+                //todo: russian translation should be here but json can't encode russian characters.
+                $response->setContent(\Zend\Json\Json::encode(
+                    array(
+                        'response' => true,
+                        'message' => 'User was successfully assigned to the task',
+                        'html' => $html,
+                        'spent_time_html' => $spentTimeHtml
+                    )
+                ));
+            }catch (\Exception $e){
+                $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => $e->getMessage())));
+            }
+
+        }else{
+            $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Invalid request')));
+        }
+
+        return $response;
+
+    }
+
+    public function edittimelogAction(){
+        $response = $this->getResponse();
+
+        if ($this->getRequest()->isPost()) {
+
+            // Fill in the form with POST data
+            $data = $this->params()->fromPost();
+            $timeLogId = $data['time_log_id'];
+
+            try {
+                $timeLog = $this->entityManager->getRepository(TimeLog::class)
+                    ->find($timeLogId);
+
+                $task = $timeLog->getTask();
+
+                if (!$timeLog->getId()) {
+                    $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Time log was not found')));
+                    return $response;
+                }
+
+                if (!$this->access('comments.manage.own', ['comment' => $timeLog])) {
+                    $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'You are not allowed to manage this comment')));
+                    return $response;
+                }
+                $this->timeLogManager->updateTimeLog($timeLog, $data);
+
+                $viewModel = new ViewModel(
+                    ['timeLog' => $timeLog]
+                );
+                $viewModel->setTemplate('time_log');
+                $renderer = $this->rendererInterface;
+                $html = $renderer->render($viewModel);
+
+
+                $allTimeLogs = $task->getTimeLogs();
+                $spentTime = 0;
+                foreach ($allTimeLogs as $timeLogGeneral) {
+                    $spentTime += $timeLogGeneral->getSpentTime();
+                }
+                $spentTimeViewModel = new ViewModel(
+                    ['task' => $task,
+                    'spentTime' => $spentTime]
+                );
+                $spentTimeViewModel->setTemplate('spent_time');
+                $spentTimeHtml = $renderer->render($spentTimeViewModel);
+
+                //todo: russian translation should be here but json can't encode russian characters.
+                $response->setContent(\Zend\Json\Json::encode(
+                    array(
+                        'response' => true,
+                        'message' => 'Your comment has been successfully updated',
+                        'html' => $html,
+                        'spent_time_html' => $spentTimeHtml
+                    )
+                ));
+            }catch (\Exception $e){
+                $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => $e->getMessage())));
+            }
+
+        } else {
+            $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Invalid Request')));
+        }
+
+        return $response;
     }
 
 }

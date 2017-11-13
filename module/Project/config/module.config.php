@@ -38,7 +38,7 @@ return [
                 ['actions' => ['index', 'view', 'edit', 'add', 'createTechnicalAssignment', 'editTechnicalAssignment', 'viewTechnicalAssignment', 'assignUsers'], 'allow' => '+projects.view'],
             ],
             Controller\TaskController::class => [
-                ['actions' => ['index', 'view', 'edit', 'add', 'reassign'], 'allow' => '+projects.view'],
+                ['actions' => ['index', 'view', 'edit', 'add', 'reassign', 'addtimelog', 'edittimelog'], 'allow' => '+projects.view'],
 //                ['actions' => ['edit', 'add'], 'allow' => '+projects.manage.all']
             ],
             Controller\TaskStatusController::class => [
@@ -167,6 +167,8 @@ return [
         'template_map' => [
             'comment' => __DIR__ . '/../view/project/task/comment.phtml',
             'all_users' => __DIR__ . '/../view/project/task/all-users.phtml',
+            'time_log' => __DIR__ . '/../view/project/task/time-log.phtml',
+            'spent_time' => __DIR__ . '/../view/project/task/spent-time.phtml',
         ]
     ],
 
@@ -174,6 +176,7 @@ return [
         'factories' => [
             Service\ProjectManager::class => Service\Factory\ProjectManagerFactory::class,
             Service\TaskManager::class => Service\Factory\TaskManagerFactory::class,
+            Service\TimeLogManager::class => Service\Factory\TimeLogManagerFactory::class,
             Service\TaskStatusManager::class => Service\Factory\TaskStatusManagerFactory::class,
             Service\CommentManager::class => Service\Factory\CommentManagerFactory::class,
             Service\RbacProjectAssertionManager::class => Service\Factory\RbacProjectAssertionManagerFactory::class,

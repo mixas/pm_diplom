@@ -1,0 +1,26 @@
+<?php $estimate = $task->getEstimate(); ?>
+<?php if($estimate != null): ?>
+    <!-- Estimate line -->
+    <dl class="left-attribute-block">
+        <dt>Estimate:</dt>
+        <dd><?= $task->getEstimate() ?></dd>
+    </dl>
+    <div class="progress progress-estimate">
+        <div class="progress-bar" role="progressbar" aria-valuenow="<?= $task->getEstimate() ?>"
+             aria-valuemin="0" aria-valuemax="<?= $task->getEstimate() ?>" style="width:100%">
+        </div>
+    </div>
+
+    <!-- Spent time line -->
+    <?php $percentValue = $spentTime * 100 / $estimate; ?>
+    <?php $class = ($spentTime > $estimate)? 'progress-bar-danger': 'progress-bar-success'; ?>
+    <dl class="left-attribute-block">
+        <dt>Spent time:</dt>
+        <dd><?= $spentTime ?></dd>
+    </dl>
+    <div class="progress progress-estimate">
+        <div class="progress-bar <?= $class; ?>" role="progressbar" aria-valuenow="<?= $spentTime; ?>"
+             aria-valuemin="0" aria-valuemax="<?= $estimate ?>" style="width:<?= $percentValue; ?>%">
+        </div>
+    </div>
+<?php endif; ?>

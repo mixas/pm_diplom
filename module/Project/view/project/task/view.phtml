@@ -21,6 +21,7 @@ $estimate = $task->getEstimate();
 <h3><?= $this->escapeHtml($task->getTaskTitle()); ?></h3>
 <a class="btn btn-default" href="<?php echo $this->url('tasks', ['action' => 'edit', 'task' => $task->getId(), 'project' => $project->getCode()]); ?>"><span class="glyphicon glyphicon-pencil"></span> Edit</a>
 <a class="btn btn-default" href="#" data-modal-id="reassign-user-popup" onclick="reassign(); return false;"><span class="glyphicon glyphicon-share-alt"></span> Re-assign</a>
+<a class="btn btn-default" href="#" data-modal-id="time-log-popup" onclick="return false;"><span class="glyphicon glyphicon-time"></span> Add time log</a>
 
 
     <div id="reassign-user-popup" class="modal-box">
@@ -31,6 +32,19 @@ $estimate = $task->getEstimate();
         <div class="modal-body" id="reassign-modal-popup-body">
         </div>
         <footer><a href="#" class="btn btn-default"  onclick="reassignPost(<?= $task->getId(); ?>); return false;"><span class="glyphicon glyphicon-check"></span> Assign</a></footer>
+    </div>
+
+    <div id="time-log-popup" class="modal-box">
+        <header>
+            <a href="#" class="js-modal-close close">x</a>
+            <h3>Add time log</h3>
+        </header>
+        <div class="modal-body" id="reassign-modal-popup-body">
+            <label for="input">Time log</label>
+            <br>
+            <input type="text" name="spent_time" id="spent-time">
+        </div>
+        <footer><a href="#" class="btn btn-default"  onclick="addTimeLogPost(<?= $task->getId(); ?>); return false;"><span class="glyphicon glyphicon-check"></span> Add</a></footer>
     </div>
 
 
@@ -54,22 +68,36 @@ $estimate = $task->getEstimate();
 </div>
 
 
-<div class="description-wrapper">
-    <div class="description-label"><strong>Description:</strong></div>
+<div class="block-wrapper">
+    <div class="block-label"><strong>Description:</strong></div>
     <div class="description-text"><?= $this->escapeHtml($task->getDescription()) ?></div>
 </div>
 
 
-<?php if($comments): ?>
-    <div class="comments-wrapper" id="comments-wrapper">
-        <div class="comments-title"><strong>Comments:</strong></div>
+<div class="time-logs-wrapper block-wrapper" id="time-logs-wrapper">
+    <div class="block-title time-logs-title"><strong>Time logs:</strong></div>
+    <?php if(count($timeLogs)): ?>
+        <?php foreach ($timeLogs as $timeLog): ?>
+            <?= $this->partial('time-log.phtml', array('timeLog' => $timeLog)); ?>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <div class="no-entities">There are no time logs added</div>
+    <?php endif; ?>
+</div>
+
+
+<div class="comments-wrapper block-wrapper" id="comments-wrapper">
+    <div class="block-title comments-title"><strong>Comments:</strong></div>
+    <?php if(count($comments)): ?>
         <?php foreach ($comments as $comment): ?>
             <?= $this->partial('comment.phtml', array('comment' => $comment)); ?>
         <?php endforeach; ?>
-    </div>
-<?php else: ?>
-    There are no comments yet
-<?php endif; ?>
+    <?php else: ?>
+        There are no comments yet added
+    <?php endif; ?>
+</div>
+
+
 
 <div class="add-comment-block">
 <!--    --><?//= $commentForm; ?>
@@ -80,190 +108,11 @@ $estimate = $task->getEstimate();
     <?= $this->formElement($commentForm->get('submit')); ?>
 </div>
 
-<script type="text/javascript">
-    function addComment(){
-        var data = {};
-        data.comment_text = $('#comment-text').val();
-        $.ajax({
-            type:'POST',
-            dataType: 'json',
-            url:'/comments/add/<?php echo $task->getId(); ?>',
-            data: data,
-            success: function(data){
-                console.log(data);
-                if(data.response) {
-                    addMessage(data.message, 'success');
-                    $('#comment-text').val('');
-                }else{
-                    addMessage(data.message, 'danger')
-                }
-                if(data.html){
-                    $(".comments-wrapper").append(data.html);
-                }
-            }
-        });
-    }
-
-    function editComment(commentId){
-        var commentText = $('#comment-text-' + commentId);
-        var editButton = $('#edit-button-' + commentId);
-        var commentTextArea = $('#comment-textarea-' + commentId);
-        var cancelButton = $('#cancel-edit-button-' + commentId);
-        var saveButton = $('#comment-save-button-' + commentId);
-        commentText.hide();
-        commentTextArea.show();
-        cancelButton.show();
-        editButton.hide();
-        saveButton.show();
-    }
-    function cancelEditComment(commentId){
-        var commentText = $('#comment-text-' + commentId);
-        var editButton = $('#edit-button-' + commentId);
-        var commentTextArea = $('#comment-textarea-' + commentId);
-        var cancelButton = $('#cancel-edit-button-' + commentId);
-        var saveButton = $('#comment-save-button-' + commentId);
-        commentText.show();
-        commentTextArea.hide();
-        cancelButton.hide();
-        editButton.show();
-        saveButton.hide();
-    }
-
-    function editCommentPost(commentId){
-        var data = {};
-        data.comment_text = $('#comment-textarea-' + commentId).val();
-        $.ajax({
-            type:'POST',
-            dataType: 'json',
-            url:'/comments/edit/' + commentId,
-            data: data,
-            success: function(data){
-                console.log(data);
-                if(data.response) {
-                    addMessage(data.message, 'success');
-                    cancelEditComment(commentId);
-                }else{
-                    addMessage(data.message, 'danger')
-                }
-                if(data.html){
-                    $("#comment-block-" + commentId).replaceWith(data.html);
-                }
-            }
-        });
-    }
-
-    function reassign(){
-        var data = {};
-        $.ajax({
-            type:'GET',
-            dataType: 'json',
-            url:'/tasks/reassign',
-            data: data,
-            success: function(data){
-                console.log(data);
-                if(data.response) {
-//                    addMessage(data.message, 'success');
-                }else{
-                    addMessage(data.message, 'danger')
-                }
-                if(data.html){
-                    $("#reassign-modal-popup-body").html(data.html);
-                }
-            }
-        });
-    }
-
-    function reassignPost(taskId){
-        var data = {};
-        data.task_id = taskId;
-        data.user_id = $('#assigned_user_id').val();
-        $.ajax({
-            type:'POST',
-            dataType: 'json',
-            url:'/tasks/reassign',
-            data: data,
-            success: function(data){
-                console.log(data);
-                if(data.response) {
-                    addMessage(data.message, 'success');
-                    if(data.user_name){
-                        $('#assigned-user-value').html(data.user_name);
-                    }
-                    closePopup();
-                }else{
-                    addMessage(data.message, 'danger')
-                }
-            }
-        });
-    }
-
-
-    /**
-     * jQuery popup js logic
-     */
-    $(function(){
-        var appendthis =  ("<div class='modal-overlay js-modal-close'></div>");
-
-        $('a[data-modal-id]').click(function(e) {
-            e.preventDefault();
-            $("body").append(appendthis);
-            $(".modal-overlay").fadeTo(500, 0.7);
-            //$(".js-modalbox").fadeIn(500);
-            var modalBox = $(this).attr('data-modal-id');
-            $('#'+modalBox).fadeIn($(this).data());
-        });
-
-
-        $(".js-modal-close, .modal-overlay").click(function() {
-            closePopup();
-        });
-
-        $(window).resize(function() {
-            $(".modal-box").css({
-                top: ($(window).height() - $(".modal-box").outerHeight()) / 2,
-                left: ($(window).width() - $(".modal-box").outerWidth()) / 2
-            });
-        });
-
-        $(window).resize();
-
-    });
-
-    function closePopup(){
-        $(".modal-box, .modal-overlay").fadeOut(500, function() {
-            $(".modal-overlay").remove();
-        });
-    }
-
-
-</script>
 
 </div>
 
 <div class="col-md-3">
-    <?php if($estimate != null): ?>
-        <!-- Estimate line -->
-        <dl class="left-attribute-block">
-            <dt>Estimate:</dt>
-            <dd><?= $task->getEstimate() ?></dd>
-        </dl>
-        <div class="progress progress-estimate">
-            <div class="progress-bar" role="progressbar" aria-valuenow="<?= $task->getEstimate() ?>"
-                 aria-valuemin="0" aria-valuemax="<?= $task->getEstimate() ?>" style="width:100%">
-            </div>
-        </div>
-
-        <!-- Spent time line -->
-        <?php $percentValue = $spentTime * 100 / $estimate; ?>
-        <?php $class = ($spentTime > $estimate)? 'progress-bar-danger': 'progress-bar-success'; ?>
-        <dl class="left-attribute-block">
-            <dt>Spent time:</dt>
-            <dd><?= $spentTime ?></dd>
-        </dl>
-        <div class="progress progress-estimate">
-            <div class="progress-bar <?= $class; ?>" role="progressbar" aria-valuenow="<?= $spentTime; ?>"
-                 aria-valuemin="0" aria-valuemax="<?= $estimate ?>" style="width:<?= $percentValue; ?>%">
-            </div>
-        </div>
-    <?php endif; ?>
+    <div id="spent-time-wrapper">
+        <?= $this->partial('spent-time.phtml', array('task' => $task, 'spentTime' => $spentTime)); ?>
+    </div>
 </div>

@@ -1,0 +1,30 @@
+<?php $user = $timeLog->getUser(); ?>
+<div class="time-log-block" id="time-log-block-<?= $timeLog->getId(); ?>">
+    <div class="time-log-header">
+        <span class="time-log-user-name"><strong><?= $user->getFullName(); ?></strong></span>
+
+        <span class="time-log-label">spent</span>
+        <span class="time-log-time" id="time-log-time-<?= $timeLog->getId(); ?>"><?= $timeLog->getSpentTime(); ?></span>
+
+        <span class="time-log-label">on</span>
+        <span class="time-log-date"><?= date('d F Y', strtotime($timeLog->getDateCreated())); ?></span>
+
+        <span class="edit-time-log-button" id="edit-time-log-button-<?= $timeLog->getId(); ?>"
+              onclick="editTimeLog(<?php echo $timeLog->getId(); ?>); return false;"><a href="#"
+                                                                                        class="btn btn-default"><span
+                    class="glyphicon glyphicon-pencil"></span></a></span>
+
+        <div class="clearer"></div>
+
+        <div class="buttons-wrapper">
+            <button onclick="editTimeLogPost(<?= $timeLog->getId(); ?>)" id="time-log-save-button-<?= $timeLog->getId(); ?>"
+                    class="time-log-save-button btn btn-default" type="button"><span class="glyphicon glyphicon-ok"></span> Save
+            </button>
+
+            <span class="cancel-time-log-edit-button" id="cancel-time-log-edit-button-<?= $timeLog->getId(); ?>" onclick="cancelEditTimeLog(<?php echo $timeLog->getId(); ?>); return false;"><a href="#" class="btn btn-default"><span class="	glyphicon glyphicon-remove"></span></a></span>
+        </div>
+    </div>
+    <input class="time-log-edit-input form-control" id="time-log-edit-input-<?= $timeLog->getId(); ?>"
+           value="<?= $timeLog->getSpentTime(); ?>">
+    <div class="clearer"></div>
+</div>

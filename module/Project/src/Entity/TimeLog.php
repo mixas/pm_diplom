@@ -3,6 +3,7 @@
 namespace Project\Entity;
 
 use Project\Service\TaskManager;
+use Project\Service\TimeLogManager;
 
 use Doctrine\ORM\Mapping as ORM;
 
@@ -42,6 +43,30 @@ class TimeLog
     public function setTask(\Project\Entity\Task $task)
     {
         $this->task = $task;
+        return $this;
+    }
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User\Entity\User", inversedBy="timeLogs")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id")
+     */
+    protected $user;
+
+    /**
+     * @return \User\Entity\User
+     */
+    public function getUser()
+    {
+        return $this->user;
+    }
+
+    /**
+     * @param \User\Entity\User $user
+     * @return $this
+     */
+    public function setUser(\User\Entity\User $user)
+    {
+        $this->user = $user;
         return $this;
     }
 
