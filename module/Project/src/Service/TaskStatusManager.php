@@ -2,6 +2,7 @@
 
 namespace Project\Service;
 
+use Zend\Permissions\Rbac\Rbac;
 use Project\Entity\TaskStatus;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Math\Rand;
@@ -20,11 +21,18 @@ class TaskStatusManager
     /**
      * Constructs the service.
      */
-    public function __construct($entityManager) 
+    public function __construct($entityManager, $rbacManager)
     {
         $this->entityManager = $entityManager;
+        $this->rbacManager = $rbacManager;
     }
-    
+
+    /**
+     * RBAC manager.
+     * @var User\Service\RbacManager
+     */
+    private $rbacManager;
+
     /**
      * This method adds a new user.
      */
@@ -64,6 +72,15 @@ class TaskStatusManager
         $this->entityManager->flush();
 
         return true;
+    }
+
+    /**
+     * Deletes the given task status.
+     */
+    public function deleteTaskStatus($taskStatus)
+    {
+        $this->entityManager->remove($taskStatus);
+        $this->entityManager->flush();
     }
 
     /**

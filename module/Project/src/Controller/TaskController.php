@@ -41,16 +41,19 @@ class TaskController extends AbstractActionController
      */
     private $authService;
 
+    private $rbacManager;
+
     /**
      * Constructor.
      */
-    public function __construct($entityManager, $taskManager, $timeLogManager, $authService, $rendererInterface)
+    public function __construct($entityManager, $taskManager, $timeLogManager, $authService, $rendererInterface, $rbacManager)
     {
         $this->entityManager = $entityManager;
         $this->taskManager = $taskManager;
         $this->timeLogManager = $timeLogManager;
         $this->authService = $authService;
         $this->rendererInterface = $rendererInterface;
+        $this->rbacManager = $rbacManager;
     }
 
     /**
@@ -65,7 +68,10 @@ class TaskController extends AbstractActionController
             ->findByAssignedUserId($currentUser->getId(), ['id'=>'ASC']);
 
         return new ViewModel([
-            'tasks' => $tasks
+            'tasks' => $tasks,
+            'taskManager' => $this->taskManager,
+            'currentUser' => $currentUser,
+            'rbacManager' => $this->rbacManager,
         ]);
     }
 
@@ -247,6 +253,41 @@ class TaskController extends AbstractActionController
             'form' => $form,
             'roles'=>$allRoles
         ));
+    }
+
+    /**
+     * This action deletes a task.
+     */
+    public function deleteAction()
+    {
+        $id = (int)$this->params()->fromRoute('task', -1);
+        if ($id < 1) {
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+
+        $task = $this->entityManager->getRepository(Task::class)
+            ->find($id);
+
+        $project = $task->getProject();
+        if (!$this->access('projects.manage.all') &&
+            !$this->access('projects.manage.own', ['project' => $project])) {
+            return $this->redirect()->toRoute('not-authorized');
+        }
+
+        if ($task == null) {
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+
+        // Delete role.
+        $this->taskManager->deleteTask($task);
+
+        // Add a flash message.
+        $this->flashMessenger()->addSuccessMessage('Task has been removed.');
+
+        // Redirect to "index" page
+        return $this->redirect()->toRoute('tasks', ['action'=>'index']);
     }
 
 

@@ -35,17 +35,18 @@ return [
         //TODO:: We should add dynamic assertions for editPermissions action
         'controllers' => [
             Controller\ProjectController::class => [
-                ['actions' => ['index', 'view', 'edit', 'add', 'createTechnicalAssignment', 'editTechnicalAssignment', 'viewTechnicalAssignment', 'assignUsers'], 'allow' => '+projects.view'],
+                ['actions' => ['index', 'view', 'edit', 'add', 'delete', 'createTechnicalAssignment', 'editTechnicalAssignment', 'viewTechnicalAssignment', 'assignUsers'], 'allow' => '+projects.view'],
+                ['actions' => ['delete'], 'allow' => '+projects.delete']
             ],
             Controller\TaskController::class => [
-                ['actions' => ['index', 'view', 'edit', 'add', 'reassign', 'addtimelog', 'edittimelog'], 'allow' => '+projects.view'],
+                ['actions' => ['index', 'view', 'edit', 'add', 'delete', 'reassign', 'addtimelog', 'edittimelog'], 'allow' => '+projects.view'],
 //                ['actions' => ['edit', 'add'], 'allow' => '+projects.manage.all']
             ],
             Controller\TaskStatusController::class => [
-                ['actions' => ['index', 'view', 'edit', 'add'], 'allow' => '+status.manage'],
+                ['actions' => ['index', 'view', 'edit', 'add', 'delete'], 'allow' => '+status.manage'],
             ],
             Controller\CommentController::class => [
-                ['actions' => ['index', 'edit', 'add'], 'allow' => '+projects.view'],
+                ['actions' => ['index', 'edit', 'add', 'delete'], 'allow' => '+projects.view'],
             ],
             Controller\SystemController::class => [
                 ['actions' => ['chooseUserAutomatically'], 'allow' => '+projects.view'],

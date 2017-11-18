@@ -9,13 +9,14 @@ $this->pageBreadcrumbs()->setItems([
 ]);
 ?>
 
-<h1>Manage Tasks</h1>
+<h1>Assigned Tasks</h1>
 
 <table class="table table-striped">
 
     <tr>
         <th>ID</th>
         <th>Title</th>
+        <th>Status</th>
         <th>Description</th>
         <th>Date Created</th>
         <th>Actions</th>
@@ -27,6 +28,7 @@ $this->pageBreadcrumbs()->setItems([
         <tr>
             <td><?= $this->escapeHtml($task->getId()); ?></td>
             <td><?= $this->escapeHtml($task->getTaskTitle()); ?></td>
+            <td><strong><?= $this->escapeHtml($taskManager->getStatusAsString($task->getStatus())); ?></strong></td>
             <td><?= $this->escapeHtml($task->getDescription()); ?></td>
             <td><?= $this->escapeHtml($task->getDateCreated()); ?></td>
             <td>
@@ -38,6 +40,13 @@ $this->pageBreadcrumbs()->setItems([
                     ['action'=>'view', 'task' => $task->getId(), 'project' => $project->getCode()]); ?>">
                     <span class="glyphicon glyphicon-pencil" ></span> View
                 </a>
+                <?php if ($this->access('projects.manage.all') ||
+                        $this->access('projects.manage.own', ['project' => $project])): ?>
+                    <a class="btn btn-danger" href="<?= $this->url('tasks',
+                        ['action' => 'delete', 'project' => $project->getCode(), 'task' => $task->getId()]); ?>">
+                        <span class="glyphicon glyphicon-remove"></span> Delete
+                    </a>
+                <?php endif; ?>
             </td>
         </tr>
 

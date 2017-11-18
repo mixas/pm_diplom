@@ -246,3 +246,7 @@ a.close:hover {
     -moz-transition: color 1s ease;
     transition: color 1s ease;
 }
+
+.table-striped .btn{
+    margin-bottom: 10px;
+}

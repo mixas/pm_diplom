@@ -2,6 +2,7 @@
 
 namespace Project\Service;
 
+use Zend\Permissions\Rbac\Rbac;
 use Project\Entity\Task;
 use Project\Entity\TaskStatus;
 use User\Entity\User;
@@ -24,11 +25,18 @@ class TaskManager
     /**
      * Constructs the service.
      */
-    public function __construct($entityManager) 
+    public function __construct($entityManager, $rbacManager)
     {
         $this->entityManager = $entityManager;
+        $this->rbacManager = $rbacManager;
     }
-    
+
+    /**
+     * RBAC manager.
+     * @var User\Service\RbacManager
+     */
+    private $rbacManager;
+
     /**
      * This method adds a new task to DB.
      */
@@ -84,6 +92,21 @@ class TaskManager
         $this->entityManager->flush();
 
         return true;
+    }
+
+    /**
+     * Deletes the given task.
+     */
+    public function deleteTask($task)
+    {
+        $this->entityManager->remove($task);
+        $comments = $task->getComments();
+        $comments->initialize();
+        foreach ($comments as $comment) {
+            $this->entityManager->remove($comment);
+        }
+        $this->entityManager->remove($task);
+        $this->entityManager->flush();
     }
 
     /**

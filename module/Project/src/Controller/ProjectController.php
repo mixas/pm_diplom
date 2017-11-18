@@ -39,14 +39,25 @@ class ProjectController extends AbstractActionController
      */
     private $technicalAssignmentManager;
 
+
+    /**
+     * Auth service.
+     * @var Zend\Authentication\AuthenticationService
+     */
+    private $authService;
+
+    private $rbacManager;
+
     /**
      * Constructor.
      */
-    public function __construct($entityManager, $projectManager, $technicalAssignmentManager)
+    public function __construct($entityManager, $projectManager, $technicalAssignmentManager, $authService, $rbacManager)
     {
         $this->entityManager = $entityManager;
         $this->projectManager = $projectManager;
         $this->technicalAssignmentManager = $technicalAssignmentManager;
+        $this->authService = $authService;
+        $this->rbacManager = $rbacManager;
     }
 
     /**
@@ -58,8 +69,13 @@ class ProjectController extends AbstractActionController
         $projects = $this->entityManager->getRepository(Project::class)
             ->findBy([], ['code'=>'ASC']);
 
+        $currentUser = $this->entityManager->getRepository(User::class)
+            ->findOneByEmail($this->authService->getIdentity());
+
         return new ViewModel([
-            'projects' => $projects
+            'projects' => $projects,
+            'currentUser' => $currentUser,
+            'rbacManager' => $this->rbacManager,
         ]);
     }
 
@@ -199,6 +215,42 @@ class ProjectController extends AbstractActionController
             'form' => $form
         ));
     }
+
+    /**
+     * This action deletes a permission.
+     */
+    public function deleteAction()
+    {
+        $code = $this->params()->fromRoute('code', -1);
+        if ($code == -1 || $code == null) {
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+
+        $project = $this->entityManager->getRepository(Project::class)
+            ->findOneByCode($code);
+
+//        if (!$this->access('projects.manage.all') &&
+//            !$this->access('projects.manage.own', ['project' => $project])) {
+//            return $this->redirect()->toRoute('not-authorized');
+//        }
+
+        if ($project == null) {
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+
+        // Delete role.
+        $this->projectManager->deleteProject($project);
+
+        // Add a flash message.
+        $this->flashMessenger()->addSuccessMessage('Project has been removed.');
+
+        // Redirect to "index" page
+        return $this->redirect()->toRoute('projects', ['action'=>'index']);
+    }
+
+
 
     function assignUsersAction(){
         $code = $this->params()->fromRoute('code', -1);

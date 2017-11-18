@@ -46,6 +46,12 @@ $this->pageBreadcrumbs()->setItems([
                     ['action'=>'view', 'code'=>$project->getCode()]); ?>">
                     <span class="glyphicon glyphicon-pencil" ></span> View
                 </a>
+                <?php if ($this->rbacManager->isGranted(null, 'projects.delete')): ?>
+                    <a class="btn btn-danger" href="<?= $this->url('projects',
+                        ['action' => 'delete', 'code' => $project->getCode()]); ?>">
+                        <span class="glyphicon glyphicon-remove"></span> Delete
+                    </a>
+                <?php endif; ?>
             </td>
         </tr>
 

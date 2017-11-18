@@ -7,6 +7,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 use Project\Controller\TaskController;
 use Project\Service\TaskManager;
 use Project\Service\TimeLogManager;
+use User\Service\RbacManager;
 
 /**
  * This is the factory for IndexController. Its purpose is to instantiate the
@@ -21,8 +22,9 @@ class TaskControllerFactory implements FactoryInterface
         $imeLogManager = $container->get(TimeLogManager::class);
         $authService = $container->get(\Zend\Authentication\AuthenticationService::class);
         $rendererInterface = $container->get('Zend\View\Renderer\RendererInterface');
+        $rbacManager = $container->get(RbacManager::class);
         
         // Instantiate the controller and inject dependencies
-        return new TaskController($entityManager, $taskManager, $imeLogManager, $authService, $rendererInterface);
+        return new TaskController($entityManager, $taskManager, $imeLogManager, $authService, $rendererInterface, $rbacManager);
     }
 }

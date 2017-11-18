@@ -93,7 +93,7 @@ $estimate = $task->getEstimate();
             <?= $this->partial('comment.phtml', array('comment' => $comment)); ?>
         <?php endforeach; ?>
     <?php else: ?>
-        There are no comments yet added
+        <div class="there-are-no-comments">There are no comments yet added</div>
     <?php endif; ?>
 </div>
 

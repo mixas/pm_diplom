@@ -1,6 +1,7 @@
 <?php
 namespace Project\Service;
 
+use Zend\Permissions\Rbac\Rbac;
 use Project\Entity\Project;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Math\Rand;
@@ -26,9 +27,10 @@ class ProjectManager
     /**
      * Constructs the service.
      */
-    public function __construct($entityManager) 
+    public function __construct($entityManager, $rbacManager)
     {
         $this->entityManager = $entityManager;
+        $this->rbacManager = $rbacManager;
     }
     
     /**
@@ -80,6 +82,25 @@ class ProjectManager
         $this->entityManager->flush();
 
         return true;
+    }
+
+    /**
+     * Deletes the given project.
+     */
+    public function deleteProject($project)
+    {
+        $this->entityManager->remove($project);
+        $tasks = $project->getTasks();
+        $tasks->initialize();
+        foreach ($tasks as $task) {
+            $comments = $task->getComments();
+            $comments->initialize();
+            foreach ($comments as $comment) {
+                $this->entityManager->remove($comment);
+            }
+            $this->entityManager->remove($task);
+        }
+        $this->entityManager->flush();
     }
 
     /**

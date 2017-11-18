@@ -166,6 +166,36 @@ class TaskStatusController extends AbstractActionController
         ));
     }
 
+
+    /**
+     * This action deletes a task.
+     */
+    public function deleteAction()
+    {
+        $id = (int)$this->params()->fromRoute('id', -1);
+        if ($id < 1) {
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+
+        $taskStatus = $this->entityManager->getRepository(TaskStatus::class)
+            ->find($id);
+
+        if ($taskStatus == null) {
+            $this->getResponse()->setStatusCode(404);
+            return;
+        }
+
+        // Delete role.
+        $this->taskStatusManager->deleteTaskStatus($taskStatus);
+
+        // Add a flash message.
+        $this->flashMessenger()->addSuccessMessage('Status has been removed.');
+
+        // Redirect to "index" page
+        return $this->redirect()->toRoute('tasks', ['action'=>'index']);
+    }
+
 }
 
 

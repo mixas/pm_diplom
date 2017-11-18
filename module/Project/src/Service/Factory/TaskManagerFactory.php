@@ -4,6 +4,7 @@ namespace Project\Service\Factory;
 
 use Interop\Container\ContainerInterface;
 use Project\Service\TaskManager;
+use User\Service\RbacManager;
 
 /**
  * This is the factory class for UserManager service. The purpose of the factory
@@ -17,7 +18,8 @@ class TaskManagerFactory
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {        
         $entityManager = $container->get('doctrine.entitymanager.orm_default');
+        $rbacManager = $container->get(RbacManager::class);
                         
-        return new TaskManager($entityManager);
+        return new TaskManager($entityManager, $rbacManager);
     }
 }

@@ -64,6 +64,9 @@ function addComment(taskId){
             if(data.html){
                 $(".comments-wrapper").append(data.html);
             }
+            if($('.there-are-no-comments').length > 0){
+                $('.there-are-no-comments').remove();
+            }
         }
     });
 }
