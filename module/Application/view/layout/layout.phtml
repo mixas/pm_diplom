@@ -15,13 +15,15 @@
             ->prependStylesheet($this->basePath('css/style.css'))
             ->prependStylesheet($this->basePath('css/bootstrap-theme.min.css'))
             ->prependStylesheet($this->basePath('css/bootstrap.min.css'))
+            ->prependStylesheet($this->basePath('css/jquery-ui.css'))
         ?>
 
         <!-- Scripts -->
         <?= $this->headScript()
             ->prependFile($this->basePath('js/bootstrap.min.js'))
-            ->prependFile($this->basePath('js/jquery-3.1.0.min.js'))
             ->prependFile($this->basePath('js/project-helper.js'))
+            ->prependFile($this->basePath('js/jquery-ui.js'))
+            ->prependFile($this->basePath('js/jquery-3.1.0.min.js'))
         ?>
     </head>
     <body>
@@ -32,6 +34,11 @@
 <!--                    <div class="app-caption">User Demo</div>-->
 <!--                </div>                -->
 <!--            </div>-->
+            <div class="row">
+                <div class="col-md-12">
+                    <img class="top-banner" src="<?php echo $this->basePath() . '/img/top-banner.jpg'; ?>" alt="">
+                </div>
+            </div>
             <div class="row">
                 <div class="col-md-12">
                     <!-- Navigation bar -->

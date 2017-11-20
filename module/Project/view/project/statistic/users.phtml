@@ -1,0 +1,81 @@
+<?php
+$this->headTitle('Users Statistic');
+
+$this->mainMenu()->setActiveItemId('stats');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home'=>$this->url('home'),
+    'Users Statistic'=>$this->url('stats'),
+]);
+?>
+
+<h1>Users Statistic</h1>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<div id="tabs">
+    <ul>
+        <?php foreach ($roles as $role): ?>
+            <?php if(in_array($role->getName(), $excludedRoles)): ?>
+                <?php continue; ?>
+            <?php endif; ?>
+            <li><a href="#tabs-<?php echo $role->getId(); ?>"><?php echo $role->getName(); ?></a></li>
+        <?php endforeach; ?>
+    </ul>
+    <?php foreach ($roles as $role): ?>
+        <?php if(in_array($role->getName(), $excludedRoles)): ?>
+            <?php continue; ?>
+        <?php endif; ?>
+    <?php if(isset($statistic[$role->getId()])): ?>
+
+        <?php $roleUsers = $role->getUsers(); ?>
+        <?php $roleUsers->initialize(); ?>
+        <?php if(count($roleUsers) == 0): ?>
+            <?php continue; ?>
+        <?php endif; ?>
+
+<!--        --><?php //foreach($roleUsers as $roleUser): ?>
+<!--            --><?php //$userData = [$roleUser->getFullName(), 100, 200]; ?>
+<!--        --><?php //endforeach; ?>
+
+        <?php $chartData = $statistic[$role->getId()]; ?>
+        <?php $header = [['User', 'Estimated Value', 'Actual Value']]; ?>
+        <?php $chartData = array_merge($header, $chartData); ?>
+<!--        --><?php //$chartData = [['User', 'Estimated Value', 'Actual Value']]; ?>
+
+    <div id="tabs-<?php echo $role->getId(); ?>">
+        <script type="text/javascript">
+            google.charts.load('current', {'packages':['bar']});
+            google.charts.setOnLoadCallback(drawChart);
+
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable(<?php echo json_encode($chartData); ?>);
+
+                var options = {
+                    chart: {
+                        title: 'Users performance coefficient',
+//                        subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+                    },
+                    bars: 'horizontal' // Required for Material Bar Charts.
+                };
+
+                var chart = new google.charts.Bar(document.getElementById('barchart_material<?php echo $role->getId(); ?>'));
+
+                chart.draw(data, google.charts.Bar.convertOptions(options));
+            }
+        </script>
+
+        <div id="barchart_material<?php echo $role->getId(); ?>" style="width: 900px; height: 500px;"></div>
+    </div>
+
+        <?php endif; ?>
+    <?php endforeach; ?>
+</div>
+
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function(event) {
+        $(function () {
+            $("#tabs").tabs();
+        });
+    });
+</script>

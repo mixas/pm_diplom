@@ -250,3 +250,9 @@ a.close:hover {
 .table-striped .btn{
     margin-bottom: 10px;
 }
+
+
+.top-banner{
+    max-width: 100%;
+    opacity: .5;
+}

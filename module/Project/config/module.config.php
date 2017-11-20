@@ -17,6 +17,7 @@ return [
             Controller\TaskStatusController::class => Controller\Factory\TaskStatusControllerFactory::class,
             Controller\CommentController::class => Controller\Factory\CommentControllerFactory::class,
             Controller\SystemController::class => Controller\Factory\SystemControllerFactory::class,
+            Controller\StatisticController::class => Controller\Factory\StatisticControllerFactory::class,
         ],
     ],
 
@@ -50,6 +51,9 @@ return [
             ],
             Controller\SystemController::class => [
                 ['actions' => ['chooseUserAutomatically'], 'allow' => '+projects.view'],
+            ],
+            Controller\StatisticController::class => [
+                ['actions' => ['index', 'users', 'projects'], 'allow' => '+stats.view'],
             ],
         ]
     ],
@@ -132,6 +136,20 @@ return [
                     ],
                 ],
             ],
+            'stats' => [
+                'type'    => Segment::class,
+                'options' => [
+                    'route'    => '/stats[/:action[/:id]]',
+                    'constraints' => [
+                        'action' => '[a-zA-Z][a-zA-Z0-9_-]*',
+                        'id' => '[a-zA-Z0-9_-]*',
+                    ],
+                    'defaults' => [
+                        'controller'    => Controller\StatisticController::class,
+                        'action'        => 'index',
+                    ],
+                ],
+            ],
         ],
     ],
 //    'access_filter' => [
@@ -183,6 +201,7 @@ return [
             Service\RbacProjectAssertionManager::class => Service\Factory\RbacProjectAssertionManagerFactory::class,
             Service\TechnicalAssignmentManager::class => Service\Factory\TechnicalAssignmentManagerFactory::class,
             Service\SolutionProcessor::class => Service\Factory\SolutionProcessorFactory::class,
+            Service\StatisticManager::class => Service\Factory\StatisticManagerFactory::class,
             Service\PriorityProcessor\PriorityAbstract::class => Service\PriorityProcessor\Factory\PriorityAbstractFactory::class,
         ],
     ],

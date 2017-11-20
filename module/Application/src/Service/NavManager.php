@@ -63,32 +63,35 @@ class NavManager
             ];
         }
 
-
-        $manageTaskStatuses = [];
-
-        if ($this->rbacManager->isGranted(null, 'status.manage')) {
-            $manageTaskStatuses = [
-                'id' => 'statuses',
-                'label' => 'Manage statuses',
-                'link' => $url('statuses')
-            ];
-        }
-
         if ($this->rbacManager->isGranted(null, 'projects.view')) {
             $items[] = [
-                'id' => 'tasks_menu',
-                'label' => 'Tasks',
-                'float' => 'left',
-                'dropdown' => [
-                    [
-                        'id' => 'tasks',
-                        'label' => 'Assigned tasks',
-                        'link' => $url('tasks')
-                    ],
-                    $manageTaskStatuses
-                ]
+                'id' => 'tasks',
+                'label' => 'Assigned tasks',
+                'link' => $url('tasks')
             ];
         }
+
+        $statsDropdownItems = [];
+
+        if ($this->rbacManager->isGranted(null, 'stats.view')) {
+            $statsDropdownItems[] = [
+                'id' => 'users_stats',
+                'label' => 'Users Statistic',
+                'link' => $url('stats', ['action' => 'users'])
+            ];
+            $statsDropdownItems[] = [
+                'id' => 'projects_stats',
+                'label' => 'Projecs Statistic',
+                'link' => $url('stats', ['action' => 'projects'])
+            ];
+
+            $items[] = [
+                'id' => 'stats',
+                'label' => 'Statistic',
+                'dropdown' => $statsDropdownItems
+            ];
+        }
+
 
         // Display "Login" menu item for not authorized user only. On the other hand,
         // display "Admin" and "Logout" menu items only for authorized users.
@@ -127,6 +130,15 @@ class NavManager
                             'link' => $url('roles')
                         ];
             }
+
+            if ($this->rbacManager->isGranted(null, 'status.manage')) {
+                $adminDropdownItems[] = [
+                    'id' => 'statuses',
+                    'label' => 'Manage statuses',
+                    'link' => $url('statuses')
+                ];
+            }
+
 
             if (count($adminDropdownItems)!=0) {
                 $items[] = [
