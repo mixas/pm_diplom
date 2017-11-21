@@ -4,7 +4,7 @@
         <span class="time-log-user-name"><strong><?= $user->getFullName(); ?></strong></span>
 
         <span class="time-log-label">spent</span>
-        <span class="time-log-time" id="time-log-time-<?= $timeLog->getId(); ?>"><?= $timeLog->getSpentTime(); ?></span>
+        <span class="time-log-time" id="time-log-time-<?= $timeLog->getId(); ?>"><?= $this->projectHelper()->formatTime($timeLog->getSpentTime()); ?></span>
 
         <span class="time-log-label">on</span>
         <span class="time-log-date"><?= date('d F Y', strtotime($timeLog->getDateCreated())); ?></span>
@@ -24,7 +24,32 @@
             <span class="cancel-time-log-edit-button" id="cancel-time-log-edit-button-<?= $timeLog->getId(); ?>" onclick="cancelEditTimeLog(<?php echo $timeLog->getId(); ?>); return false;"><a href="#" class="btn btn-default"><span class="	glyphicon glyphicon-remove"></span></a></span>
         </div>
     </div>
-    <input class="time-log-edit-input form-control" id="time-log-edit-input-<?= $timeLog->getId(); ?>"
-           value="<?= $timeLog->getSpentTime(); ?>">
+    <form action="#" class="time-log-edit-form" id="time-log-form-edit-<?= $timeLog->getId(); ?>">
+        <label for="spent_time_hours_edit_<?= $timeLog->getId(); ?>">H</label>
+        <input class="time-log-edit-input form-control" name="spent_time_hours_edit_<?= $timeLog->getId(); ?>" id="spent_time_hours_edit_<?= $timeLog->getId(); ?>"
+            value="<?= $this->projectHelper()->formatTime($timeLog->getSpentTime(), 'h'); ?>">
+        <label for="spent_time_minutes_edit_<?= $timeLog->getId(); ?>">M</label>
+        <input class="time-log-edit-input form-control" name="spent_time_minutes_edit_<?= $timeLog->getId(); ?>" id="spent_time_minutes_edit_<?= $timeLog->getId(); ?>"
+               value="<?= $this->projectHelper()->formatTime($timeLog->getSpentTime(), 'm'); ?>">
+    </form>
     <div class="clearer"></div>
+
+    <script type="text/javascript">
+        jQuery.validator.setDefaults({
+            debug: true,
+            success: "valid"
+        });
+        $("#time-log-form-edit-<?= $timeLog->getId(); ?>").validate({
+            rules: {
+                spent_time_hours_edit_<?= $timeLog->getId(); ?>: {
+                    required: false,
+                    number: true
+                },
+                spent_time_minutes_edit_<?= $timeLog->getId(); ?>: {
+                    required: false,
+                    number: true
+                },
+            }
+        });
+    </script>
 </div>

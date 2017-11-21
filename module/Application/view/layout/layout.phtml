@@ -20,6 +20,7 @@
 
         <!-- Scripts -->
         <?= $this->headScript()
+            ->prependFile($this->basePath('js/jquery.validation.js'))
             ->prependFile($this->basePath('js/bootstrap.min.js'))
             ->prependFile($this->basePath('js/project-helper.js'))
             ->prependFile($this->basePath('js/jquery-ui.js'))

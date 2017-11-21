@@ -84,10 +84,25 @@ class TaskForm extends Form
         ]);
 
         $this->add([
-            'type' => 'text',
+            'type' => 'hidden',
             'name' => 'estimate',
             'options' => [
                 'label' => 'Estimate',
+            ],
+        ]);
+        $this->add([
+            'type' => 'text',
+            'name' => 'estimate_hours',
+            'options' => [
+                'label' => 'Estimate hours',
+            ],
+        ]);
+
+        $this->add([
+            'type' => 'text',
+            'name' => 'estimate_minutes',
+            'options' => [
+                'label' => 'Estimate minutes',
             ],
         ]);
 

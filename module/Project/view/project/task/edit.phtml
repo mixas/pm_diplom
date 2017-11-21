@@ -26,7 +26,21 @@ $form->get('status')->setAttributes([
 
 $form->get('estimate')->setAttributes([
     'class' => 'form-control',
+    'id' => 'estimate',
     'placeholder' => 'Estimate'
+]);
+
+$form->get('estimate_hours')->setAttributes([
+    'class' => 'form-control',
+    'id' => 'estimate_hours',
+    'placeholder' => 'Hours',
+    'value' => $this->projectHelper()->formatTime($task->getEstimate(), 'h')
+]);
+$form->get('estimate_minutes')->setAttributes([
+    'class' => 'form-control',
+    'id' => 'estimate_minutes',
+    'placeholder' => 'Minutes',
+    'value' => $this->projectHelper()->formatTime($task->getEstimate(), 'm'),
 ]);
 
 $form->get('priority')->setAttributes([
@@ -43,7 +57,7 @@ $form->get('assigned_user_id')->setAttributes([
 
 
 $form->get('submit')
-    ->setAttributes(['class' => 'btn btn-primary'])
+    ->setAttributes(['class' => 'btn btn-primary', 'onclick' => 'prepareSubmit();'])
     ->setValue('Save');
 
 $form->prepare();
@@ -84,6 +98,15 @@ $form->prepare();
             <?= $this->formLabel($form->get('estimate')); ?>
             <?= $this->formElement($form->get('estimate')); ?>
             <?= $this->formElementErrors($form->get('estimate')); ?>
+            <br>
+
+            <?= $this->formLabel($form->get('estimate_hours')); ?>
+            <?= $this->formElement($form->get('estimate_hours')); ?>
+            <?= $this->formElementErrors($form->get('estimate_hours')); ?>
+
+            <?= $this->formLabel($form->get('estimate_minutes')); ?>
+            <?= $this->formElement($form->get('estimate_minutes')); ?>
+            <?= $this->formElementErrors($form->get('estimate_minutes')); ?>
         </div>
 
 
@@ -117,3 +140,39 @@ $form->prepare();
         <?= $this->form()->closeTag(); ?>
     </div>
 </div>
+
+<script type="text/javascript">
+
+    window.onload = function() {
+        $("#project-form" ).validate({
+            rules: {
+                estimate_hours: {
+                    required: false,
+                    number: true
+                },
+                estimate_minutes: {
+                    required: false,
+                    number: true
+                },
+            }
+        });
+    };
+
+    function prepareSubmit() {
+        var estimate_time_hours = $('#estimate_hours').val();
+        var estimate_time_minutes = $('#estimate_minutes').val();
+
+        if (!$('#project-form').valid()){
+            alert('Not valid value for estimate time');
+            return false;
+        }
+
+        var totalEstimateMinutes = (Number(estimate_time_hours) * 60) + Number(estimate_time_minutes);
+        if (!$.isNumeric(totalEstimateMinutes)) {
+            alert('Not valid value for estimate time');
+            return false;
+        }
+        $('#estimate').val(totalEstimateMinutes);
+        return true;
+    }
+</script>

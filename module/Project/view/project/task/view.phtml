@@ -40,13 +40,39 @@ $estimate = $task->getEstimate();
             <h3>Add time log</h3>
         </header>
         <div class="modal-body" id="reassign-modal-popup-body">
-            <label for="input">Time log</label>
-            <br>
-            <input type="text" name="spent_time" id="spent-time">
+            <form action="#" id="time-log-form">
+                <label for="">Time Log</label>
+                <br>
+                <label for="spent-time-hours">H</label>
+                <input type="text" class="form-control spent-time-input" name="spent_time_hours" id="spent_time_hours">
+                <br>
+                <label for="spent-time-minutes">M</label>
+                <input type="text" class="form-control spent-time-input" name="spent_time_minutes" id="spent_time_minutes">
+            </form>
         </div>
         <footer><a href="#" class="btn btn-default"  onclick="addTimeLogPost(<?= $task->getId(); ?>); return false;"><span class="glyphicon glyphicon-check"></span> Add</a></footer>
     </div>
 
+    <script>
+        window.onload = function() {
+            jQuery.validator.setDefaults({
+                debug: true,
+                success: "valid"
+            });
+            $("#time-log-form" ).validate({
+                rules: {
+                    spent_time_hours: {
+                        required: false,
+                        number: true
+                    },
+                    spent_time_minutes: {
+                        required: false,
+                        number: true
+                    },
+                }
+            });
+        };
+    </script>
 
 <div class="general-info-wrapper">
     <dl class="general-info-attribute-block">

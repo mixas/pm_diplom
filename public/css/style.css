@@ -125,11 +125,20 @@ div.container a.navbar-brand > img {
 
 .time-log-block{
     position: relative;
+    margin: 10px;
+}
+.time-log-edit-form{
+    display: none;
 }
 .time-log-edit-input{
-    display: none;
     margin-top: 10px;
-    max-width: 220px;
+    max-width: 60px;
+    display: inline-block;
+}
+.spent-time-input{
+    max-width: 60px;
+    display: inline-block;
+    margin-bottom: 10px;
 }
 .time-log-label{
 

@@ -2,7 +2,7 @@
 <!-- Estimate line -->
 <dl class="left-attribute-block">
     <dt>Estimate:</dt>
-    <dd><?= $task->getEstimate() ?></dd>
+    <dd><?= $this->projectHelper()->formatTime($task->getEstimate()); ?></dd>
 </dl>
 <div class="progress progress-estimate">
     <div class="progress-bar" role="progressbar" aria-valuenow="<?= $task->getEstimate() ?>"
@@ -19,7 +19,7 @@
 <?php $class = ($spentTime > $estimate)? 'progress-bar-danger': 'progress-bar-success'; ?>
 <dl class="left-attribute-block">
     <dt>Spent time:</dt>
-    <dd><?= $spentTime ?></dd>
+    <dd><?= $this->projectHelper()->formatTime($spentTime); ?></dd>
 </dl>
 <div class="progress progress-estimate">
     <div class="progress-bar <?= $class; ?>" role="progressbar" aria-valuenow="<?= $spentTime; ?>"

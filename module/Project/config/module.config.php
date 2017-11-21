@@ -7,6 +7,7 @@ use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Project\Entity\Task;
+use Zend\ServiceManager\Factory\InvokableFactory;
 
 return [
 
@@ -211,6 +212,14 @@ return [
         ],
     ],
 
+    'view_helpers' => [
+        'factories' => [
+            View\Helper\Project::class => InvokableFactory::class,
+        ],
+        'aliases' => [
+            'projectHelper' => View\Helper\Project::class,
+        ],
+    ],
 ];
 
 

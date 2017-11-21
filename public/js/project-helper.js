@@ -122,9 +122,22 @@ function editCommentPost(commentId){
 function addTimeLogPost(taskId){
     var data = {};
     data.task_id = taskId;
-    data.spent_time = $('#spent-time').val();
+    var spent_time_hours = $('#spent_time_hours').val();
+    var spent_time_minutes = $('#spent_time_minutes').val();
+
+    if(!$('#time-log-form').valid()){
+        alert('Not valid value for time');
+    }
+
+    console.log(spent_time_hours);
+    console.log(spent_time_minutes);
+
+    data.spent_time = (Number(spent_time_hours) * 60) + Number(spent_time_minutes);
+
+    console.log(data.spent_time);
+
     if(!$.isNumeric(data.spent_time)){
-        console.log('Non numeric value for spent_time');
+        alert('Not valid value for time');
         return false;
     }
     $.ajax({
@@ -152,7 +165,7 @@ function addTimeLogPost(taskId){
 function editTimeLog(timeLogId){
     var commentText = $('#time-log-time-' + timeLogId);
     var editButton = $('#edit-time-log-button-' + timeLogId);
-    var commentTextArea = $('#time-log-edit-input-' + timeLogId);
+    var commentTextArea = $('#time-log-form-edit-' + timeLogId);
     var cancelButton = $('#cancel-time-log-edit-button-' + timeLogId);
     var saveButton = $('#time-log-save-button-' + timeLogId);
     commentText.hide();
@@ -164,7 +177,7 @@ function editTimeLog(timeLogId){
 function cancelEditTimeLog(timeLogId){
     var commentText = $('#time-log-time-' + timeLogId);
     var editButton = $('#edit-time-log-button-' + timeLogId);
-    var commentTextArea = $('#time-log-edit-input-' + timeLogId);
+    var commentTextArea = $('#time-log-form-edit-' + timeLogId);
     var cancelButton = $('#cancel-time-log-edit-button-' + timeLogId);
     var saveButton = $('#time-log-save-button-' + timeLogId);
     commentText.show();
@@ -175,7 +188,20 @@ function cancelEditTimeLog(timeLogId){
 }
 function editTimeLogPost(timeLogId){
     var data = {};
-    data.spent_time = $('#time-log-edit-input-' + timeLogId).val();
+
+    if(!$('#spent_time_hours_edit_' + timeLogId).valid() || !$('#spent_time_minutes_edit_' + timeLogId)){
+        alert('Not valid value for time');
+    }
+
+    var spent_time_hours = $('#spent_time_hours_edit_' + timeLogId).val();
+    var spent_time_minutes = $('#spent_time_minutes_edit_' + timeLogId).val();
+
+    data.spent_time = (Number(spent_time_hours) * 60) + Number(spent_time_minutes);
+    if(!$.isNumeric(data.spent_time)){
+        alert('Not valid value for time');
+        return false;
+    }
+
     data.time_log_id = timeLogId;
     $.ajax({
         type:'POST',
