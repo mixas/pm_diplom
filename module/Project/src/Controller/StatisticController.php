@@ -84,16 +84,25 @@ class StatisticController extends AbstractActionController
     }
 
     public function projectsAction(){
-        $currentUser = $this->entityManager->getRepository(User::class)
-            ->findOneByEmail($this->authService->getIdentity());
 
-        $tasks = $this->entityManager->getRepository(Task::class)
-            ->findByAssignedUserId($currentUser->getId(), ['id'=>'ASC']);
+        $projects = $this->entityManager->getRepository(Project::class)
+            ->findBy([], ['code'=>'ASC']);
+
+//        $excludedRoles = ['Administrator', 'Guest', 'Project Manager'];
+//
+//        $roles = $this->entityManager->getRepository(Role::class)
+//            ->findBy([], ['id'=>'ASC']);
+//
+//        $users = $this->entityManager->getRepository(User::class)
+//            ->findBy([], ['id'=>'ASC']);
+//
+//        $statistic = $this->statisticManager->getUsersStats($excludedRoles);
+
+        $projectsStats = $this->statisticManager->getProjectsStats();
 
         return new ViewModel([
-            'tasks' => $tasks,
-            'taskManager' => $this->taskManager,
-            'currentUser' => $currentUser,
+            'projects' => $projects,
+            'projectsStats' => $projectsStats,
         ]);
     }
 

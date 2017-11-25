@@ -1,0 +1,42 @@
+<?php
+$this->headTitle('Projects Statistic');
+
+$this->mainMenu()->setActiveItemId('stats');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home'=>$this->url('home'),
+    'Project Statistic'=>$this->url('stats'),
+]);
+
+$currencyCode = 'UAH';
+?>
+
+<h1>Projects Statistic</h1>
+
+<table class="table table-striped">
+
+    <tr>
+        <th>ID</th>
+        <th>Code</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Total Tasks Estimate Time</th>
+        <th>Total Spent Time</th>
+        <th>Total Salary Wastes</th>
+    </tr>
+
+    <?php foreach ($projects as $project): ?>
+
+        <tr>
+            <td><?= $this->escapeHtml($project->getId()); ?></td>
+            <td><?= $this->escapeHtml($project->getCode()); ?></td>
+            <td><?= $this->escapeHtml($project->getName()); ?></td>
+            <td><?= $this->escapeHtml($project->getDescription()); ?></td>
+            <td><?= $this->escapeHtml($this->projectHelper()->formatTime($projectsStats[$project->getId()]['estimate_time'])); ?></td>
+            <td><?= $this->escapeHtml($this->projectHelper()->formatTime($projectsStats[$project->getId()]['time'])); ?></td>
+            <td><?= $this->escapeHtml($projectsStats[$project->getId()]['salary']) . ' ' . $currencyCode; ?></td>
+        </tr>
+
+    <?php endforeach; ?>
+
+</table>

@@ -6,6 +6,7 @@ use Project\Entity\Task;
 use Project\Entity\TaskStatus;
 use User\Entity\User;
 use User\Entity\Role;
+use Project\Entity\Project;
 use Zend\Crypt\Password\Bcrypt;
 use Zend\Math\Rand;
 
@@ -179,6 +180,39 @@ class StatisticManager
         }
     }
 
+
+    public function getProjectsStats(){
+        $projects = $this->entityManager->getRepository(Project::class)
+            ->findBy([], ['code'=>'ASC']);
+
+        $projectsStats = [];
+
+        foreach ($projects as $project) {
+            $projectTasks = $project->getTasks();
+            $projectTasks->initialize();
+            $projectTime = 0;
+            $projectAmount = 0;
+            $projectEstimateTime = 0;
+            foreach ($projectTasks as $projectTask) {
+                $taskTimeLogs = $projectTask->getTimeLogs();
+                foreach ($taskTimeLogs as $taskTimeLog) {
+                    $spentTime = $taskTimeLog->getSpentTime();
+                    $projectTime += $spentTime;
+                    $timeLogUser = $taskTimeLog->getUser();
+                    $rate = $timeLogUser->getSalaryRate();
+                    $amount = $rate * $spentTime / 60;//division by 60 minutes
+                    $projectAmount += $amount;
+                }
+                $taskEstimate = $projectTask->getEstimate();
+                $projectEstimateTime += $taskEstimate;
+            }
+            $projectsStats[$project->getId()]['time'] = round($projectTime);
+            $projectsStats[$project->getId()]['salary'] = round($projectAmount);
+            $projectsStats[$project->getId()]['estimate_time'] = round($projectEstimateTime);
+        }
+
+        return $projectsStats;
+    }
 
 }
 
