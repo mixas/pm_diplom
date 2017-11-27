@@ -21,7 +21,6 @@ $this->pageBreadcrumbs()->setItems([
 <table class="table table-striped">
 
    <tr>
-        <th>ID</th>
         <th>E-mail</th>
         <th>Full Name</th>
         <th>Role(s)</th>        
@@ -33,7 +32,6 @@ $this->pageBreadcrumbs()->setItems([
     <?php foreach ($users as $user): ?>
     
     <tr>
-        <td><?= $this->escapeHtml($user->getId()); ?></td>
         <td>
             <a href="<?= $this->url('users', ['action'=>'view', 'id'=>$user->getId()]); ?>">
                 <?= $this->escapeHtml($user->getEmail()); ?>

@@ -21,7 +21,6 @@ $this->pageBreadcrumbs()->setItems([
 <table class="table table-striped">
 
    <tr>
-        <th>ID</th>
         <th>Name</th>
         <th>Description</th>
         <th>Date Created</th>
@@ -31,7 +30,6 @@ $this->pageBreadcrumbs()->setItems([
     <?php foreach ($roles as $role): ?>
     
     <tr>
-        <td><?= $this->escapeHtml($role->getId()); ?></td>
         <td>
             <a href="<?= $this->url('roles', ['action'=>'view', 'id'=>$role->getId()]); ?>">
                 <?= $this->escapeHtml($role->getName()); ?>

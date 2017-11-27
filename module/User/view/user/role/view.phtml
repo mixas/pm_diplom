@@ -63,9 +63,6 @@ $this->pageBreadcrumbs()->setItems([
                 <td>
                     <input type="checkbox" disabled <?php if (isset($effectivePermissions[$permission->getName()])) echo 'checked'; ?>>
                     <?= $this->escapeHtml($permission->getName()) ?>
-                    <?php if (isset($effectivePermissions[$permission->getName()]) && $effectivePermissions[$permission->getName()]=='inherited'): ?>
-                    <em>(inherited)</em>
-                    <?php endif; ?>
                 </td>
                 <td><?= $this->escapeHtml($permission->getDescription()) ?></td>
             </tr>

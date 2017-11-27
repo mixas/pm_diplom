@@ -21,7 +21,6 @@ $this->pageBreadcrumbs()->setItems([
 <table class="table table-striped">
 
    <tr>
-        <th>ID</th>
         <th>Name</th>
         <th>Description</th>
         <th>Date Created</th>
@@ -31,7 +30,6 @@ $this->pageBreadcrumbs()->setItems([
     <?php foreach ($permissions as $permission): ?>
     
     <tr>
-        <td><?= $this->escapeHtml($permission->getId()); ?></td>
         <td>
             <a href="<?= $this->url('permissions', ['action'=>'view', 'id'=>$permission->getId()]); ?>">
                 <?= $this->escapeHtml($permission->getName()); ?>
