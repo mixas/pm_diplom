@@ -34,38 +34,58 @@ $this->pageBreadcrumbs()->setItems([
             <?php continue; ?>
         <?php endif; ?>
 
-<!--        --><?php //foreach($roleUsers as $roleUser): ?>
-<!--            --><?php //$userData = [$roleUser->getFullName(), 100, 200]; ?>
-<!--        --><?php //endforeach; ?>
-
-        <?php $chartData = $statistic[$role->getId()]; ?>
+        <?php $minorData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_MINOR]; ?>
         <?php $header = [['User', 'Estimated Value', 'Actual Value']]; ?>
-        <?php $chartData = array_merge($header, $chartData); ?>
-<!--        --><?php //$chartData = [['User', 'Estimated Value', 'Actual Value']]; ?>
+        <?php $minorData = array_merge($header, $minorData); ?>
+
+
+        <?php $criticalData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_CRITICAL]; ?>
+        <?php $header = [['User', 'Estimated Value', 'Actual Value']]; ?>
+        <?php $criticalData = array_merge($header, $criticalData); ?>
 
     <div id="tabs-<?php echo $role->getId(); ?>">
         <script type="text/javascript">
             google.charts.load('current', {'packages':['bar']});
-            google.charts.setOnLoadCallback(drawChart);
+            google.charts.setOnLoadCallback(drawMinorChart);
 
-            function drawChart() {
-                var data = google.visualization.arrayToDataTable(<?php echo json_encode($chartData); ?>);
+            function drawMinorChart() {
+                var data = google.visualization.arrayToDataTable(<?php echo json_encode($minorData); ?>);
 
                 var options = {
                     chart: {
-                        title: 'Users performance coefficient',
+                        title: 'Users performance coefficient for minor tasks',
 //                        subtitle: 'Sales, Expenses, and Profit: 2014-2017',
                     },
                     bars: 'horizontal' // Required for Material Bar Charts.
                 };
 
-                var chart = new google.charts.Bar(document.getElementById('barchart_material<?php echo $role->getId(); ?>'));
+                var chart = new google.charts.Bar(document.getElementById('barchart_material_minor_<?php echo $role->getId(); ?>'));
+
+                chart.draw(data, google.charts.Bar.convertOptions(options));
+            }
+
+            google.charts.load('current', {'packages':['bar']});
+            google.charts.setOnLoadCallback(drawCriticalChart);
+
+            function drawCriticalChart() {
+                var data = google.visualization.arrayToDataTable(<?php echo json_encode($criticalData); ?>);
+
+                var options = {
+                    chart: {
+                        title: 'Users performance coefficient for critical tasks',
+//                        subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+                    },
+                    bars: 'horizontal' // Required for Material Bar Charts.
+                };
+
+                var chart = new google.charts.Bar(document.getElementById('barchart_material_critical_<?php echo $role->getId(); ?>'));
 
                 chart.draw(data, google.charts.Bar.convertOptions(options));
             }
         </script>
 
-        <div id="barchart_material<?php echo $role->getId(); ?>" style="width: 900px; height: 500px;"></div>
+        <div class="chart-wrapper" id="barchart_material_minor_<?php echo $role->getId(); ?>" style="width: 900px; height: 500px;"></div>
+        <div class="chart-wrapper" id="barchart_material_critical_<?php echo $role->getId(); ?>" style="width: 900px; height: 500px;"></div>
     </div>
 
         <?php endif; ?>

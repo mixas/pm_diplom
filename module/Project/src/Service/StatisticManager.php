@@ -34,6 +34,10 @@ class StatisticManager
         $roles = $this->entityManager->getRepository(Role::class)
             ->findBy([], ['id'=>'ASC']);
 
+        $criticalPriority = Task::PRIORITY_CRITICAL;
+        $minorPriority = Task::PRIORITY_MINOR;
+        $priorities = [$criticalPriority, $minorPriority];
+
         $effectivityCoefficientArray = [];
 
         foreach ($roles as $userRole) {
@@ -41,46 +45,91 @@ class StatisticManager
                 continue;
             }
 
-//            $effectivityCoefficientArray[] = ['User', 'Estimated Value', 'Actual Value'];
+//            $effectivityCoefficientArray[] = ['User', 'Estimated Time/Estimated expenses', 'Actual Time/Actual Expenses'];
 
             $roleUsers = $userRole->getUsers();
             $roleUsers->initialize();
 
             $roleId = $userRole->getId();
 
+
+            //calculate average salary
+            $queryBuilder = $this->entityManager->createQueryBuilder();
+            $queryBuilder
+                ->select('avg(u.salary_rate) salary_rate')
+                ->from('user', 'u')
+                ->leftJoin('user_role', 'ur', 'ON', 'u.id = ur.user_id')
+                ->where("ur.role_id = $roleId");
+
+
+            $query = $queryBuilder->getQuery();
+            $stmt = $this->entityManager->getConnection()->prepare($query->getDQL());
+            $stmt->execute();
+            $averageSalaryResult = $stmt->fetch();
+            $averageSalary = $averageSalaryResult['salary_rate'];
+
+
             foreach ($roleUsers as $user) {
 
-                $queryBuilder = $this->entityManager->createQueryBuilder();
 
-                $userId = $user->getId();
-                $queryBuilder
-                    ->select('t.id', 't.assigned_user_id', 'ur.role_id', 't.estimate', 'sum(tl.spent_time) real_spent_time')
-                    ->from('task', 't')
-                    ->leftJoin('user_role', 'ur', 'ON', 't.assigned_user_id = ur.user_id')
-                    ->leftJoin('time_log', 'tl', 'ON', 't.id = tl.task_id')
-                    ->where("ur.role_id = $roleId")
-                    ->andWhere("t.assigned_user_id = $userId")
-                    ->groupBy("tl.task_id");
+                foreach ($priorities as $priority) {
 
-                $query = $queryBuilder->getQuery();
+                    if($priority == $minorPriority) {
 
-                $stmt = $this->entityManager->getConnection()->prepare($query->getDQL());
-                $stmt->execute();
-                $allTasksForParticularRole = $stmt->fetchAll();
+                        $salaryCoefficient = $averageSalary / (float)$user->getSalaryRate();
+                    }
 
-                $estimateSum = 0;
-                $spentTimeSum = 0;
-                foreach ($allTasksForParticularRole as $task) {
-                    $estimateSum += $task['estimate'];
-                    $spentTimeSum += $task['real_spent_time'];
-                }
 
-                if($spentTimeSum == 0 || $estimateSum == 0){
+                    $queryBuilder = $this->entityManager->createQueryBuilder();
+
+                    $userId = $user->getId();
+                    $queryBuilder
+                        ->select('t.id', 't.assigned_user_id', 'ur.role_id', 't.estimate', 'sum(tl.spent_time) real_spent_time')
+                        ->from('task', 't')
+                        ->leftJoin('user_role', 'ur', 'ON', 't.assigned_user_id = ur.user_id')
+                        ->leftJoin('time_log', 'tl', 'ON', 't.id = tl.task_id')
+                        ->where("ur.role_id = $roleId")
+                        ->andWhere("t.priority = $priority")
+                        ->andWhere("t.assigned_user_id = $userId")
+                        ->groupBy("tl.task_id");
+
+                    $query = $queryBuilder->getQuery();
+
+                    $stmt = $this->entityManager->getConnection()->prepare($query->getDQL());
+                    $stmt->execute();
+                    $allTasksForParticularRole = $stmt->fetchAll();
+
+                    $estimateSum = 0;
+                    $spentTimeSum = 0;
+                    foreach ($allTasksForParticularRole as $task) {
+                        $estimateSum += $task['estimate'];
+                        $spentTimeSum += $task['real_spent_time'];
+                    }
+
+                    if($priority == $minorPriority) {
+                        $estimatedExpenses = $estimateSum * $salaryCoefficient;
+                        $realExpenses = $spentTimeSum * $salaryCoefficient;
+                        if ($estimatedExpenses == 0 || $realExpenses == 0) {
+
+                        } else {
+                            $effectivityCoefficientArray[$userRole->getId()][$priority][$userId] = [$user->getFullName(), $estimatedExpenses, $realExpenses];
+                        }
+                    }else{
+                        if ($spentTimeSum == 0 || $estimateSum == 0) {
+                        } else {
+                            $effectivityCoefficientArray[$userRole->getId()][$priority][$userId] = [$user->getFullName(), $estimateSum, $spentTimeSum];
+                        }
+                    }
+
+                    /*
+                    if ($spentTimeSum == 0 || $estimateSum == 0) {
 //                    $effectivityCoefficientArray[$userRole->getId()][$userId] = 0;
-                }else{
-                    $effectivityCoefficientArray[$userRole->getId()][$userId] = [$user->getFullName(), $estimateSum, $spentTimeSum];
-                }
+                    } else {
+                        $effectivityCoefficientArray[$userRole->getId()][$priority][$userId] = [$user->getFullName(), $estimateSum, $spentTimeSum];
+                    }
+                    */
 
+                }
             }
 
         }
@@ -88,14 +137,7 @@ class StatisticManager
         return $effectivityCoefficientArray;
 
     }
-
-    /**
-     * The main auto assign logic for Minor tasks
-     *
-     * @param $userType
-     * @return array
-     * @throws \Exception
-     */
+/*
     public function process($userType){
         $userRole = $this->entityManager->getRepository(Role::class)
             ->findOneById($userType, ['name'=>'ASC']);
@@ -179,7 +221,7 @@ class StatisticManager
             throw new \Exception("User was not found");
         }
     }
-
+*/
 
     public function getProjectsStats(){
         $projects = $this->entityManager->getRepository(Project::class)

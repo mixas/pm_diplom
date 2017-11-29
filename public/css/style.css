@@ -269,3 +269,7 @@ a.close:hover {
 .attachment-date{
     font-style: italic;
 }
+
+.chart-wrapper{
+    margin-bottom: 50px;
+}
