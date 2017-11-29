@@ -333,3 +333,54 @@ function addMessage(message, type, scrollTo){
 }
 /****************************************/
 /****************************************/
+
+
+/***********************************************/
+/* Form ajax sending logic using jQuery plugin */
+/***********************************************/
+// prepare the form when the DOM is ready
+$(document).ready(function() {
+    var options = {
+//            target:        '#output2',   // target element(s) to be updated with server response
+        beforeSubmit:  showRequest,  // pre-submit callback
+        success:       showResponse,  // post-submit callback
+        dataType: 'json'
+        // other available options:
+        //url:       url         // override for form's 'action' attribute
+        //type:      type        // 'get' or 'post', override for form's 'method' attribute
+        //dataType:  null        // 'xml', 'script', or 'json' (expected server response type)
+        //clearForm: true        // clear all form fields after successful submit
+        //resetForm: true        // reset the form after successful submit
+        // $.ajax options can be used here too, for example:
+        //timeout:   3000
+    };
+    // bind to the form's submit event
+    $('#upload-form').submit(function() {
+        $(this).ajaxSubmit(options);
+        return false;
+    });
+});
+
+// pre-submit callback
+function showRequest(formData, jqForm, options) {
+    var queryString = $.param(formData);
+    console.log(queryString);
+    return true;
+}
+
+// post-submit callback
+function showResponse(responseText, statusText, xhr, $form)  {
+console.log(responseText);
+console.log(statusText);
+    if(responseText.response) {
+        addMessage(responseText.message, 'success', false);
+        if(responseText.html){
+            $(".attachments-items-wrapper").append(responseText.html);
+        }
+        closePopup();
+    }else{
+        addMessage(responseText.message, 'danger');
+    }
+}
+/****************************************/
+/****************************************/

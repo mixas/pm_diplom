@@ -265,3 +265,7 @@ a.close:hover {
     max-width: 100%;
     opacity: .5;
 }
+
+.attachment-date{
+    font-style: italic;
+}

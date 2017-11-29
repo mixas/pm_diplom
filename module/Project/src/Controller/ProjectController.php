@@ -2,6 +2,7 @@
 
 namespace Project\Controller;
 
+use Project\Form\AttachmentForm;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Project\Entity\Project;
@@ -364,8 +365,15 @@ class ProjectController extends AbstractActionController
             return;
         }
 
+        $attachments = $technicalAssignment->getAttachments();
+        $attachments->initialize();
+
+        $form = new AttachmentForm('attachment');
+
         return new ViewModel([
             'technicalAssignment' => $technicalAssignment,
+            'attachments' => $attachments,
+            'attachmentForm' => $form,
             'project' => $project,
         ]);
     }

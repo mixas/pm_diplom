@@ -51,7 +51,7 @@ return [
                 ['actions' => ['index', 'edit', 'add', 'delete'], 'allow' => '+projects.view'],
             ],
             Controller\SystemController::class => [
-                ['actions' => ['chooseUserAutomatically'], 'allow' => '+projects.view'],
+                ['actions' => ['chooseUserAutomatically', 'uploadFile', 'removeFile', 'downloadFile'], 'allow' => '+projects.view'],
             ],
             Controller\StatisticController::class => [
                 ['actions' => ['index', 'users', 'projects'], 'allow' => '+stats.view'],
@@ -189,6 +189,8 @@ return [
             'all_users' => __DIR__ . '/../view/project/task/all-users.phtml',
             'time_log' => __DIR__ . '/../view/project/task/time-log.phtml',
             'spent_time' => __DIR__ . '/../view/project/task/spent-time.phtml',
+            'technical_assignment_attachments' => __DIR__ . '/../view/project/project/attachment.phtml',
+            'task_attachments' => __DIR__ . '/../view/project/task/attachment.phtml',
         ]
     ],
 
@@ -203,6 +205,7 @@ return [
             Service\TechnicalAssignmentManager::class => Service\Factory\TechnicalAssignmentManagerFactory::class,
             Service\SolutionProcessor::class => Service\Factory\SolutionProcessorFactory::class,
             Service\StatisticManager::class => Service\Factory\StatisticManagerFactory::class,
+            Service\AttachmentManager::class => Service\Factory\AttachmentManagerFactory::class,
             Service\PriorityProcessor\PriorityAbstract::class => Service\PriorityProcessor\Factory\PriorityAbstractFactory::class,
         ],
     ],

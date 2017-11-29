@@ -1,0 +1,6 @@
+<?php $attachment; ?>
+<div class="attachment-wrapper">
+    <span class="attachment-file-name"><strong><a target="_blank" href="<?= $this->url('system', ['action' => 'downloadFile', 'id' => $attachment->getId()]); ?>"><?= $attachment->getFileName(); ?></a></strong></span>
+    <span class="attachment-date"><?= date('d F Y', strtotime($attachment->getDateCreated())); ?></span>
+    <a href="<?= $this->url('system', ['action' => 'removeFile', 'id' => $attachment->getId()]); ?>" class="btn btn-default"><span class="glyphicon glyphicon-remove"></span></a>
+</div>

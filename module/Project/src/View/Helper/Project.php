@@ -21,4 +21,9 @@ class Project extends AbstractHelper
         return sprintf($format, $hours, $minutes);
     }
 
+
+    public function getFileLink($link){
+        return '/' . $link;
+    }
+
 }

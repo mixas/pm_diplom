@@ -31,6 +31,11 @@ use Doctrine\ORM\Mapping\GeneratedValue;
 class TechnicalAssignment
 {
 
+    public function __construct()
+    {
+        $this->attachments = new ArrayCollection();
+    }
+
     /**
      * One Cart has One Customer.
      * @ORM\OneToOne(targetEntity="Project\Entity\Project", inversedBy="technicalAssignment")
@@ -55,6 +60,28 @@ class TechnicalAssignment
         $this->project = $project;
         return $this;
     }
+
+    /**
+     * @ORM\OneToMany(targetEntity="Attachment", mappedBy="technicalAssignment")
+     */
+    protected $attachments;
+
+    /**
+     * @return array
+     */
+    public function getAttachments()
+    {
+        return $this->attachments;
+    }
+
+    /**
+     * @param $attachment
+     */
+    public function addAttachment($attachment)
+    {
+        $this->attachments[] = $attachment;
+    }
+
 
 
     /**

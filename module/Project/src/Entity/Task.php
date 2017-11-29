@@ -40,8 +40,6 @@ class Task
     }
 
     /**
-     * Sets associated project.
-     *
      * @param Project $project
      */
     public function setProject(\Project\Entity\Project $project)
@@ -50,6 +48,28 @@ class Task
 //        $project->addTask($this);
     }
 
+
+
+    /**
+     * @ORM\OneToMany(targetEntity="Attachment", mappedBy="task")
+     */
+    protected $attachments;
+
+    /**
+     * @return array
+     */
+    public function getAttachments()
+    {
+        return $this->attachments;
+    }
+
+    /**
+     * @param $attachment
+     */
+    public function addAttachment($attachment)
+    {
+        $this->attachments[] = $attachment;
+    }
 
 
     /**
@@ -63,8 +83,6 @@ class Task
         $this->timeLogs = new ArrayCollection();
     }
     /**
-     * Возвращает таски проекта.
-     *
      * @return array
      */
     public function getComments()

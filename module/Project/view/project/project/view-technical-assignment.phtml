@@ -16,6 +16,8 @@ $this->pageBreadcrumbs()->setItems([
 
 <div class="project-header">
     <h2>Technical Assignment for <?= $project->getName(); ?></h2>
+    <a class="btn btn-default" href="#" data-modal-id="attach-file-popup" onclick="return false;"><span class="glyphicon glyphicon-save-file"></span> Attach file</a>
+
     <a class="edit=link" href="<?= $this->url('projects', ['action' => 'editTechnicalAssignment', 'code' => $project->getCode()]); ?>">Edit</a>
 </div>
 
@@ -46,7 +48,11 @@ $this->pageBreadcrumbs()->setItems([
 
 <div class="attachments-wrapper">
     <div class="attachments-label"><strong>Attachments:</strong></div>
-    <div class="attachments-text"></div>
+    <div class="attachments-items-wrapper">
+        <?php foreach($attachments as $attachment): ?>
+            <?= $this->partial('attachment.phtml', array('attachment' => $attachment)); ?>
+        <?php endforeach; ?>
+    </div>
 </div>
 
 
@@ -55,3 +61,30 @@ $this->pageBreadcrumbs()->setItems([
 <div class="col-md-3">
 
 </div>
+
+
+
+<div id="attach-file-popup" class="modal-box">
+    <header>
+        <a href="#" class="js-modal-close close">x</a>
+        <h3>Assign another user</h3>
+    </header>
+    <div class="modal-body" id="attach-file-popup-body">
+        <form name="upload-form" id="upload-form" method="post" enctype="multipart/form-data" action="<?php echo $this->url('system', ['action' => 'uploadFile']); ?>">
+            <input type="hidden" name="project_id" value="<?= $project->getId(); ?>">
+            <div class="form-element">
+                <label for="image-file">File Upload</label>
+                <input type="file" name="attachment" id="attachment">
+            </div>
+
+            <button class="btn btn-default" style="margin-top: 20px; float: right;;">Submit</button>
+            <div class="clearer"></div>
+        </form>
+
+    </div>
+</div>
+
+
+<script>
+
+</script>
