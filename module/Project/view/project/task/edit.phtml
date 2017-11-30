@@ -95,18 +95,17 @@ $form->prepare();
         </div>
 
         <div class="form-group">
-            <?= $this->formLabel($form->get('estimate')); ?>
-            <?= $this->formElement($form->get('estimate')); ?>
-            <?= $this->formElementErrors($form->get('estimate')); ?>
-            <br>
+            <div class="estimates-block">
+                <label for="" style="text-align: center; display: block;">Estimate</label>
+                <?= $this->formLabel($form->get('estimate_hours')); ?>
+                <?= $this->formElement($form->get('estimate_hours')); ?>
+                <?= $this->formElementErrors($form->get('estimate_hours')); ?>
 
-            <?= $this->formLabel($form->get('estimate_hours')); ?>
-            <?= $this->formElement($form->get('estimate_hours')); ?>
-            <?= $this->formElementErrors($form->get('estimate_hours')); ?>
+                <?= $this->formLabel($form->get('estimate_minutes')); ?>
+                <?= $this->formElement($form->get('estimate_minutes')); ?>
+                <?= $this->formElementErrors($form->get('estimate_minutes')); ?>
+            </div>
 
-            <?= $this->formLabel($form->get('estimate_minutes')); ?>
-            <?= $this->formElement($form->get('estimate_minutes')); ?>
-            <?= $this->formElementErrors($form->get('estimate_minutes')); ?>
         </div>
 
 

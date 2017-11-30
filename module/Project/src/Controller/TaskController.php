@@ -103,6 +103,12 @@ class TaskController extends AbstractActionController
 
         $allRoles = $this->entityManager->getRepository(Role::class)
             ->findBy([], ['name'=>'ASC']);
+        $excludedRoles = ['Administrator', 'Guest', 'Project Manager'];
+        foreach ($allRoles  as $key => $role) {
+            if(in_array($role->getName(), $excludedRoles)){
+                unset($allRoles[$key]);
+            }
+        }
 
         // Check if user has submitted the form
         if ($this->getRequest()->isPost()) {
@@ -214,6 +220,14 @@ class TaskController extends AbstractActionController
 
         $allRoles = $this->entityManager->getRepository(Role::class)
             ->findBy([], ['name'=>'ASC']);
+        $excludedRoles = ['Administrator', 'Guest', 'Project Manager'];
+
+        foreach ($allRoles  as $key => $role) {
+            if(in_array($role->getName(), $excludedRoles)){
+                unset($allRoles[$key]);
+            }
+        }
+
 
         // Check if user has submitted the form
         if ($this->getRequest()->isPost()) {
