@@ -60,7 +60,7 @@ $this->pageBreadcrumbs()->setItems([
         <script type="text/javascript">
             <?php if($minorDataExists): ?>
             google.charts.load('current', {'packages':['bar']});
-            google.charts.setOnLoadCallback(drawMinorChart<?php echo $role->getId(); ?>);
+//            google.charts.setOnLoadCallback(drawMinorChart<?php //echo $role->getId(); ?>//);
 
             function drawMinorChart<?php echo $role->getId(); ?>() {
                 var data = google.visualization.arrayToDataTable(<?php echo json_encode($minorData); ?>);
@@ -79,7 +79,6 @@ $this->pageBreadcrumbs()->setItems([
             }
             <?php endif; ?>
             <?php if($criticalDataExists): ?>
-            google.charts.load('current', {'packages':['bar']});
             google.charts.setOnLoadCallback(drawCriticalChart<?php echo $role->getId(); ?>);
 
             function drawCriticalChart<?php echo $role->getId(); ?>() {
@@ -100,7 +99,7 @@ $this->pageBreadcrumbs()->setItems([
             <?php endif; ?>
         </script>
 
-        <div class="chart-wrapper" id="barchart_material_minor_<?php echo $role->getId(); ?>" style="width: 900px; height: 500px;"></div>
+<!--        <div class="chart-wrapper" id="barchart_material_minor_--><?php //echo $role->getId(); ?><!--" style="width: 900px; height: 500px;"></div>-->
         <div class="chart-wrapper" id="barchart_material_critical_<?php echo $role->getId(); ?>" style="width: 900px; height: 500px;"></div>
     </div>
 
