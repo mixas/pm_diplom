@@ -34,23 +34,25 @@ $this->pageBreadcrumbs()->setItems([
             <?php continue; ?>
         <?php endif; ?>
 
-        <?php echo $role->getId(); ?>
-            <pre>
-        <?php var_dump($statistic); ?>
-                </pre>
-            <?php  die;; ?>
-
+        <?php $minorDataExists = false; ?>
         <?php $minorData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_MINOR]; ?>
-        <?php $header = [['User', 'Estimated Value', 'Actual Value']]; ?>
-        <?php $minorData = array_merge($header, $minorData); ?>
+        <?php if(is_array($minorData)): ?>
+            <?php $minorDataExists = true; ?>
+            <?php $header = [['User', 'Estimated Value', 'Actual Value']]; ?>
+            <?php $minorData = array_merge($header, $minorData); ?>
+        <?php endif; ?>
 
-
+        <?php $criticalDataExists = false; ?>
         <?php $criticalData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_CRITICAL]; ?>
-        <?php $header = [['User', 'Estimated Value', 'Actual Value']]; ?>
-        <?php $criticalData = array_merge($header, $criticalData); ?>
+        <?php if(is_array($criticalData)): ?>
+            <?php $criticalDataExists = true; ?>
+            <?php $header = [['User', 'Estimated Value', 'Actual Value']]; ?>
+            <?php $criticalData = array_merge($header, $criticalData); ?>
+        <?php endif; ?>
 
     <div id="tabs-<?php echo $role->getId(); ?>">
         <script type="text/javascript">
+            <?php if($minorDataExists): ?>
             google.charts.load('current', {'packages':['bar']});
             google.charts.setOnLoadCallback(drawMinorChart);
 
@@ -69,7 +71,8 @@ $this->pageBreadcrumbs()->setItems([
 
                 chart.draw(data, google.charts.Bar.convertOptions(options));
             }
-
+            <?php endif; ?>
+            <?php if($criticalDataExists): ?>
             google.charts.load('current', {'packages':['bar']});
             google.charts.setOnLoadCallback(drawCriticalChart);
 
@@ -88,6 +91,7 @@ $this->pageBreadcrumbs()->setItems([
 
                 chart.draw(data, google.charts.Bar.convertOptions(options));
             }
+            <?php endif; ?>
         </script>
 
         <div class="chart-wrapper" id="barchart_material_minor_<?php echo $role->getId(); ?>" style="width: 900px; height: 500px;"></div>
