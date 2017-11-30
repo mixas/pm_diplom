@@ -77,37 +77,12 @@ class TaskStatusController extends AbstractActionController
 
                 // Redirect to "view" page
                 return $this->redirect()->toRoute('statuses',
-                    ['action'=>'view', 'id'=>$taskStatus->getId()]);
+                    ['action'=>'index']);
             }
         }
 
         return new ViewModel([
             'form' => $form
-        ]);
-    }
-
-    /**
-     * The "view" action displays a page allowing to view user's details.
-     */
-    public function viewAction()
-    {
-        $id = (int)$this->params()->fromRoute('id', -1);
-        if ($id<1) {
-            $this->getResponse()->setStatusCode(404);
-            return;
-        }
-
-        // Find a user with such ID.
-        $taskStatus = $this->entityManager->getRepository(TaskStatus::class)
-            ->find($id);
-
-        if ($taskStatus == null) {
-            $this->getResponse()->setStatusCode(404);
-            return;
-        }
-
-        return new ViewModel([
-            'status' => $taskStatus
         ]);
     }
 
@@ -152,7 +127,7 @@ class TaskStatusController extends AbstractActionController
 
                 // Redirect to "view" page
                 return $this->redirect()->toRoute('statuses',
-                    ['action'=>'view', 'id'=>$taskStatus->getId()]);
+                    ['action'=>'index']);
             }
         } else {
             $form->setData(array(
@@ -193,7 +168,7 @@ class TaskStatusController extends AbstractActionController
         $this->flashMessenger()->addSuccessMessage('Status has been removed.');
 
         // Redirect to "index" page
-        return $this->redirect()->toRoute('tasks', ['action'=>'index']);
+        return $this->redirect()->toRoute('statuses', ['action'=>'index']);
     }
 
 }

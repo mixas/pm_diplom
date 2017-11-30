@@ -37,6 +37,10 @@ $this->pageBreadcrumbs()->setItems([
                     ['action'=>'edit', 'id'=>$taskStatus->getId()]); ?>">
                     <span class="glyphicon glyphicon-pencil" ></span> Edit
                 </a>
+                <a class="btn btn-danger" href="<?= $this->url('statuses',
+                    ['action' => 'delete', 'id' => $taskStatus->getId()]); ?>">
+                    <span class="glyphicon glyphicon-remove"></span> Delete
+                </a>
             </td>
         </tr>
 
