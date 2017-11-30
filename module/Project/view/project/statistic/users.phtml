@@ -35,7 +35,10 @@ $this->pageBreadcrumbs()->setItems([
         <?php endif; ?>
 
         <?php $minorDataExists = false; ?>
-        <?php $minorData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_MINOR]; ?>
+        <?php $minorData = false; ?>
+        <?php if(isset($statistic[$role->getId()][\Project\Entity\Task::PRIORITY_MINOR])): ?>
+            <?php $minorData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_MINOR]; ?>
+        <?php endif; ?>
         <?php if(is_array($minorData)): ?>
             <?php $minorDataExists = true; ?>
             <?php $header = [['User', 'Estimated Value', 'Actual Value']]; ?>
@@ -43,7 +46,10 @@ $this->pageBreadcrumbs()->setItems([
         <?php endif; ?>
 
         <?php $criticalDataExists = false; ?>
-        <?php $criticalData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_CRITICAL]; ?>
+        <?php $criticalData = false; ?>
+        <?php if(isset($statistic[$role->getId()][\Project\Entity\Task::PRIORITY_CRITICAL])): ?>
+            <?php $criticalData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_CRITICAL]; ?>
+        <?php endif; ?>
         <?php if(is_array($criticalData)): ?>
             <?php $criticalDataExists = true; ?>
             <?php $header = [['User', 'Estimated Value', 'Actual Value']]; ?>
