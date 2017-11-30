@@ -34,6 +34,9 @@ $this->pageBreadcrumbs()->setItems([
             <?php continue; ?>
         <?php endif; ?>
 
+        <?php echo $role->getId(); ?>
+        <?php var_dump($statistic); die; ?>
+
         <?php $minorData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_MINOR]; ?>
         <?php $header = [['User', 'Estimated Value', 'Actual Value']]; ?>
         <?php $minorData = array_merge($header, $minorData); ?>
