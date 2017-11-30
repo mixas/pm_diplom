@@ -60,9 +60,9 @@ $this->pageBreadcrumbs()->setItems([
         <script type="text/javascript">
             <?php if($minorDataExists): ?>
             google.charts.load('current', {'packages':['bar']});
-            google.charts.setOnLoadCallback(drawMinorChart);
+            google.charts.setOnLoadCallback(drawMinorChart<?php echo $role->getId(); ?>);
 
-            function drawMinorChart() {
+            function drawMinorChart<?php echo $role->getId(); ?>() {
                 var data = google.visualization.arrayToDataTable(<?php echo json_encode($minorData); ?>);
 
                 var options = {
@@ -80,9 +80,9 @@ $this->pageBreadcrumbs()->setItems([
             <?php endif; ?>
             <?php if($criticalDataExists): ?>
             google.charts.load('current', {'packages':['bar']});
-            google.charts.setOnLoadCallback(drawCriticalChart);
+            google.charts.setOnLoadCallback(drawCriticalChart<?php echo $role->getId(); ?>);
 
-            function drawCriticalChart() {
+            function drawCriticalChart<?php echo $role->getId(); ?>() {
                 var data = google.visualization.arrayToDataTable(<?php echo json_encode($criticalData); ?>);
 
                 var options = {
