@@ -34,12 +34,14 @@ $this->pageBreadcrumbs()->setItems([
     </dl>
     <dl class="general-info-attribute-block">
         <dt>Participants:</dt>
+        <dd>&nbsp
         <?php $i = 0; ?>
         <?php $participantsCount = count($participants); ?>
         <?php foreach ($participants as $participant): ?>
             <?php $i++; ?>
             <a target="_blank" href="<?= $this->url('users', ['action' => 'view', 'id' => $participant->getId()]); ?>"><?= $participant->getFullName(); ?><?= ($participantsCount != $i)?',':''; ?></a>
         <?php endforeach; ?>
+        </dd>
     </dl>
     <?php if($technicalAssignment): ?>
         <dl class="general-info-attribute-block">
