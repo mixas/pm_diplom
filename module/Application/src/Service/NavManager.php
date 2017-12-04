@@ -81,7 +81,7 @@ class NavManager
             ];
             $statsDropdownItems[] = [
                 'id' => 'projects_stats',
-                'label' => 'Projecs Statistic',
+                'label' => 'Projects Statistic',
                 'link' => $url('stats', ['action' => 'projects'])
             ];
 
