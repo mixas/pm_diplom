@@ -29,7 +29,7 @@ class Minor extends PriorityAbstract
     public function __construct($entityManager)
     {
         parent::__construct($entityManager);
-        $this->type = Task::PRIORITY_CRITICAL;
+        $this->type = Task::PRIORITY_MINOR;
     }
 
     /**
