@@ -66,7 +66,9 @@ class Minor extends PriorityAbstract
             $queryBuilder = $this->entityManager->createQueryBuilder();
             $queryBuilder
                 ->select('avg(u.salary_rate) salary_rate')
-                ->from('user', 'u');
+                ->from('user', 'u')
+                ->leftJoin('user_role', 'ur', 'ON', 'u.id = ur.user_id')
+                ->where("ur.role_id = $roleId");
 
             $query = $queryBuilder->getQuery();
             $stmt = $this->entityManager->getConnection()->prepare($query->getDQL());
@@ -108,8 +110,6 @@ class Minor extends PriorityAbstract
             $economicEffectivityCoefficientArray[$userId] = $estimateSum / $spentTimeSum * $salaryCoefficient;
 
         }
-
-        var_dump($economicEffectivityCoefficientArray);
 
         if(!empty($economicEffectivityCoefficientArray)) {
             $theMostEffectiveUserId = array_keys($economicEffectivityCoefficientArray, max($economicEffectivityCoefficientArray));
