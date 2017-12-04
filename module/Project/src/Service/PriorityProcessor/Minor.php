@@ -109,6 +109,8 @@ class Minor extends PriorityAbstract
 
         }
 
+        var_dump($economicEffectivityCoefficientArray);
+
         if(!empty($economicEffectivityCoefficientArray)) {
             $theMostEffectiveUserId = array_keys($economicEffectivityCoefficientArray, max($economicEffectivityCoefficientArray));
             $user = $this->entityManager->getRepository(User::class)
