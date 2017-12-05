@@ -2,6 +2,7 @@
 namespace Project\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
+use Project\Entity\Task;
 
 class Project extends AbstractHelper
 {
@@ -19,6 +20,11 @@ class Project extends AbstractHelper
             return $hours;
         }
         return sprintf($format, $hours, $minutes);
+    }
+
+    public function getPriorityLabel($priority){
+        $priorities = Task::getPriorityList();
+        return $priorities[$priority];
     }
 
 

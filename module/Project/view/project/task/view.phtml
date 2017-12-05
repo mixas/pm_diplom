@@ -77,7 +77,7 @@ $estimate = $task->getEstimate();
 <div class="general-info-wrapper">
     <dl class="general-info-attribute-block">
         <dt>Priority:</dt>
-        <dd><?= $this->escapeHtml($task->getPriority()) ?></dd>
+        <dd><?= $this->projectHelper()->getPriorityLabel($task->getPriority()); ?></dd>
     </dl>
     <dl class="general-info-attribute-block">
         <dt>Status:</dt>
