@@ -48,7 +48,16 @@ class IndexController extends AbstractActionController
             'appName' => $appName,
             'appDescription' => $appDescription
         ]);
-    }  
+    }
+
+    /**
+     * This is the "about" action. It is used to display the "About" page.
+     */
+    public function helpAction()
+    {
+        return new ViewModel([
+        ]);
+    }
     
     /**
      * The "settings" action displays the info about currently logged in user.

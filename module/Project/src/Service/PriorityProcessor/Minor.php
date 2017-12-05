@@ -112,12 +112,14 @@ class Minor extends PriorityAbstract
         }
 
         if(!empty($economicEffectivityCoefficientArray)) {
-            $theMostEffectiveUserId = array_keys($economicEffectivityCoefficientArray, max($economicEffectivityCoefficientArray));
+            $maxCoefficient = max($economicEffectivityCoefficientArray);
+            $theMostEffectiveUserId = array_keys($economicEffectivityCoefficientArray, $maxCoefficient);
             $user = $this->entityManager->getRepository(User::class)
                 ->findOneById($theMostEffectiveUserId);
             $userData = [
                 'id' => $user->getId(),
                 'full_name' => $user->getFullName(),
+                'coefficient' => $maxCoefficient,
             ];
             return $userData;
         }else{

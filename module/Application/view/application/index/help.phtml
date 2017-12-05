@@ -1,0 +1,12 @@
+<?php
+$this->headTitle('About');
+
+$this->mainMenu()->setActiveItemId('help');
+
+$this->pageBreadcrumbs()->setItems([
+            'Home'=>$this->url('home'),
+            'Help'=>$this->url('help'),
+            ]);
+?>
+
+<h1>Help</h1>

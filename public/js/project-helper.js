@@ -27,7 +27,7 @@ function chooseUserAutomatically(identifier, isNew){
                     var user = data.result.user;
                     $('#assigned-user-id').val(user.id);
                     var label = '<label>Assigned user: </label>';
-                    $('#result-block').html(label + ' ' + user.full_name);
+                    $('#result-block').html(label + ' ' + user.full_name + ' with effectivity coefficient: <strong>'+user.coefficient+'</strong><br>More detailed information about this calculations see <a target="_blank" href="/help">here</a>');
                     $('#result-block').show();
                 }else{
                     addMessage(data.result.message, 'danger');

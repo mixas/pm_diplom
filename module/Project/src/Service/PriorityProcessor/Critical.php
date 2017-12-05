@@ -98,12 +98,14 @@ class Critical extends PriorityAbstract
         }
 
         if(!empty($effectivityCoefficientArray)) {
-            $theMostEffectiveUserId = array_keys($effectivityCoefficientArray, max($effectivityCoefficientArray));
+            $maxCoefficient = max($effectivityCoefficientArray);
+            $theMostEffectiveUserId = array_keys($effectivityCoefficientArray, $maxCoefficient);
             $user = $this->entityManager->getRepository(User::class)
                 ->findOneById($theMostEffectiveUserId);
             $userData = [
                 'id' => $user->getId(),
                 'full_name' => $user->getFullName(),
+                'coefficient' => $maxCoefficient,
             ];
             return $userData;
         }else{

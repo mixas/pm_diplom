@@ -48,6 +48,16 @@ return [
                     ],
                 ],
             ],
+            'help' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route'    => '/help',
+                    'defaults' => [
+                        'controller' => Controller\IndexController::class,
+                        'action'     => 'help',
+                    ],
+                ],
+            ],
         ],
     ],
     'controllers' => [
@@ -70,7 +80,7 @@ return [
         'controllers' => [
             Controller\IndexController::class => [
                 // Allow anyone to visit "index" and "about" actions
-                ['actions' => ['index', 'about'], 'allow' => '*'],
+                ['actions' => ['index', 'about', 'help'], 'allow' => '*'],
                 // Allow authorized users to visit "settings" action
                 ['actions' => ['settings'], 'allow' => '@']
             ],
