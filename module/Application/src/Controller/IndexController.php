@@ -39,14 +39,7 @@ class IndexController extends AbstractActionController
      */
     public function aboutAction() 
     {              
-        $appName = 'Role Demo';
-        $appDescription = 'This demo shows how to implement role-based access control with Zend Framework 3';
-        
-        // Return variables to view script with the help of
-        // ViewObject variable container
         return new ViewModel([
-            'appName' => $appName,
-            'appDescription' => $appDescription
         ]);
     }
 
