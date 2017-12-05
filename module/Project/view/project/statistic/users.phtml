@@ -77,9 +77,13 @@ $this->pageBreadcrumbs()->setItems([
 
                     var chart = new google.charts.Bar(document.getElementById('barchart_material_minor_<?php echo $role->getId(); ?>'));
 
+                    google.visualization.events.addListener(chart, 'ready', minorChartReadyHandler<?php echo $role->getId(); ?>);
+
                     chart.draw(data, google.charts.Bar.convertOptions(options));
-                    $("#tabs").tabs();
                 }
+                function minorChartReadyHandler<?php echo $role->getId(); ?>(){
+
+                };
             <?php endif; ?>
             <?php if($criticalDataExists): ?>
                 google.charts.setOnLoadCallback(drawCriticalChart<?php echo $role->getId(); ?>);
@@ -98,7 +102,11 @@ $this->pageBreadcrumbs()->setItems([
 
                     var chart = new google.charts.Bar(document.getElementById('barchart_material_critical_<?php echo $role->getId(); ?>'));
 
+                    google.visualization.events.addListener(chart, 'ready', criticalChartReadyHandler<?php echo $role->getId(); ?>);
+
                     chart.draw(data, google.charts.Bar.convertOptions(options));
+                }
+                function criticalChartReadyHandler<?php echo $role->getId(); ?>(){
                     $("#tabs").tabs();
                 }
             <?php endif; ?>
