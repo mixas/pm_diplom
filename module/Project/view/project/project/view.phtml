@@ -100,7 +100,7 @@ $this->pageBreadcrumbs()->setItems([
     <?php if(count($tasks)): ?>
         <?php foreach ($tasks as $task): ?>
             <div class="task-wrapper">
-                <a href="<?= $this->url('tasks', ['action' => 'view', 'project' => $project->getCode(), 'task' => $task->getId()]); ?>"><?= $task->getTaskTitle(); ?></a>
+                <a href="<?= $this->url('tasks', ['action' => 'view', 'project' => $project->getCode(), 'task' => $task->getId()]); ?>"><?= $task->getId(); ?>: <?= $task->getTaskTitle(); ?></a>
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
