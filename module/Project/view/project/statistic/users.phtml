@@ -9,6 +9,11 @@ $this->pageBreadcrumbs()->setItems([
 ]);
 ?>
 
+<script type="text/javascript">
+    var totalCharts = 0;
+    var drawnCharts = 0;
+</script>
+
 <h1>Users Statistic</h1>
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -77,13 +82,11 @@ $this->pageBreadcrumbs()->setItems([
 
                     var chart = new google.charts.Bar(document.getElementById('barchart_material_minor_<?php echo $role->getId(); ?>'));
 
-                    google.visualization.events.addListener(chart, 'ready', minorChartReadyHandler<?php echo $role->getId(); ?>);
+                    totalCharts++;
+                    google.visualization.events.addListener(chart, 'ready', lastChartReadyHandler);
 
                     chart.draw(data, google.charts.Bar.convertOptions(options));
                 }
-                function minorChartReadyHandler<?php echo $role->getId(); ?>(){
-
-                };
             <?php endif; ?>
             <?php if($criticalDataExists): ?>
                 google.charts.setOnLoadCallback(drawCriticalChart<?php echo $role->getId(); ?>);
@@ -102,14 +105,19 @@ $this->pageBreadcrumbs()->setItems([
 
                     var chart = new google.charts.Bar(document.getElementById('barchart_material_critical_<?php echo $role->getId(); ?>'));
 
-                    google.visualization.events.addListener(chart, 'ready', criticalChartReadyHandler<?php echo $role->getId(); ?>);
+                    totalCharts++;
+
+                    google.visualization.events.addListener(chart, 'ready', lastChartReadyHandler);
 
                     chart.draw(data, google.charts.Bar.convertOptions(options));
                 }
-                function criticalChartReadyHandler<?php echo $role->getId(); ?>(){
+            <?php endif; ?>
+            function lastChartReadyHandler(){
+                drawnCharts++;
+                if(drawnCharts == totalCharts) {
                     $("#tabs").tabs();
                 }
-            <?php endif; ?>
+            }
         </script>
 
         <div class="chart-wrapper" id="barchart_material_minor_<?php echo $role->getId(); ?>" style="width: 900px; height: 500px;"></div>
