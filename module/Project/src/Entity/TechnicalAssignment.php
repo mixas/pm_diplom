@@ -5,6 +5,7 @@ namespace Project\Entity;
 use Project\Service\TaskManager;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 
 use Interop\Container\ContainerInterface;
