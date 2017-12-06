@@ -19,7 +19,9 @@ class RoleController extends AbstractActionController
      * @var Doctrine\ORM\EntityManager
      */
     private $entityManager;
-    
+
+    private $taskManager;
+
     /**
      * Role manager.
      * @var User\Service\RoleManager 
@@ -29,10 +31,11 @@ class RoleController extends AbstractActionController
     /**
      * Constructor. 
      */
-    public function __construct($entityManager, $roleManager)
+    public function __construct($entityManager, $roleManager, $taskManager)
     {
         $this->entityManager = $entityManager;
         $this->roleManager = $roleManager;
+        $this->taskManager = $taskManager;
     }
     
     /**
@@ -55,7 +58,7 @@ class RoleController extends AbstractActionController
     public function addAction()
     {
         // Create form
-        $form = new RoleForm('create', $this->entityManager);
+        $form = new RoleForm('create', $this->entityManager, $this->taskManager);
         
         $roleList = [];
         $roles = $this->entityManager->getRepository(Role::class)
@@ -147,7 +150,7 @@ class RoleController extends AbstractActionController
         }
         
         // Create form
-        $form = new RoleForm('update', $this->entityManager, $role);
+        $form = new RoleForm('update', $this->entityManager, $this->taskManager, $role);
         
         $roleList = [];
         $roles = $this->entityManager->getRepository(Role::class)

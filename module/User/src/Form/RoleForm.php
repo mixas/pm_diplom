@@ -19,10 +19,11 @@ class RoleForm extends Form
     /**
      * Constructor.     
      */
-    public function __construct($scenario='create', $entityManager = null, $role = null)
+    public function __construct($scenario='create', $entityManager = null, $taskManager = null, $role = null)
     {
         $this->scenario = $scenario;
         $this->entityManager = $entityManager;
+        $this->taskManager = $taskManager;
         $this->role = $role;
         
         // Define form name
@@ -74,6 +75,18 @@ class RoleForm extends Form
             ],
             'options' => [
                 'label' => 'Optionally inherit permissions from these role(s)'
+            ],
+        ]);
+
+        $statuses = $this->taskManager->getStatusList();
+
+        // Add "status" field
+        $this->add([
+            'type' => 'select',
+            'name' => 'default_status_filter',
+            'options' => [
+                'label' => 'Status',
+                'value_options' => $statuses
             ],
         ]);
                         

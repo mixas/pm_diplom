@@ -5,6 +5,7 @@ use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 use User\Controller\RoleController;
 use User\Service\RoleManager;
+use Project\Service\TaskManager;
 
 /**
  * This is the factory for RoleController. Its purpose is to instantiate the
@@ -16,9 +17,10 @@ class RoleControllerFactory implements FactoryInterface
     {
         $entityManager = $container->get('doctrine.entitymanager.orm_default');
         $roleManager = $container->get(RoleManager::class);
-        
+        $taskManager = $container->get(TaskManager::class);
+
         // Instantiate the controller and inject dependencies
-        return new RoleController($entityManager, $roleManager);
+        return new RoleController($entityManager, $roleManager, $taskManager);
     }
 }
 

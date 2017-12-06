@@ -11,6 +11,9 @@ use Project\Entity\Task;
 use Project\Form\ProjectForm;
 use Project\Form\ProjectUsersAssignmentForm;
 use Project\Form\TechnicalAssignmentForm;
+
+use Project\Entity\TaskStatus;
+
 //use User\Form\PasswordChangeForm;
 //use User\Form\PasswordResetForm;
 
@@ -120,6 +123,7 @@ class ProjectController extends AbstractActionController
         ]);
     }
 
+
     /**
      * The "view" action displays a page allowing to view user's details.
      */
@@ -135,8 +139,27 @@ class ProjectController extends AbstractActionController
         $project = $this->entityManager->getRepository(Project::class)
             ->findOneByCode($code);
 
-        $tasks = $project->getTasks();
-        $tasks->initialize();
+        //Filter tasks by status
+        $currentUser = $this->entityManager->getRepository(User::class)
+            ->findOneByEmail($this->authService->getIdentity());
+        $currentRoles = $currentUser->getRoles();
+        $currentRole = $currentRoles[0];
+        $defaultRoleFilterStatus = $currentRole->getDefaultStatusFilter();
+        $currentFilterStatus = 0;
+
+        $selectedFilter = $this->getRequest()->getQuery('filter_status');
+        if($selectedFilter || $selectedFilter === "0"){
+            $defaultRoleFilterStatus = $selectedFilter;
+        }
+
+        if($defaultRoleFilterStatus) {
+            $tasks = $this->entityManager->getRepository(Task::class)
+                ->findBy(['projectId' => $project->getId(), 'status' => $defaultRoleFilterStatus], ['id' => 'ASC']);
+            $currentFilterStatus = $defaultRoleFilterStatus;
+        }else{
+            $tasks = $this->entityManager->getRepository(Task::class)
+                ->findBy(['projectId' => $project->getId()], ['id' => 'ASC']);
+        }
 
         if ($project == null) {
             $this->getResponse()->setStatusCode(404);
@@ -145,11 +168,17 @@ class ProjectController extends AbstractActionController
 
         $participants = $project->getUsers();
         $technicalAssignment = $project->getTechnicalAssignment();
+
+        $allTaskStatuses = $this->entityManager->getRepository(TaskStatus::class)
+            ->findBy([], ['id'=>'ASC']);
+
         return new ViewModel([
             'project' => $project,
             'tasks' => $tasks,
             'participants' => $participants,
             'technicalAssignment' => $technicalAssignment,
+            'allStatuses' => $allTaskStatuses,
+            'currentFilterStatus' => $currentFilterStatus,
         ]);
     }
 

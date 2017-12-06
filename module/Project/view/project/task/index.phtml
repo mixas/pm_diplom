@@ -10,6 +10,24 @@ $this->pageBreadcrumbs()->setItems([
 ?>
 
 <h1>Assigned Tasks</h1>
+<div class="form-group">
+    <label for="status_filter">Status Filter</label>
+    <select name="status_filter" id="status_filter" class="form-control">
+        <option value="0" <?php echo ($currentFilterStatus == 0)? 'selected="selected"':'';?> >All</option>
+        <?php foreach ($allStatuses as $status): ?>
+            <option value="<?= $status->getId(); ?>" <?php echo ($currentFilterStatus == $status->getId())? 'selected="selected"':'';?> ><?= $status->getLabel(); ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
+<script type="text/javascript">
+    $("#status_filter" ).change(function(element) {
+        console.log($(this));
+        console.log($(this).val());
+        var selectedStatus = $(this).val();
+        var generalUrl = '<?= $this->url('tasks', ['action'=>'index']); ?>';
+        window.location = generalUrl + '?filter_status='+selectedStatus
+    });
+</script>
 
 <table class="table table-striped">
 

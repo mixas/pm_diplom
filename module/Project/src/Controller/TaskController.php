@@ -14,6 +14,7 @@ use Project\Service\TaskManager;
 use Project\Form\TaskForm;
 use Project\Form\CommentForm;
 use Project\Form\ReassignForm;
+use Project\Entity\TaskStatus;
 //use User\Form\PasswordChangeForm;
 //use User\Form\PasswordResetForm;
 
@@ -64,14 +65,34 @@ class TaskController extends AbstractActionController
         $currentUser = $this->entityManager->getRepository(User::class)
             ->findOneByEmail($this->authService->getIdentity());
 
-        $tasks = $this->entityManager->getRepository(Task::class)
-            ->findByAssignedUserId($currentUser->getId(), ['id'=>'ASC']);
+        //Filter tasks by status
+        $currentRoles = $currentUser->getRoles();
+        $currentRole = $currentRoles[0];
+        $defaultRoleFilterStatus = $currentRole->getDefaultStatusFilter();
+        $currentFilterStatus = 0;
+        $selectedFilter = $this->getRequest()->getQuery('filter_status');
+        if($selectedFilter || $selectedFilter === "0"){
+            $defaultRoleFilterStatus = $selectedFilter;
+        }
+        if($defaultRoleFilterStatus) {
+            $tasks = $this->entityManager->getRepository(Task::class)
+                ->findBy(['assignedUserId' => $currentUser->getId(), 'status' => $defaultRoleFilterStatus], ['id' => 'ASC']);
+            $currentFilterStatus = $defaultRoleFilterStatus;
+        }else{
+            $tasks = $this->entityManager->getRepository(Task::class)
+                ->findBy(['assignedUserId' => $currentUser->getId()], ['id' => 'ASC']);
+        }
+
+        $allTaskStatuses = $this->entityManager->getRepository(TaskStatus::class)
+            ->findBy([], ['id'=>'ASC']);
 
         return new ViewModel([
             'tasks' => $tasks,
             'taskManager' => $this->taskManager,
             'currentUser' => $currentUser,
             'rbacManager' => $this->rbacManager,
+            'currentFilterStatus' => $currentFilterStatus,
+            'allStatuses' => $allTaskStatuses,
         ]);
     }
 

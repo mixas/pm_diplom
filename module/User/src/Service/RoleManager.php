@@ -45,6 +45,7 @@ class RoleManager
         $role = new Role;
         $role->setName($data['name']);
         $role->setDescription($data['description']);
+        $role->setDefaultStatusFilter($data['default_status_filter']);
         $role->setDateCreated(date('Y-m-d H:i:s'));
         
         $this->entityManager->persist($role);
@@ -71,7 +72,8 @@ class RoleManager
         
         $role->setName($data['name']);
         $role->setDescription($data['description']);
-        
+        $role->setDefaultStatusFilter($data['default_status_filter']);
+
         $this->entityManager->flush();
         
         // Reload RBAC container.

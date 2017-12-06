@@ -97,6 +97,14 @@ $this->pageBreadcrumbs()->setItems([
 
 <div class="col-md-3">
     <h2>Tasks:</h2>
+    <div class="form-group">
+        <label for="status_filter">Status Filter</label>
+        <select name="status_filter" id="status_filter" class="form-control">
+            <?php foreach ($allStatuses as $status): ?>
+                <option value="<?= $status->getId(); ?>" <?php echo ($currentFilterStatus == $status->getId())? 'selected="selected"':'';?> ><?= $status->getLabel(); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
     <?php if(count($tasks)): ?>
         <?php foreach ($tasks as $task): ?>
             <div class="task-wrapper">
@@ -104,4 +112,14 @@ $this->pageBreadcrumbs()->setItems([
             </div>
         <?php endforeach; ?>
     <?php endif; ?>
+
+    <script type="text/javascript">
+        $("#status_filter" ).change(function(element) {
+            console.log($(this));
+            console.log($(this).val());
+            var selectedStatus = $(this).val();
+            var generalUrl = '<?= $this->url('projects', ['action'=>'view', 'code' => $project->getCode()]); ?>';
+            window.location = generalUrl + '?filter_status='+selectedStatus
+        });
+    </script>
 </div>

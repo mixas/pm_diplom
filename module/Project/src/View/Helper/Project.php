@@ -3,6 +3,7 @@ namespace Project\View\Helper;
 
 use Zend\View\Helper\AbstractHelper;
 use Project\Entity\Task;
+use Project\Entity\TaskStatus;
 
 class Project extends AbstractHelper
 {
@@ -27,6 +28,9 @@ class Project extends AbstractHelper
         return $priorities[$priority];
     }
 
+    public function getDefaultStatus(){
+        return TaskStatus::STATUS_TO_DO;
+    }
 
     public function getFileLink($link){
         return '/' . $link;

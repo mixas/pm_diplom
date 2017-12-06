@@ -3,6 +3,7 @@ namespace User\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use Project\Entity\TaskStatus;
 
 /**
  * This class represents a role.
@@ -32,6 +33,11 @@ class Role
      * @ORM\Column(name="date_created")  
      */
     protected $dateCreated;
+
+    /**
+     * @ORM\Column(name="default_status_filter")
+     */
+    protected $defaultStatusFilter;
 
     /**
      * @ORM\ManyToMany(targetEntity="User\Entity\Role")
@@ -131,7 +137,17 @@ class Role
     {
         $this->dateCreated = $dateCreated;
     }
-    
+
+    public function getDefaultStatusFilter()
+    {
+        return $this->defaultStatusFilter;
+    }
+
+    public function setDefaultStatusFilter($defaultStatusFilter)
+    {
+        $this->defaultStatusFilter = $defaultStatusFilter;
+    }
+
     public function getParentRoles()
     {
         return $this->parentRoles;
