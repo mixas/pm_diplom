@@ -100,6 +100,7 @@ $this->pageBreadcrumbs()->setItems([
     <div class="form-group">
         <label for="status_filter">Status Filter</label>
         <select name="status_filter" id="status_filter" class="form-control">
+            <option value="0" <?php echo ($currentFilterStatus == 0)? 'selected="selected"':'';?> >All</option>
             <?php foreach ($allStatuses as $status): ?>
                 <option value="<?= $status->getId(); ?>" <?php echo ($currentFilterStatus == $status->getId())? 'selected="selected"':'';?> ><?= $status->getLabel(); ?></option>
             <?php endforeach; ?>
