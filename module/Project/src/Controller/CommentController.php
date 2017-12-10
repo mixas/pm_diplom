@@ -7,15 +7,10 @@ use Zend\View\Model\ViewModel;
 use Project\Entity\Comment;
 use Project\Entity\Task;
 use User\Entity\User;
-use Project\Entity\Project;
-use Project\Service\TaskManager;
 use Project\Form\CommentForm;
-//use User\Form\PasswordChangeForm;
-//use User\Form\PasswordResetForm;
 
 /**
- * This controller is responsible for user management (adding, editing,
- * viewing users and changing user's password).
+ * Контроллер для обработки запросов связанных с комемнтариями
  */
 class CommentController extends AbstractActionController
 {
@@ -34,9 +29,6 @@ class CommentController extends AbstractActionController
 
     private $authService;
 
-    /**
-     * Constructor.
-     */
     public function __construct($entityManager, $commentManager, $rendererInterface, $authService)
     {
         $this->entityManager = $entityManager;
@@ -46,21 +38,9 @@ class CommentController extends AbstractActionController
     }
 
     /**
-     * This is the default "index" action of the controller. It displays the
-     * list of users.
-     */
-    public function indexAction()
-    {
-        $comments = $this->entityManager->getRepository(Comment::class)
-            ->findBy([], ['id'=>'ASC']);
-
-        return new ViewModel([
-            'tasks' => $comments
-        ]);
-    }
-
-    /**
-     * This action displays a page allowing to add a new user.
+     * Добавление коментария (ajax действие)
+     *
+     * @return \Zend\Http\Response|\Zend\Stdlib\ResponseInterface
      */
     public function addAction()
     {
@@ -77,29 +57,29 @@ class CommentController extends AbstractActionController
 
         $project = $task->getProject();
 
+        // Проверка полномочий
         if (!$this->access('projects.manage.all') &&
             !$this->access('projects.manage.own', ['project' => $project])) {
             return $this->redirect()->toRoute('not-authorized');
         }
 
-        // Create user form
+        // Создание формы
         $form = new CommentForm('create', $this->entityManager, null, null);
 
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
-            // Fill in the form with POST data
+            // Считывание данных из запроса
             $data = $this->params()->fromPost();
 
             $form->setData($data);
 
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
 
-                // Get filtered and validated data
                 $data = $form->getData();
 
-                // Add comment.
+                // Блок добавления комментария в БД
                 try {
                     $currentUser = $this->entityManager->getRepository(User::class)
                         ->findOneByEmail($this->authService->getIdentity());
@@ -113,7 +93,6 @@ class CommentController extends AbstractActionController
                     $renderer = $this->rendererInterface;
                     $html = $renderer->render($viewModel);
 
-                    //todo: russian translation should be here but json can't encode russian characters.
                     $response->setContent(\Zend\Json\Json::encode(
                         array(
                             'response' => true,
@@ -136,7 +115,9 @@ class CommentController extends AbstractActionController
     }
 
     /**
-     * The "edit" action displays a page allowing to edit user.
+     * Редактирование существующего комментария
+     *
+     * @return \Zend\Stdlib\ResponseInterface
      */
     public function editAction()
     {
@@ -150,20 +131,21 @@ class CommentController extends AbstractActionController
 
         $form = new CommentForm('create', $this->entityManager, null, null);
 
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
-            // Fill in the form with POST data
+            // Считывание данных из запроса
             $data = $this->params()->fromPost();
 
             $form->setData($data);
 
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
 
                 try {
-                    // Get filtered and validated data
                     $data = $form->getData();
 
+                    // Поиск комментария по ID
                     $comment = $this->entityManager->getRepository(Comment::class)
                         ->find($commentId);
 
@@ -177,7 +159,7 @@ class CommentController extends AbstractActionController
                         return $response;
                     }
 
-                    // Update the user.
+                    // Обновление комментария в БД
                     $this->commentManager->updateComment($comment, $data);
 
                     $viewModel = new ViewModel(
@@ -187,7 +169,6 @@ class CommentController extends AbstractActionController
                     $renderer = $this->rendererInterface;
                     $html = $renderer->render($viewModel);
 
-                    //todo: russian translation should be here but json can't encode russian characters.
                     $response->setContent(\Zend\Json\Json::encode(
                         array(
                             'response' => true,

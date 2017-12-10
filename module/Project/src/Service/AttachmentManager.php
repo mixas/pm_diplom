@@ -3,14 +3,12 @@
 namespace Project\Service;
 
 use Project\Entity\Attachment;
-use Project\Entity\TaskStatus;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Math\Rand;
-
-use Interop\Container\ContainerInterface;
 
 /**
- * This service is responsible for adding/editing tasks
+ * Класс для выполнения операций связанных с прикреплениями в БД
+ *
+ * Class AttachmentManager
+ * @package Project\Service
  */
 class AttachmentManager
 {
@@ -20,20 +18,22 @@ class AttachmentManager
      */
     private $entityManager;
 
-    /**
-     * Constructs the service.
-     */
-    public function __construct($entityManager) 
+    public function __construct($entityManager)
     {
         $this->entityManager = $entityManager;
     }
-    
+
     /**
-     * This method adds a new comment to DB.
+     * Добавить прикрепление в БД
+     *
+     * @param $data
+     * @param null $entity
+     * @return Attachment
+     * @throws \Exception
      */
     public function addAttachment($data, $entity = null)
     {
-        // Create new Comment entity.
+        // Создание новой сущности
         $attachment = new Attachment();
         $attachment->setFileLink($data['file_link']);
         $attachment->setFileName($data['file_name']);
@@ -54,35 +54,25 @@ class AttachmentManager
         $currentDate = date('Y-m-d H:i:s');
         $attachment->setDateCreated($currentDate);
 
-        // Add the entity to the entity manager.
+        // Добавить сущность в entity manager.
         $this->entityManager->persist($attachment);
         
-        // Apply changes to database.
+        // Применить изменения в БД
         $this->entityManager->flush();
         
         return $attachment;
     }
 
+    /**
+     * Удавить прикрепление из БД
+     *
+     * @param $attachment
+     */
     public function deleteAttachment($attachment){
         $this->entityManager->remove($attachment);
         $this->entityManager->flush();
     }
     
-    /**
-     * This method updates data of an existing comment.
-     */
-    public function updateComment($comment, $data)
-    {
-        $comment->setCommentText($data['comment_text']);
-        $currentDate = date('Y-m-d H:i:s');
-        $comment->setUpdatedDate($currentDate);
-
-        // Apply changes to database.
-        $this->entityManager->flush();
-
-        return true;
-    }
-
 
 }
 

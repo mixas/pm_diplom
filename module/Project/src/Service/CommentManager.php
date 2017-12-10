@@ -3,14 +3,12 @@
 namespace Project\Service;
 
 use Project\Entity\Comment;
-use Project\Entity\TaskStatus;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Math\Rand;
-
-use Interop\Container\ContainerInterface;
 
 /**
- * This service is responsible for adding/editing tasks
+ * Класс для выполнения операций связанных с комментариями в БД
+ *
+ * Class CommentManager
+ * @package Project\Service
  */
 class CommentManager
 {
@@ -20,20 +18,22 @@ class CommentManager
      */
     private $entityManager;
 
-    /**
-     * Constructs the service.
-     */
-    public function __construct($entityManager) 
+    public function __construct($entityManager)
     {
         $this->entityManager = $entityManager;
     }
-    
+
     /**
-     * This method adds a new comment to DB.
+     * Добавление комментария в БД
+     *
+     * @param $data
+     * @param null $task
+     * @param null $user
+     * @return Comment
      */
     public function addComment($data, $task = null, $user = null)
     {
-        // Create new Comment entity.
+        // Создание новой сущности
         $comment = new Comment();
         $comment->setCommentText($data['comment_text']);
         if($task){
@@ -44,26 +44,31 @@ class CommentManager
         }
         $currentDate = date('Y-m-d H:i:s');
         $comment->setCreatedDate($currentDate);
-                
-        // Add the entity to the entity manager.
+
+        // Добавить сущность в entity manager.
         $this->entityManager->persist($comment);
-        
-        // Apply changes to database.
+
+        // Применить изменения в БД
         $this->entityManager->flush();
         
         return $comment;
     }
-    
+
     /**
-     * This method updates data of an existing comment.
+     * Обновление комментария в БД
+     *
+     * @param $comment
+     * @param $data
+     * @return bool
      */
     public function updateComment($comment, $data)
     {
+        // Установка данных в комментарии
         $comment->setCommentText($data['comment_text']);
         $currentDate = date('Y-m-d H:i:s');
         $comment->setUpdatedDate($currentDate);
 
-        // Apply changes to database.
+        // Применить изменения в БД
         $this->entityManager->flush();
 
         return true;

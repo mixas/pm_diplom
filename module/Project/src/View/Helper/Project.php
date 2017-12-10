@@ -8,6 +8,13 @@ use Project\Entity\TaskStatus;
 class Project extends AbstractHelper
 {
 
+    /**
+     * Форматирование времени
+     *
+     * @param $minutes
+     * @param null $only
+     * @return float|int|string|void
+     */
     public function formatTime($minutes, $only = null){
         if ($minutes < 1) {
             return;
@@ -23,13 +30,15 @@ class Project extends AbstractHelper
         return sprintf($format, $hours, $minutes);
     }
 
+    /**
+     * Нахождение читаемого значения для приоритета
+     *
+     * @param $priority
+     * @return mixed
+     */
     public function getPriorityLabel($priority){
         $priorities = Task::getPriorityList();
         return $priorities[$priority];
-    }
-
-    public function getDefaultStatus(){
-        return TaskStatus::STATUS_TO_DO;
     }
 
     public function getFileLink($link){

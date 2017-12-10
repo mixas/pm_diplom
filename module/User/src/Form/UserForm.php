@@ -7,16 +7,11 @@ use Zend\InputFilter\InputFilter;
 use Zend\InputFilter\ArrayInput;
 use User\Validator\UserExistsValidator;
 
-/**
- * This form is used to collect user's email, full name, password and status. The form 
- * can work in two scenarios - 'create' and 'update'. In 'create' scenario, user
- * enters password, in 'update' scenario he/she doesn't enter password.
- */
 class UserForm extends Form
 {
     /**
      * Scenario ('create' or 'update').
-     * @var string 
+     * @var string
      */
     private $scenario;
     
@@ -32,18 +27,12 @@ class UserForm extends Form
      */
     private $user = null;
     
-    /**
-     * Constructor.     
-     */
     public function __construct($scenario = 'create', $entityManager = null, $user = null)
     {
-        // Define form name
         parent::__construct('user-form');
      
-        // Set POST method for this form
         $this->setAttribute('method', 'post');
         
-        // Save parameters for internal use.
         $this->scenario = $scenario;
         $this->entityManager = $entityManager;
         $this->user = $user;
@@ -52,13 +41,9 @@ class UserForm extends Form
         $this->addInputFilter();          
     }
     
-    /**
-     * This method adds elements to form (input fields and submit button).
-     */
-    protected function addElements() 
+    protected function addElements()
     {
-        // Add "email" field
-        $this->add([            
+        $this->add([
             'type'  => 'text',
             'name' => 'email',
             'options' => [
@@ -66,8 +51,7 @@ class UserForm extends Form
             ],
         ]);
         
-        // Add "full_name" field
-        $this->add([            
+        $this->add([
             'type'  => 'text',
             'name' => 'full_name',            
             'options' => [
@@ -75,7 +59,6 @@ class UserForm extends Form
             ],
         ]);
 
-        // Add "password" field
         $this->add([
             'type'  => 'text',
             'name' => 'salary_rate',
@@ -86,8 +69,7 @@ class UserForm extends Form
         
         if ($this->scenario == 'create') {
         
-            // Add "password" field
-            $this->add([            
+            $this->add([
                 'type'  => 'password',
                 'name' => 'password',
                 'options' => [
@@ -95,8 +77,7 @@ class UserForm extends Form
                 ],
             ]);
             
-            // Add "confirm_password" field
-            $this->add([            
+            $this->add([
                 'type'  => 'password',
                 'name' => 'confirm_password',
                 'options' => [
@@ -105,8 +86,7 @@ class UserForm extends Form
             ]);
         }
         
-        // Add "status" field
-        $this->add([            
+        $this->add([
             'type'  => 'select',
             'name' => 'status',
             'options' => [
@@ -118,8 +98,7 @@ class UserForm extends Form
             ],
         ]);
         
-        // Add "roles" field
-        $this->add([            
+        $this->add([
             'type'  => 'select',
             'name' => 'roles',
             'attributes' => [
@@ -130,7 +109,6 @@ class UserForm extends Form
             ],
         ]);
         
-        // Add the Submit button
         $this->add([
             'type'  => 'submit',
             'name' => 'submit',
@@ -140,16 +118,11 @@ class UserForm extends Form
         ]);
     }
     
-    /**
-     * This method creates input filter (used for form filtering/validation).
-     */
-    private function addInputFilter() 
+    private function addInputFilter()
     {
-        // Create main input filter
-        $inputFilter = new InputFilter();        
+        $inputFilter = new InputFilter();
         $this->setInputFilter($inputFilter);
                 
-        // Add input for "email" field
         $inputFilter->add([
                 'name'     => 'email',
                 'required' => true,
@@ -181,7 +154,6 @@ class UserForm extends Form
                 ],
             ]);     
         
-        // Add input for "full_name" field
         $inputFilter->add([
                 'name'     => 'full_name',
                 'required' => true,
@@ -201,7 +173,6 @@ class UserForm extends Form
         
         if ($this->scenario == 'create') {
             
-            // Add input for "password" field
             $inputFilter->add([
                     'name'     => 'password',
                     'required' => true,
@@ -218,7 +189,6 @@ class UserForm extends Form
                     ],
                 ]);
             
-            // Add input for "confirm_password" field
             $inputFilter->add([
                     'name'     => 'confirm_password',
                     'required' => true,
@@ -235,7 +205,6 @@ class UserForm extends Form
                 ]);
         }
         
-        // Add input for "status" field
         $inputFilter->add([
                 'name'     => 'status',
                 'required' => true,
@@ -247,7 +216,6 @@ class UserForm extends Form
                 ],
             ]); 
         
-        // Add input for "roles" field
         $inputFilter->add([
                 'class'    => ArrayInput::class,
                 'name'     => 'roles',

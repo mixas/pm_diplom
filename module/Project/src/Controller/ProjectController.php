@@ -14,14 +14,11 @@ use Project\Form\TechnicalAssignmentForm;
 
 use Project\Entity\TaskStatus;
 
-//use User\Form\PasswordChangeForm;
-//use User\Form\PasswordResetForm;
-
-use Doctrine\Common\Collections\Criteria;
-
 /**
- * This controller is responsible for user management (adding, editing,
- * viewing users and changing user's password).
+ * Контроллер для обработки действий связанных за проект
+ *
+ * Class ProjectController
+ * @package Project\Controller
  */
 class ProjectController extends AbstractActionController
 {
@@ -52,9 +49,6 @@ class ProjectController extends AbstractActionController
 
     private $rbacManager;
 
-    /**
-     * Constructor.
-     */
     public function __construct($entityManager, $projectManager, $technicalAssignmentManager, $authService, $rbacManager)
     {
         $this->entityManager = $entityManager;
@@ -65,8 +59,9 @@ class ProjectController extends AbstractActionController
     }
 
     /**
-     * This is the default "index" action of the controller. It displays the
-     * list of users.
+     * Отображает список всех проектов
+     *
+     * @return ViewModel
      */
     public function indexAction()
     {
@@ -84,7 +79,9 @@ class ProjectController extends AbstractActionController
     }
 
     /**
-     * This action displays a page allowing to add a new user.
+     * Добавление проекта в БД
+     *
+     * @return \Zend\Http\Response|ViewModel
      */
     public function addAction()
     {
@@ -92,32 +89,31 @@ class ProjectController extends AbstractActionController
             return $this->redirect()->toRoute('not-authorized');
         }
 
-        // Create user form
+        // Создание формы
         $form = new ProjectForm('create', $this->entityManager);
 
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();
 
             $form->setData($data);
 
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
 
-                // Get filtered and validated data
                 $data = $form->getData();
 
-                // Add user.
+                // Добавление проекта в БД
                 $project = $this->projectManager->addProject($data);
 
-                // Redirect to "view" page
                 return $this->redirect()->toRoute('projects',
                     ['action'=>'view', 'code' => $project->getCode()]);
             }
         }
 
+        // рендер шаблона
         return new ViewModel([
             'form' => $form
         ]);
@@ -125,7 +121,9 @@ class ProjectController extends AbstractActionController
 
 
     /**
-     * The "view" action displays a page allowing to view user's details.
+     * Просмотр проекта
+     *
+     * @return void|ViewModel
      */
     public function viewAction()
     {
@@ -135,23 +133,21 @@ class ProjectController extends AbstractActionController
             return;
         }
 
-        // Find a user with such ID.
+        // Поиск проекта по ID
         $project = $this->entityManager->getRepository(Project::class)
             ->findOneByCode($code);
 
-        //Filter tasks by status
+        // Фильтрование тасков проекта по статусу
         $currentUser = $this->entityManager->getRepository(User::class)
             ->findOneByEmail($this->authService->getIdentity());
         $currentRoles = $currentUser->getRoles();
         $currentRole = $currentRoles[0];
         $defaultRoleFilterStatus = $currentRole->getDefaultStatusFilter();
         $currentFilterStatus = 0;
-
         $selectedFilter = $this->getRequest()->getQuery('filter_status');
         if($selectedFilter || $selectedFilter === "0"){
             $defaultRoleFilterStatus = $selectedFilter;
         }
-
         if($defaultRoleFilterStatus) {
             $tasks = $this->entityManager->getRepository(Task::class)
                 ->findBy(['projectId' => $project->getId(), 'status' => $defaultRoleFilterStatus], ['id' => 'ASC']);
@@ -183,7 +179,9 @@ class ProjectController extends AbstractActionController
     }
 
     /**
-     * The "edit" action displays a page allowing to edit user.
+     * Редактирование проекта
+     *
+     * @return void|\Zend\Http\Response|ViewModel
      */
     public function editAction()
     {
@@ -193,6 +191,7 @@ class ProjectController extends AbstractActionController
             return;
         }
 
+        // Поиск проекта по ID
         $project = $this->entityManager->getRepository(Project::class)
             ->findOneByCode($code);
 
@@ -201,37 +200,36 @@ class ProjectController extends AbstractActionController
             return;
         }
 
-
+        // Проверка полномочий
         if (!$this->access('projects.manage.all') &&
             !$this->access('projects.manage.own', ['project' => $project])) {
             return $this->redirect()->toRoute('not-authorized');
         }
 
-        // Create project form
+        // Создание формы
         $form = new ProjectForm('update', $this->entityManager, $project);
 
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();
 
             $form->setData($data);
 
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
 
-                // Get filtered and validated data
                 $data = $form->getData();
 
-                // Update the user.
+                // Обновление проекта в БД
                 $this->projectManager->updateProject($project, $data);
 
-                // Redirect to "view" page
                 return $this->redirect()->toRoute('projects',
                     ['action'=>'view', 'code'=>$project->getCode()]);
             }
         } else {
+            // Установка данных для формы редактирования
             $form->setData(array(
                 'name'=>$project->getName(),
                 'code'=>$project->getCode(),
@@ -240,6 +238,7 @@ class ProjectController extends AbstractActionController
             ));
         }
 
+        // рендер шаблона
         return new ViewModel(array(
             'project' => $project,
             'form' => $form
@@ -247,7 +246,9 @@ class ProjectController extends AbstractActionController
     }
 
     /**
-     * This action deletes a permission.
+     * Удаление проекта
+     *
+     * @return void|\Zend\Http\Response
      */
     public function deleteAction()
     {
@@ -257,31 +258,35 @@ class ProjectController extends AbstractActionController
             return;
         }
 
+        // Поиск проекта
         $project = $this->entityManager->getRepository(Project::class)
             ->findOneByCode($code);
 
-//        if (!$this->access('projects.manage.all') &&
-//            !$this->access('projects.manage.own', ['project' => $project])) {
-//            return $this->redirect()->toRoute('not-authorized');
-//        }
+        // Проверка полномочий
+        if (!$this->access('projects.manage.all') &&
+            !$this->access('projects.manage.own', ['project' => $project])) {
+            return $this->redirect()->toRoute('not-authorized');
+        }
 
         if ($project == null) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
 
-        // Delete role.
+        // Удаление проекта из БД
         $this->projectManager->deleteProject($project);
 
-        // Add a flash message.
         $this->flashMessenger()->addSuccessMessage('Project has been removed.');
 
-        // Redirect to "index" page
         return $this->redirect()->toRoute('projects', ['action'=>'index']);
     }
 
 
-
+    /**
+     * Назначение пользователей на проект
+     *
+     * @return void|\Zend\Http\Response|ViewModel
+     */
     function assignUsersAction(){
         $code = $this->params()->fromRoute('code', -1);
         if ($code == -1 || $code == null) {
@@ -289,6 +294,7 @@ class ProjectController extends AbstractActionController
             return;
         }
 
+        // Поиск проекта в БД
         $project = $this->entityManager->getRepository(Project::class)
             ->findOneByCode($code);
 
@@ -297,25 +303,24 @@ class ProjectController extends AbstractActionController
             return;
         }
 
+        // Проверка полномочий
         if (!$this->access('projects.assign.users.all') &&
             !$this->access('projects.assign.users.own', ['project' => $project])) {
             return $this->redirect()->toRoute('not-authorized');
         }
 
+        // Извлечение списка пользователей
         $allUsers = $this->entityManager->getRepository(User::class)
             ->findBy([], ['email'=>'ASC']);
 
-//        $assignedUsers = $this->roleManager->getEffectivePermissions($project);
         $assignedUsers = $project->getUsers();
         $assignedUsers->initialize();
 
-        // Create form
+        // Создание формы
         $form = new ProjectUsersAssignmentForm($this->entityManager);
         foreach ($allUsers as $user) {
             $label = $user->getFullName();
             $checked = false;
-//            $criteria = Criteria::create()->where(Criteria::expr()->in("id", [$user->getId()]));
-            //TODO: get $assigned users ids array and find current user in this array instead of foreach collection
             foreach ($assignedUsers as $assignedUser) {
                 if($assignedUser->getId() == $user->getId()){
                     $label .= ' (assigned)';
@@ -326,27 +331,24 @@ class ProjectController extends AbstractActionController
             $form->addUsersField($user->getId(), $label, $checked);
         }
 
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();
 
             $form->setData($data);
 
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
 
-                // Get filtered and validated data
                 $data = $form->getData();
 
-                // Update permissions.
+                // Назначение пользователей на проект в БД
                 $this->projectManager->updateProjectUsers($project, $data);
 
-                // Add a flash message.
-                $this->flashMessenger()->addSuccessMessage('User were successfully assignment.');
+                $this->flashMessenger()->addSuccessMessage('Users were successfully assignment.');
 
-                // Redirect to "index" page
                 return $this->redirect()->toRoute('projects', ['action' => 'view', 'code' => $project->getCode()]);
             }
         } else {
@@ -361,6 +363,7 @@ class ProjectController extends AbstractActionController
 
         $errors = $form->getMessages();
 
+        // Рендер шаблона
         return new ViewModel([
             'form' => $form,
             'project' => $project,
@@ -370,6 +373,11 @@ class ProjectController extends AbstractActionController
     }
 
 
+    /**
+     * Просмотр ТЗ
+     *
+     * @return void|ViewModel
+     */
     public function viewTechnicalAssignmentAction()
     {
         $code = $this->params()->fromRoute('code', -1);
@@ -378,10 +386,11 @@ class ProjectController extends AbstractActionController
             return;
         }
 
-        // Find a user with such ID.
+        // Поиск проекта по ID
         $project = $this->entityManager->getRepository(Project::class)
             ->findOneByCode($code);
 
+        // Выбор ТЗ у проекта
         $technicalAssignment = $project->getTechnicalAssignment();
 
         if(!$technicalAssignment){
@@ -394,11 +403,13 @@ class ProjectController extends AbstractActionController
             return;
         }
 
+        // Выбор прикрепленных файлов у ТЗ
         $attachments = $technicalAssignment->getAttachments();
         $attachments->initialize();
 
         $form = new AttachmentForm('attachment');
 
+        // Рендер шаблона
         return new ViewModel([
             'technicalAssignment' => $technicalAssignment,
             'attachments' => $attachments,
@@ -407,7 +418,11 @@ class ProjectController extends AbstractActionController
         ]);
     }
 
-
+    /**
+     * Редактирование ТЗ
+     *
+     * @return void|\Zend\Http\Response|ViewModel
+     */
     public function editTechnicalAssignmentAction()
     {
         $code = $this->params()->fromRoute('code', -1);
@@ -416,6 +431,7 @@ class ProjectController extends AbstractActionController
             return;
         }
 
+        // Поиск проекта по ID
         $project = $this->entityManager->getRepository(Project::class)
             ->findOneByCode($code);
 
@@ -424,6 +440,7 @@ class ProjectController extends AbstractActionController
             return;
         }
 
+        // Выбор ТЗ из проекта
         $technicalAssignment = $project->getTechnicalAssignment();
 
         if ($technicalAssignment == null) {
@@ -431,32 +448,31 @@ class ProjectController extends AbstractActionController
             return;
         }
 
+        // Проверка полномочий
         if (!$this->access('projects.manage.all') &&
             !$this->access('projects.manage.own', ['project' => $project])) {
             return $this->redirect()->toRoute('not-authorized');
         }
 
-        // Create project form
+        // Создание формы
         $form = new TechnicalAssignmentForm('update', $this->entityManager, $project);
 
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();
 
             $form->setData($data);
 
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
 
-                // Get filtered and validated data
                 $data = $form->getData();
 
-                // Update the user.
+                // Обновление данных ТЗ в БД
                 $this->technicalAssignmentManager->updateTechnicalAssignment($technicalAssignment, $data);
 
-                // Redirect to "view" page
                 return $this->redirect()->toRoute('projects',
                     ['action' => 'viewTechnicalAssignment', 'code' => $project->getCode()]);
             }
@@ -467,6 +483,7 @@ class ProjectController extends AbstractActionController
             ));
         }
 
+        // Рендер шаблона
         return new ViewModel(array(
             'project' => $project,
             'technicalAssignment' => $technicalAssignment,
@@ -474,7 +491,11 @@ class ProjectController extends AbstractActionController
         ));
     }
 
-
+    /**
+     * Создание ТЗ
+     *
+     * @return void|\Zend\Http\Response|ViewModel
+     */
     public function createTechnicalAssignmentAction()
     {
         $code = $this->params()->fromRoute('code', -1);
@@ -483,41 +504,41 @@ class ProjectController extends AbstractActionController
             return;
         }
 
-        // Find a user with such ID.
+        // Поиск проекта в БД по ID
         $project = $this->entityManager->getRepository(Project::class)
             ->findOneByCode($code);
 
+        // Проверка полномочий
         if (!$this->access('projects.manage.all') &&
             !$this->access('projects.manage.own', ['project' => $project])) {
             return $this->redirect()->toRoute('not-authorized');
         }
 
-        // Create user form
+        // Создание формы
         $form = new TechnicalAssignmentForm('create', $this->entityManager);
 
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();
 
             $form->setData($data);
 
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
 
-                // Get filtered and validated data
                 $data = $form->getData();
 
-                // Add user.
-                $technicalAssignment = $this->technicalAssignmentManager->addTechnicalAssignment($data, $project);
+                // Создание ТЗ в БД
+                $this->technicalAssignmentManager->addTechnicalAssignment($data, $project);
 
-                // Redirect to "view" page
                 return $this->redirect()->toRoute('projects',
                     ['action' => 'view', 'code' => $project->getCode()]);
             }
         }
 
+        // Рендер шаблона
         return new ViewModel([
             'form' => $form,
             'project' => $project

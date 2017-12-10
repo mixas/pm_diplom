@@ -2,17 +2,15 @@
 
 namespace Project\Service;
 
-use Zend\Permissions\Rbac\Rbac;
 use Project\Entity\Task;
 use Project\Entity\TaskStatus;
 use User\Entity\User;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Math\Rand;
-
-use Interop\Container\ContainerInterface;
 
 /**
- * This service is responsible for adding/editing tasks
+ * Класс для выполнения операций связанных с задачами в БД
+ *
+ * Class TaskManager
+ * @package Project\Service
  */
 class TaskManager
 {
@@ -22,9 +20,6 @@ class TaskManager
      */
     private $entityManager;
 
-    /**
-     * Constructs the service.
-     */
     public function __construct($entityManager, $rbacManager)
     {
         $this->entityManager = $entityManager;
@@ -38,11 +33,16 @@ class TaskManager
     private $rbacManager;
 
     /**
-     * This method adds a new task to DB.
+     * Добавление задач в БД
+     *
+     * @param $data
+     * @param null $project
+     * @param null $user
+     * @return Task
      */
     public function addTask($data, $project = null, $user = null)
     {
-        // Create new Task entity.
+        // Создание новой сущности
         $task = new Task();
         $task->setTaskTitle($data['task_title']);
         $task->setEstimate($data['estimate']);
@@ -57,21 +57,26 @@ class TaskManager
         }
         $currentDate = date('Y-m-d H:i:s');
         $task->setDateCreated($currentDate);
-                
-        // Add the entity to the entity manager.
+
+        // Добавить сущность в entity manager.
         $this->entityManager->persist($task);
-        
-        // Apply changes to database.
+
+        // Применить изменения в БД
         $this->entityManager->flush();
         
         return $task;
     }
-    
+
     /**
-     * This method updates data of an existing user.
+     * Обновление задач в БД
+     *
+     * @param $task
+     * @param $data
+     * @return bool
      */
     public function updateTask($task, $data)
     {
+        // Установка новых данных
         if(isset($data['task_title']))
             $task->setTaskTitle($data['task_title']);
         if(isset($data['description']))
@@ -88,17 +93,20 @@ class TaskManager
         $currentDate = date('Y-m-d H:i:s');
         $task->setDateUpdated($currentDate);
 
-        // Apply changes to database.
+        // Применить изменения в БД
         $this->entityManager->flush();
 
         return true;
     }
 
     /**
-     * Deletes the given task.
+     * Удаление задачи из БД
+     *
+     * @param $task
      */
     public function deleteTask($task)
     {
+        // Удаление задачи и связанных комментариев из БД
         $this->entityManager->remove($task);
         $comments = $task->getComments();
         $comments->initialize();
@@ -106,11 +114,13 @@ class TaskManager
             $this->entityManager->remove($comment);
         }
         $this->entityManager->remove($task);
+
+        // Применить изменения в БД
         $this->entityManager->flush();
     }
 
     /**
-     * Returns possible statuses from DB as array.
+     * Выборка всех возможных статусов для задач из БД
      *
      * @return array
      */
@@ -124,9 +134,8 @@ class TaskManager
         return $taskStatuses;
     }
 
-
     /**
-     * Returns possible statuses from DB as array.
+     * Выборка всех пользователей из БД (необходимо для вывода списка пользователей при переназначении пользователя)
      *
      * @return array
      */
@@ -141,6 +150,8 @@ class TaskManager
     }
 
     /**
+     * Вывод читаемого статуса
+     *
      * @param $status
      * @return string
      */

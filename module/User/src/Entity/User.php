@@ -5,15 +5,16 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * This class represents a registered user.
+ * Класс отображает пользователя системы (сущность БД)
+ *
  * @ORM\Entity()
  * @ORM\Table(name="user")
  */
 class User 
 {
     // User status constants.
-    const STATUS_ACTIVE       = 1; // Active user.
-    const STATUS_RETIRED      = 2; // Retired user.
+    const STATUS_ACTIVE       = 1;
+    const STATUS_RETIRED      = 2;
 
     /**
      * @ORM\Id
@@ -79,64 +80,56 @@ class User
      *      )
      */
     private $projects;
-    
-    /**
-     * Constructor.
-     */
-    public function __construct() 
+
+
+    public function __construct()
     {
         $this->roles = new ArrayCollection();
         $this->projects = new ArrayCollection();
     }
-    
+
     /**
-     * Returns user ID.
-     * @return integer
+     * @return mixed
      */
-    public function getId() 
+    public function getId()
     {
         return $this->id;
     }
 
     /**
-     * Sets user ID. 
-     * @param int $id    
+     * @param $id
      */
-    public function setId($id) 
+    public function setId($id)
     {
         $this->id = $id;
     }
 
     /**
-     * Returns email.     
-     * @return string
+     * @return mixed
      */
-    public function getEmail() 
+    public function getEmail()
     {
         return $this->email;
     }
 
     /**
-     * Sets email.     
-     * @param string $email
+     * @param $email
      */
     public function setEmail($email) 
     {
         $this->email = $email;
     }
-    
+
     /**
-     * Returns full name.
-     * @return string     
+     * @return mixed
      */
     public function getFullName() 
     {
         return $this->fullName;
-    }       
+    }
 
     /**
-     * Sets full name.
-     * @param string $fullName
+     * @param $fullName
      */
     public function setFullName($fullName) 
     {
@@ -160,10 +153,9 @@ class User
         $this->salaryRate = $salaryRate;
         return $this;
     }
-    
+
     /**
-     * Returns status.
-     * @return int     
+     * @return mixed
      */
     public function getStatus() 
     {
@@ -171,7 +163,6 @@ class User
     }
 
     /**
-     * Returns possible statuses as array.
      * @return array
      */
     public static function getStatusList() 
@@ -180,10 +171,9 @@ class User
             self::STATUS_ACTIVE => 'Active',
             self::STATUS_RETIRED => 'Retired'
         ];
-    }    
-    
+    }
+
     /**
-     * Returns user status as string.
      * @return string
      */
     public function getStatusAsString()
@@ -193,100 +183,90 @@ class User
             return $list[$this->status];
         
         return 'Unknown';
-    }    
-    
+    }
+
     /**
-     * Sets status.
-     * @param int $status     
+     * @param $status
      */
     public function setStatus($status) 
     {
         $this->status = $status;
-    }   
-    
+    }
+
     /**
-     * Returns password.
-     * @return string
+     * @return mixed
      */
     public function getPassword() 
     {
        return $this->password; 
     }
-    
+
     /**
-     * Sets password.     
-     * @param string $password
+     * @param $password
      */
     public function setPassword($password) 
     {
         $this->password = $password;
     }
-    
+
     /**
-     * Returns the date of user creation.
-     * @return string     
+     * @return mixed
      */
     public function getDateCreated() 
     {
         return $this->dateCreated;
     }
-    
+
     /**
-     * Sets the date when this user was created.
-     * @param string $dateCreated     
+     * @param $dateCreated
      */
     public function setDateCreated($dateCreated) 
     {
         $this->dateCreated = $dateCreated;
-    }    
-    
+    }
+
     /**
-     * Returns password reset token.
-     * @return string
+     * @return mixed
      */
     public function getResetPasswordToken()
     {
         return $this->passwordResetToken;
     }
-    
+
     /**
-     * Sets password reset token.
-     * @param string $token
+     * @param $token
      */
     public function setPasswordResetToken($token) 
     {
         $this->passwordResetToken = $token;
     }
-    
+
     /**
-     * Returns password reset token's creation date.
-     * @return string
+     * @return mixed
      */
     public function getPasswordResetTokenCreationDate()
     {
         return $this->passwordResetTokenCreationDate;
     }
-    
+
     /**
-     * Sets password reset token's creation date.
-     * @param string $date
+     * @param $date
      */
     public function setPasswordResetTokenCreationDate($date) 
     {
         $this->passwordResetTokenCreationDate = $date;
     }
-    
+
     /**
-     * Returns the array of roles assigned to this user.
-     * @return array
+     * @return ArrayCollection
      */
     public function getRoles()
     {
         return $this->roles;
     }
-    
+
     /**
-     * Returns the string of assigned role names.
+     * @return string
      */
     public function getRolesAsString()
     {
@@ -303,9 +283,9 @@ class User
         
         return $roleList;
     }
-    
+
     /**
-     * Assigns a role to user.
+     * @param $role
      */
     public function addRole($role)
     {
@@ -313,8 +293,7 @@ class User
     }
 
     /**
-     * Returns the array of project allowed to this user.
-     * @return array
+     * @return ArrayCollection
      */
     public function getProjects()
     {
@@ -322,7 +301,7 @@ class User
     }
 
     /**
-     * Assigns a project to user.
+     * @param $project
      */
     public function addProject($project)
     {

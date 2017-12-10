@@ -3,13 +3,13 @@
 namespace Project\Service;
 
 use Project\Entity\Task;
-use Project\Entity\TaskStatus;
-use User\Entity\User;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Math\Rand;
 
-use Interop\Container\ContainerInterface;
-
+/**
+ * Класс обработчик основной логики автоназначения пользователей
+ *
+ * Class SolutionProcessor
+ * @package Project\Service
+ */
 class SolutionProcessor
 {
     /**
@@ -18,18 +18,16 @@ class SolutionProcessor
      */
     private $entityManager;
 
-    /**
-     * Constructs the service.
-     */
     public function __construct($entityManager)
     {
         $this->entityManager = $entityManager;
     }
 
-
     /**
+     * Расчет лучшего пользователя для выполнения задачи
+     *
      * @param $data
-     * @return null
+     * @return array
      */
     public function fetchTheBestUserSolution($data){
         $priority = $data['priority'];

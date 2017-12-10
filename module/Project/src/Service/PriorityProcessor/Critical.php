@@ -3,28 +3,14 @@
 namespace Project\Service\PriorityProcessor;
 
 use Project\Entity\Task;
-use Project\Entity\TaskStatus;
 use User\Entity\User;
 use User\Entity\Role;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Math\Rand;
-
-use Interop\Container\ContainerInterface;
 
 class Critical extends PriorityAbstract
 {
 
     protected $type;
 
-    /**
-     * Doctrine entity manager.
-     * @var Doctrine\ORM\EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * Constructs the service.
-     */
     public function __construct($entityManager)
     {
         parent::__construct($entityManager);
@@ -32,38 +18,35 @@ class Critical extends PriorityAbstract
     }
 
     /**
-     * The main auto assign logic for Critical tasks
+     * Основная логика для автоматического назначения пользователей для задач с приоритетом Critical
+     * За основу берется коэффициент эффективности труда
      *
      * @param $userType
      * @return array
      * @throws \Exception
      */
     public function process($userType){
+        // Нахождение роли в БД на основе переданного типа
         $userRole = $this->entityManager->getRepository(Role::class)
             ->findOneById($userType, ['name'=>'ASC']);
         if(!$userRole){
             throw new \Exception("User type (role) is undefined");
         }
 
+        // Нахождение всех пользователей роли
         $roleUsers = $userRole->getUsers();
         $roleUsers->initialize();
 
         $roleId = $userRole->getId();
-
-//        $queryBuilder
-//            ->select('u.id', 'u.full_name', 'ur.role_id')
-//            ->from('user', 'u')
-//            ->innerJoin('user_role', 'ur', 'ON', 'u.id = ur.user_id')
-//            ->where("role_id = $roleId");
-
         $type = $this->type;
 
+        // Коэффициент эффективности труда
+        // Будет расчитываться на основе сравнения реально затраченого времени и оценочного времени(estimate)
         $effectivityCoefficientArray = [];
 
         foreach ($roleUsers as $user) {
-
+            // Выборка всех задач для пользователя для дальнейшего подсчета коэффициента эффективности труда
             $queryBuilder = $this->entityManager->createQueryBuilder();
-
             $userId = $user->getId();
             $queryBuilder
                 ->select('t.id', 't.assigned_user_id', 'ur.role_id', 't.estimate', 'sum(tl.spent_time) real_spent_time')
@@ -74,14 +57,12 @@ class Critical extends PriorityAbstract
                 ->andWhere("t.priority = $type")
                 ->andWhere("t.assigned_user_id = $userId")
                 ->groupBy("tl.task_id");
-
             $query = $queryBuilder->getQuery();
-
             $stmt = $this->entityManager->getConnection()->prepare($query->getDQL());
             $stmt->execute();
             $allTasksForParticularRole = $stmt->fetchAll();
 
-
+            //Расчет общего затраченого времени + общего оценочного времени(estimate)
             $estimateSum = 0;
             $spentTimeSum = 0;
             foreach ($allTasksForParticularRole as $task) {
@@ -89,14 +70,17 @@ class Critical extends PriorityAbstract
                 $spentTimeSum += $task['real_spent_time'];
             }
 
+            // Если данных недостаточно - возвращаем ошибку
             if($spentTimeSum == 0 || $estimateSum == 0){
                 throw new \Exception("There are few data to define the most effective user");
             }
 
+            // Расчет общего коэффициента эффективности труда
             $effectivityCoefficientArray[$userId] = $estimateSum / $spentTimeSum;
 
         }
 
+        // Формирование данных для ответа
         if(!empty($effectivityCoefficientArray)) {
             $maxCoefficient = max($effectivityCoefficientArray);
             $theMostEffectiveUserId = array_keys($effectivityCoefficientArray, $maxCoefficient);

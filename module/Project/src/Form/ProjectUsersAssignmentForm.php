@@ -5,43 +5,34 @@ namespace Project\Form;
 use Zend\Form\Form;
 use Zend\Form\Fieldset;
 use Zend\InputFilter\InputFilter;
-use Zend\InputFilter\ArrayInput;
-use User\Validator\PermissionExistsValidator;
 
 /**
- * The form for collecting information about permissions assigned to a role.
+ * ‘орма дл€ назначени€ пользователей на проект
+ *
+ * Class ProjectUsersAssignmentForm
+ * @package Project\Form
  */
 class ProjectUsersAssignmentForm extends Form
 {
     private $entityManager;
 
-    /**
-     * Constructor.
-     */
     public function __construct($entityManager)
     {
         $this->entityManager = $entityManager;
 
-        // Define form name
         parent::__construct('project-users-form');
 
-        // Set POST method for this form
         $this->setAttribute('method', 'post');
 
         $this->addElements();
         $this->addInputFilter();
     }
 
-    /**
-     * This method adds elements to form (input fields and submit button).
-     */
     protected function addElements()
     {
-        // Add a fieldset for users
         $fieldset = new Fieldset('users');
         $this->add($fieldset);
 
-        // Add the Submit button
         $this->add([
             'type'  => 'submit',
             'name' => 'submit',
@@ -51,7 +42,6 @@ class ProjectUsersAssignmentForm extends Form
             ],
         ]);
 
-        // Add the CSRF field
         $this->add([
             'type' => 'csrf',
             'name' => 'csrf',
@@ -65,7 +55,6 @@ class ProjectUsersAssignmentForm extends Form
 
     public function addUsersField($name, $label, $checked = false)
     {
-        // Add a permission field
         $this->get('users')->add([
             'type'  => 'checkbox',
             'name' => $name,
@@ -78,7 +67,6 @@ class ProjectUsersAssignmentForm extends Form
             ],
         ]);
 
-        // Add input
         $this->getInputFilter()->get('users')->add([
             'name'     => $name,
             'required' => false,
@@ -90,9 +78,6 @@ class ProjectUsersAssignmentForm extends Form
         ]);
     }
 
-    /**
-     * This method creates input filter (used for form filtering/validation).
-     */
     private function addInputFilter()
     {
         // Create input filter

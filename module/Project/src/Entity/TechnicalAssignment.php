@@ -2,30 +2,12 @@
 
 namespace Project\Entity;
 
-use Project\Service\TaskManager;
-
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
-
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\InvokableFactory;
-use Zend\ServiceManager\ServiceManager;
-
-use Project\Entity\Project;
-
-use stdClass;
-
-
-
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\Table;
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\GeneratedValue;
-
 /**
- * This class represents a registered task.
+ * —ущность представл€юща€ техническое задание
+ *
  * @ORM\Entity()
  * @ORM\Table(name="technical_assignment")
  */
@@ -83,8 +65,6 @@ class TechnicalAssignment
         $this->attachments[] = $attachment;
     }
 
-
-
     /**
      * @ORM\Id
      * @ORM\Column(name="id")
@@ -110,7 +90,6 @@ class TechnicalAssignment
         return $this;
     }
 
-
     /**
      * @ORM\Column(name="project_id")
      * @ORM\GeneratedValue
@@ -126,7 +105,7 @@ class TechnicalAssignment
     }
 
     /**
-     * @param $taskId
+     * @param $projectId
      * @return $this
      */
     public function setProjectId($projectId)

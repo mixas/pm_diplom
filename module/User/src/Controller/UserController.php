@@ -10,8 +10,9 @@ use User\Form\PasswordChangeForm;
 use User\Form\PasswordResetForm;
 
 /**
- * This controller is responsible for user management (adding, editing, 
- * viewing users and changing user's password).
+ * Контроллер, ответсвенный за обработку запросов связанных с пользователями
+ * Class UserController
+ * @package User\Controller
  */
 class UserController extends AbstractActionController 
 {
@@ -27,22 +28,20 @@ class UserController extends AbstractActionController
      */
     private $userManager;
     
-    /**
-     * Constructor. 
-     */
     public function __construct($entityManager, $userManager)
     {
         $this->entityManager = $entityManager;
         $this->userManager = $userManager;
     }
-    
+
     /**
-     * This is the default "index" action of the controller. It displays the 
-     * list of users.
+     * Отобращение всех пользователей в виде теблицы
+     *
+     * @return void|ViewModel
      */
-    public function indexAction() 
+    public function indexAction()
     {
-        // Access control.
+        // Проверка полномочий текущего пользоватлея на соответсвие требованиям
         if (!$this->access('user.manage')) {
             $this->getResponse()->setStatusCode(401);
             return;
@@ -50,21 +49,24 @@ class UserController extends AbstractActionController
         
         $users = $this->entityManager->getRepository(User::class)
                 ->findBy([], ['id'=>'ASC']);
-        
+
+        //рендер шаблона
         return new ViewModel([
             'users' => $users
         ]);
-    } 
-    
+    }
+
     /**
-     * This action displays a page allowing to add a new user.
+     * Добавление нового пользователя
+     *
+     * @return \Zend\Http\Response|ViewModel
      */
     public function addAction()
     {
-        // Create user form
+        // Создание формы для пользователя
         $form = new UserForm('create', $this->entityManager);
         
-        // Get the list of all available roles (sorted by name).
+        // Берем все роли
         $allRoles = $this->entityManager->getRepository(Role::class)
                 ->findBy([], ['name'=>'ASC']);
         $roleList = [];
@@ -74,46 +76,49 @@ class UserController extends AbstractActionController
         
         $form->get('roles')->setValueOptions($roleList);
         
-        // Check if user has submitted the form
+        // проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
             
-            // Fill in the form with POST data
+            // извлечение всех заполненных данных
             $data = $this->params()->fromPost();            
             
             $form->setData($data);
             
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
-                
-                // Get filtered and validated data
+
                 $data = $form->getData();
                 
-                // Add user.
+                // Добавляем пользователя
                 $user = $this->userManager->addUser($data);
                 
-                // Redirect to "view" page
+                // рендер шаблона
                 return $this->redirect()->toRoute('users', 
                         ['action'=>'view', 'id'=>$user->getId()]);                
             }               
-        } 
-        
+        }
+
+        // рендер шаблона
         return new ViewModel([
-                'form' => $form
-            ]);
+            'form' => $form
+        ]);
     }
-    
+
     /**
-     * The "view" action displays a page allowing to view user's details.
+     * Отображение данных пользователя
+     *
+     * @return void|ViewModel
      */
     public function viewAction() 
     {
+        // Принимаем данные
         $id = (int)$this->params()->fromRoute('id', -1);
         if ($id<1) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
         
-        // Find a user with such ID.
+        // Находим пользователя по ID
         $user = $this->entityManager->getRepository(User::class)
                 ->find($id);
         
@@ -121,23 +126,28 @@ class UserController extends AbstractActionController
             $this->getResponse()->setStatusCode(404);
             return;
         }
-                
+
+        // рендер шаблона
         return new ViewModel([
             'user' => $user
         ]);
     }
-    
+
     /**
-     * The "edit" action displays a page allowing to edit user.
+     * Редактировани пользователя
+     *
+     * @return void|\Zend\Http\Response|ViewModel
      */
     public function editAction() 
     {
+        // Принимаем данные
         $id = (int)$this->params()->fromRoute('id', -1);
         if ($id<1) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
-        
+
+        // Находим пользователя по ID
         $user = $this->entityManager->getRepository(User::class)
                 ->find($id);
         
@@ -146,42 +156,40 @@ class UserController extends AbstractActionController
             return;
         }
         
-        // Create user form
+        // создаем форму для пользователя
         $form = new UserForm('update', $this->entityManager, $user);
-        
-        // Get the list of all available roles (sorted by name).
+
+        // Извлекаем все роли
         $allRoles = $this->entityManager->getRepository(Role::class)
                 ->findBy([], ['name'=>'ASC']);
         $roleList = [];
         foreach ($allRoles as $role) {
             $roleList[$role->getId()] = $role->getName();
         }
-        
         $form->get('roles')->setValueOptions($roleList);
         
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
             
-            // Fill in the form with POST data
-            $data = $this->params()->fromPost();            
+            // Извлечение данных формы
+            $data = $this->params()->fromPost();
             
             $form->setData($data);
             
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
-                
-                // Get filtered and validated data
+
                 $data = $form->getData();
                 
-                // Update the user.
+                // Обновляем пользователя новыми данными из формы
                 $this->userManager->updateUser($user, $data);
                 
-                // Redirect to "view" page
+                // Рендер шаблона
                 return $this->redirect()->toRoute('users', 
                         ['action'=>'view', 'id'=>$user->getId()]);                
             }               
         } else {
-            
+            // Определение данных для изначальной формы
             $userRoleIds = [];
             foreach ($user->getRoles() as $role) {
                 $userRoleIds[] = $role->getId();
@@ -195,24 +203,29 @@ class UserController extends AbstractActionController
                     'roles' => $userRoleIds
                 ));
         }
-        
+
+        // Рендер шаблона
         return new ViewModel(array(
             'user' => $user,
             'form' => $form
         ));
     }
-    
+
     /**
-     * This action displays a page allowing to change user's password.
+     * Изменить пароль
+     *
+     * @return void|\Zend\Http\Response|ViewModel
      */
     public function changePasswordAction() 
     {
+        // Принимаем данные
         $id = (int)$this->params()->fromRoute('id', -1);
         if ($id<1) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
-        
+
+        // Находи пользователя по ID
         $user = $this->entityManager->getRepository(User::class)
                 ->find($id);
         
@@ -221,24 +234,23 @@ class UserController extends AbstractActionController
             return;
         }
         
-        // Create "change password" form
+        // Создаем форму
         $form = new PasswordChangeForm('change');
-        
-        // Check if user has submitted the form
+
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
             
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();            
             
             $form->setData($data);
             
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
-                
-                // Get filtered and validated data
+
                 $data = $form->getData();
                 
-                // Try to change password.
+                // Изменить пароль
                 if (!$this->userManager->changePassword($user, $data)) {
                     $this->flashMessenger()->addErrorMessage(
                             'Sorry, the old password is incorrect. Could not set the new password.');
@@ -247,46 +259,48 @@ class UserController extends AbstractActionController
                             'Changed the password successfully.');
                 }
                 
-                // Redirect to "view" page
+                // Рендер шаблона
                 return $this->redirect()->toRoute('users', 
                         ['action'=>'view', 'id'=>$user->getId()]);                
             }               
-        } 
-        
+        }
+
+        // Рендер шаблона
         return new ViewModel([
             'user' => $user,
             'form' => $form
         ]);
     }
-    
+
     /**
-     * This action displays the "Reset Password" page.
+     * Сбросить пароль
+     *
+     * @return \Zend\Http\Response|ViewModel
      */
     public function resetPasswordAction()
     {
-        // Create form
+        // Создание формы
         $form = new PasswordResetForm();
         
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
             
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();            
             
             $form->setData($data);
             
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
                 
-                // Look for the user with such email.
+                // Поиск пользователя по email
                 $user = $this->entityManager->getRepository(User::class)
                         ->findOneByEmail($data['email']);                
                 if ($user!=null) {
-                    // Generate a new password for user and send an E-mail 
-                    // notification about that.
+                    // Генерация нового пароля и отправка на email
                     $this->userManager->generatePasswordResetToken($user);
                     
-                    // Redirect to "message" page
+                    // Редирект
                     return $this->redirect()->toRoute('users', 
                             ['action'=>'message', 'id'=>'sent']);                 
                 } else {
@@ -294,40 +308,42 @@ class UserController extends AbstractActionController
                             ['action'=>'message', 'id'=>'invalid-email']);                 
                 }
             }               
-        } 
-        
+        }
+
+        // Рендер шаблона
         return new ViewModel([                    
             'form' => $form
         ]);
     }
-    
+
     /**
-     * This action displays an informational message page. 
-     * For example "Your password has been resetted" and so on.
+     * Страциа с уведомление пользователя о завершении действия
+     *
+     * @return ViewModel
+     * @throws \Exception
      */
     public function messageAction() 
     {
-        // Get message ID from route.
         $id = (string)$this->params()->fromRoute('id');
-        
-        // Validate input argument.
+
         if($id!='invalid-email' && $id!='sent' && $id!='set' && $id!='failed') {
             throw new \Exception('Invalid message ID specified');
         }
-        
+
+        // Рендер шаблона
         return new ViewModel([
             'id' => $id
         ]);
     }
     
     /**
-     * This action displays the "Reset Password" page. 
+     * Отображение "Reset Password" страницы.
      */
     public function setPasswordAction()
     {
         $token = $this->params()->fromQuery('token', null);
         
-        // Validate token length
+        // Валидация длины token
         if ($token!=null && (!is_string($token) || strlen($token)!=32)) {
             throw new \Exception('Invalid token type or length');
         }
@@ -338,36 +354,37 @@ class UserController extends AbstractActionController
                     ['action'=>'message', 'id'=>'failed']);
         }
                 
-        // Create form
+        // Создание новой формы
         $form = new PasswordChangeForm('reset');
         
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
             
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();            
             
             $form->setData($data);
             
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
                 
                 $data = $form->getData();
                                                
-                // Set new password for the user.
+                // Установка нового пароля
                 if ($this->userManager->setNewPasswordByToken($token, $data['new_password'])) {
                     
-                    // Redirect to "message" page
+                    // Редирект для показа сообщение
                     return $this->redirect()->toRoute('users', 
                             ['action'=>'message', 'id'=>'set']);                 
                 } else {
-                    // Redirect to "message" page
+                    // Редирект для показа сообщение
                     return $this->redirect()->toRoute('users', 
                             ['action'=>'message', 'id'=>'failed']);                 
                 }
             }               
         } 
-        
+
+        // Рендер формы
         return new ViewModel([                    
             'form' => $form
         ]);

@@ -1,8 +1,7 @@
 <?php
 /**
- * @link      http://github.com/zendframework/ZendSkeletonApplication for the canonical source repository
- * @copyright Copyright (c) 2005-2016 Zend Technologies USA Inc. (http://www.zend.com)
- * @license   http://framework.zend.com/license/new-bsd New BSD License
+ * Основной файл конфигурации для модуля Application. Модуль предназначен для реализации основной структуры приложения,
+ * регистрации, управлени пользователями, ролями, разрешениями
  */
 
 namespace Application;
@@ -12,6 +11,7 @@ use Zend\Router\Http\Segment;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 return [
+    /* маршрутизация запросов */
     'router' => [
         'routes' => [
             'home' => [
@@ -60,42 +60,38 @@ return [
             ],
         ],
     ],
+    /* Настройка автоматического создания контроллеров с помощью фабрик */
     'controllers' => [
         'factories' => [
             Controller\IndexController::class => Controller\Factory\IndexControllerFactory::class,
         ],
     ],
-    // The 'access_filter' key is used by the User module to restrict or permit
-    // access to certain controller actions for unauthorized visitors.
+    /* Настройка ограничений доступа */
     'access_filter' => [
         'options' => [
-            // The access filter can work in 'restrictive' (recommended) or 'permissive'
-            // mode. In restrictive mode all controller actions must be explicitly listed 
-            // under the 'access_filter' config key, and access is denied to any not listed 
-            // action for not logged in users. In permissive mode, if an action is not listed 
-            // under the 'access_filter' key, access to it is permitted to anyone (even for 
-            // not logged in users. Restrictive mode is more secure and recommended to use.
             'mode' => 'restrictive'
         ],
         'controllers' => [
             Controller\IndexController::class => [
-                // Allow anyone to visit "index" and "about" actions
+                // разрешить всем посещать "index" , "about" , "help" страницы
                 ['actions' => ['index', 'about', 'help'], 'allow' => '*'],
-                // Allow authorized users to visit "settings" action
+                // разрашить посещать "settings" только зарегистрированным пользовалетелям
                 ['actions' => ['settings'], 'allow' => '@']
             ],
         ]
     ],
-    // This key stores configuration for RBAC manager.
+    /* RBAC manager позволяет проверять полномочия пользователей.*/
     'rbac_manager' => [
         'assertions' => [Service\RbacAssertionManager::class],
     ],
+    /* Настройка автоматического создания сервисов с помощью фабрик, сервисы - это один из видов моделей */
     'service_manager' => [
         'factories' => [
             Service\NavManager::class => Service\Factory\NavManagerFactory::class,
             Service\RbacAssertionManager::class => Service\Factory\RbacAssertionManagerFactory::class,
         ],
     ],
+    /* Настройка автоматического создания view helper с помощью фабрик, это вспомогательные функции */
     'view_helpers' => [
         'factories' => [
             View\Helper\Menu::class => View\Helper\Factory\MenuFactory::class,
@@ -106,6 +102,7 @@ return [
             'pageBreadcrumbs' => View\Helper\Breadcrumbs::class,
         ],
     ],
+    /* Настройка рендера шаблонов */
     'view_manager' => [
         'display_not_found_reason' => true,
         'display_exceptions'       => true,
@@ -122,7 +119,7 @@ return [
             __DIR__ . '/../view',
         ],
     ],
-    // The following key allows to define custom styling for FlashMessenger view helper.
+    /* Настройка текстовых уведомлений(success и error сообщений) */
     'view_helper_config' => [
         'flashmessenger' => [
             'message_open_format'      => '<div%s><a href="#" class="close" data-dismiss="alert" aria-label="close" title="close">x</a><li>',

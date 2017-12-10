@@ -1,14 +1,14 @@
 <?php
 namespace Project\Service;
 
-use Zend\Permissions\Rbac\Rbac;
 use Project\Entity\Project;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Math\Rand;
 use User\Entity\User;
 
 /**
- * This service is responsible for adding/editing projects
+ * Класс для выполнения операций связанных с проектами в БД
+ *
+ * Class ProjectManager
+ * @package Project\Service
  */
 class ProjectManager
 {
@@ -24,26 +24,27 @@ class ProjectManager
      */
     private $rbacManager;
 
-    /**
-     * Constructs the service.
-     */
     public function __construct($entityManager, $rbacManager)
     {
         $this->entityManager = $entityManager;
         $this->rbacManager = $rbacManager;
     }
-    
+
     /**
-     * This method adds a new user.
+     * Добавление проекта в БД
+     *
+     * @param $data
+     * @return Project
+     * @throws \Exception
      */
     public function addProject($data)
     {
-        // Do not allow several users with the same email address.
+        // Не позволять создавать несколько проектов с одинаковыми кодами
         if($this->checkProjectExists($data['code'])) {
             throw new \Exception("Another project with the same code " . $data['$code'] . " already exists");
         }
-        
-        // Create new User entity.
+
+        // Создание новой сущности
         $project = new Project();
         $project->setCode($data['code']);
         $project->setName($data['name']);
@@ -53,8 +54,8 @@ class ProjectManager
         
         $currentDate = date('Y-m-d H:i:s');
         $project->setDateCreated($currentDate);
-                
-        // Add the entity to the entity manager.
+
+        // Добавить сущность в entity manager.
         $this->entityManager->persist($project);
         
         // Apply changes to database.
@@ -62,13 +63,18 @@ class ProjectManager
         
         return $project;
     }
-    
+
     /**
-     * This method updates data of an existing user.
+     * Обновление проекта в БД
+     *
+     * @param $project
+     * @param $data
+     * @return bool
+     * @throws \Exception
      */
     public function updateProject($project, $data)
     {
-        // Do not allow to change user email if another user with such email already exits.
+        // Не позволять создавать несколько проектов с одинаковыми кодами
         if($project->getCode()!=$data['code'] && $this->checkProjectExists($data['code'])) {
             throw new \Exception("Another project with the same code " . $data['email'] . " already exists");
         }
@@ -78,17 +84,20 @@ class ProjectManager
         $project->setStatus($data['status']);
         $project->setDescription($data['description']);
 
-        // Apply changes to database.
+        // Применить изменения в БД
         $this->entityManager->flush();
 
         return true;
     }
 
     /**
-     * Deletes the given project.
+     * Удаление проекта из БД
+     *
+     * @param $project
      */
     public function deleteProject($project)
     {
+        // Удалние проекта, счязанных с ним тасков и комментариев
         $this->entityManager->remove($project);
         $tasks = $project->getTasks();
         $tasks->initialize();
@@ -100,11 +109,15 @@ class ProjectManager
             }
             $this->entityManager->remove($task);
         }
+        // Применить изменения в БД
         $this->entityManager->flush();
     }
 
     /**
-     * Checks whether an active user with given email address already exists in the database.     
+     * Проверяет существует ли проект с таким кодом
+     *
+     * @param $code
+     * @return bool
      */
     public function checkProjectExists($code) {
         
@@ -114,13 +127,16 @@ class ProjectManager
         return $project !== null;
     }
 
-
     /**
-     * Updates permissions of a role.
+     * Обновляет проект в БД
+     *
+     * @param $project
+     * @param $data
+     * @throws \Exception
      */
     public function updateProjectUsers($project, $data)
     {
-        // Remove old users.
+        // Удаление старых назначеных пользователей из проекта
         $project->getUsers()->clear();
 
         // Assign new permissions to role
@@ -136,12 +152,8 @@ class ProjectManager
             $project->getUsers()->add($user);
         }
 
-        // Apply changes to database.
+        // Применить изменения в БД
         $this->entityManager->flush();
-
-        // Reload RBAC container.
-        //TODO: RBAC
-//        $this->rbacManager->init(true);
     }
 
 }

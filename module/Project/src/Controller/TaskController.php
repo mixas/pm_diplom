@@ -5,22 +5,17 @@ namespace Project\Controller;
 use Project\Entity\TimeLog;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
-use Project\Entity\Comment;
 use Project\Entity\Task;
 use Project\Entity\Project;
 use User\Entity\User;
 use User\Entity\Role;
-use Project\Service\TaskManager;
 use Project\Form\TaskForm;
 use Project\Form\CommentForm;
 use Project\Form\ReassignForm;
 use Project\Entity\TaskStatus;
-//use User\Form\PasswordChangeForm;
-//use User\Form\PasswordResetForm;
 
 /**
- * This controller is responsible for user management (adding, editing,
- * viewing users and changing user's password).
+ * Контроллер для обработки запросов, связанных в задачами
  */
 class TaskController extends AbstractActionController
 {
@@ -44,9 +39,6 @@ class TaskController extends AbstractActionController
 
     private $rbacManager;
 
-    /**
-     * Constructor.
-     */
     public function __construct($entityManager, $taskManager, $timeLogManager, $authService, $rendererInterface, $rbacManager)
     {
         $this->entityManager = $entityManager;
@@ -58,14 +50,16 @@ class TaskController extends AbstractActionController
     }
 
     /**
-     * renders list of assigned to current user tasks.
+     * Отображение списка задач (для текущего пользователя)
+     *
+     * @return ViewModel
      */
     public function indexAction()
     {
         $currentUser = $this->entityManager->getRepository(User::class)
             ->findOneByEmail($this->authService->getIdentity());
 
-        //Filter tasks by status
+        // Фильтрация таксков по статусу
         $currentRoles = $currentUser->getRoles();
         $currentRole = $currentRoles[0];
         $defaultRoleFilterStatus = $currentRole->getDefaultStatusFilter();
@@ -86,6 +80,7 @@ class TaskController extends AbstractActionController
         $allTaskStatuses = $this->entityManager->getRepository(TaskStatus::class)
             ->findBy([], ['id'=>'ASC']);
 
+        // Рендер шаблона
         return new ViewModel([
             'tasks' => $tasks,
             'taskManager' => $this->taskManager,
@@ -97,7 +92,9 @@ class TaskController extends AbstractActionController
     }
 
     /**
-     * This action displays a page allowing to add a new task.
+     * Добавить таск в БД
+     *
+     * @return void|\Zend\Http\Response|ViewModel
      */
     public function addAction()
     {
@@ -106,6 +103,7 @@ class TaskController extends AbstractActionController
             $this->getResponse()->setStatusCode(404);
             return;
         }
+        // Поиск проекта
         $project = $this->entityManager->getRepository(Project::class)
             ->findOneByCode($projectCode);
 
@@ -114,14 +112,16 @@ class TaskController extends AbstractActionController
                 ['action' => 'view', 'code' => $projectCode]);
         }
 
+        // Проверка полномочий
         if (!$this->access('projects.manage.all') &&
             !$this->access('projects.manage.own', ['project' => $project])) {
             return $this->redirect()->toRoute('not-authorized');
         }
 
-        // Create user form
+        // Создание формы
         $form = new TaskForm('create', $this->entityManager, null, $this->taskManager);
 
+        // Поиск всех ролей в БД
         $allRoles = $this->entityManager->getRepository(Role::class)
             ->findBy([], ['name'=>'ASC']);
         $excludedRoles = ['Administrator', 'Guest', 'Project Manager'];
@@ -131,34 +131,34 @@ class TaskController extends AbstractActionController
             }
         }
 
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();
 
             $form->setData($data);
 
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
 
-                // Get filtered and validated data
                 $data = $form->getData();
 
+                // Поиск назначеного на таск пользователя
                 $assignedUser = $this->entityManager->getRepository(User::class)
                     ->findOneById($data['assigned_user_id']);
 
-                // Add task.
+                // Добавление задачи в БД
                 $task = $this->taskManager->addTask($data, $project, $assignedUser);
 
                 $this->flashMessenger()->addMessage('Task has been successfully created', 'success');
 
-                // Redirect to "view" page
                 return $this->redirect()->toRoute('tasks',
                     ['action' => 'view', 'task' => $task->getId(), 'project' => $project->getId()]);
             }
         }
 
+        // Рендер шаблона
         return new ViewModel([
             'form' => $form,
             'roles' => $allRoles,
@@ -167,39 +167,40 @@ class TaskController extends AbstractActionController
     }
 
     /**
-     * The "view" action displays a page allowing to view user's details.
+     * Просмотр задачи
+     *
+     * @return void|ViewModel
      */
     public function viewAction()
     {
-//        $this->flashMessenger()->addMessage('Task has been successfully created', 'success');
-
         $id = (int)$this->params()->fromRoute('task', -1);
         if ($id<1) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
 
+        // Создание формы для комментариаев
         $commentForm = new CommentForm('create', $this->entityManager, $id);
 
-        // Find a user with such ID.
+        // Поиск таска в БД по ID
         $task = $this->entityManager->getRepository(Task::class)
             ->find($id);
 
         $comments = $task->getComments();
 
+        // Поиск всех time logs для таска
         $timeLogs = $task->getTimeLogs();
         $spentTime = 0;
         foreach ($timeLogs as $timeLog) {
             $spentTime += $timeLog->getSpentTime();
         }
 
-
         if ($task == null) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
 
-
+        // Рендер шаблона
         return new ViewModel([
             'commentForm' => $commentForm,
             'task' => $task,
@@ -212,7 +213,9 @@ class TaskController extends AbstractActionController
     }
 
     /**
-     * The "edit" action displays a page allowing to edit user.
+     * Редактирование задачи
+     *
+     * @return void|\Zend\Http\Response|ViewModel
      */
     public function editAction()
     {
@@ -222,10 +225,13 @@ class TaskController extends AbstractActionController
             return;
         }
 
+        // Поиск задачи по ID
         $task = $this->entityManager->getRepository(Task::class)
             ->find($id);
 
         $project = $task->getProject();
+
+        // Проверка полномочий
         if (!$this->access('projects.manage.all') &&
             !$this->access('projects.manage.own', ['project' => $project])) {
             return $this->redirect()->toRoute('not-authorized');
@@ -236,44 +242,42 @@ class TaskController extends AbstractActionController
             return;
         }
 
-        // Create task form
+        // Создание формы
         $form = new TaskForm('update', $this->entityManager, $task, $this->taskManager);
 
+        // Поиск всех ролей
         $allRoles = $this->entityManager->getRepository(Role::class)
             ->findBy([], ['name'=>'ASC']);
         $excludedRoles = ['Administrator', 'Guest', 'Project Manager'];
-
         foreach ($allRoles  as $key => $role) {
             if(in_array($role->getName(), $excludedRoles)){
                 unset($allRoles[$key]);
             }
         }
 
-
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();
 
             $form->setData($data);
 
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
 
-                // Get filtered and validated data
                 $data = $form->getData();
 
-                // Update the user.
+                // Обновление задачи в БД
                 $this->taskManager->updateTask($task, $data);
 
                 $project = $task->getProject();
 
-                // Redirect to "view" page
                 return $this->redirect()->toRoute('tasks',
                     ['action'=>'view', 'task' => $task->getId(), 'project' => $project->getCode()]);
             }
         } else {
+            // Установка данных для формы
             $form->setData(array(
                 'assigned_user_id'=>$task->getAssignedUserId(),
                 'estimate'=>$task->getEstimate(),
@@ -283,6 +287,7 @@ class TaskController extends AbstractActionController
             ));
         }
 
+        // Рендер формы
         return new ViewModel(array(
             'task' => $task,
             'form' => $form,
@@ -291,7 +296,7 @@ class TaskController extends AbstractActionController
     }
 
     /**
-     * This action deletes a task.
+     * Удаление задачи из БД
      */
     public function deleteAction()
     {
@@ -301,10 +306,13 @@ class TaskController extends AbstractActionController
             return;
         }
 
+        // Найти задачу в БД
         $task = $this->entityManager->getRepository(Task::class)
             ->find($id);
 
         $project = $task->getProject();
+
+        // Проверка полномочий
         if (!$this->access('projects.manage.all') &&
             !$this->access('projects.manage.own', ['project' => $project])) {
             return $this->redirect()->toRoute('not-authorized');
@@ -315,28 +323,27 @@ class TaskController extends AbstractActionController
             return;
         }
 
-        // Delete role.
+        // Удалить задачу в БД
         $this->taskManager->deleteTask($task);
 
-        // Add a flash message.
         $this->flashMessenger()->addSuccessMessage('Task has been removed.');
 
-        // Redirect to "index" page
         return $this->redirect()->toRoute('tasks', ['action'=>'index']);
     }
 
 
     /**
-     * Reassign user for particular task action
+     * Переназначение пользователя для задачи
      *
      * @return \Zend\Http\Response|\Zend\Stdlib\ResponseInterface
      */
     public function reassignAction(){
         $response = $this->getResponse();
 
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();
             $taskId = $data['task_id'];
 
@@ -345,6 +352,7 @@ class TaskController extends AbstractActionController
 
             $project = $task->getProject();
 
+            // Проверка полномочий
             if (!$this->access('projects.manage.all') &&
                 !$this->access('projects.manage.own', ['project' => $project])) {
                 return $this->redirect()->toRoute('not-authorized');
@@ -357,9 +365,9 @@ class TaskController extends AbstractActionController
 
                 $taskData = ['assigned_user_id' => $userId];
 
+                // Обновление задачи в БД
                 $this->taskManager->updateTask($task, $taskData);
 
-                //todo: russian translation should be here but json can't encode russian characters.
                 $response->setContent(\Zend\Json\Json::encode(
                     array(
                         'response' => true,
@@ -375,6 +383,7 @@ class TaskController extends AbstractActionController
             $allUsers = $this->entityManager->getRepository(User::class)
                 ->findBy([], ['id'=>'ASC']);
 
+            // Рендер шаблона
             $viewModel = new ViewModel(
                 ['allUsers' => $allUsers]
             );
@@ -382,7 +391,6 @@ class TaskController extends AbstractActionController
             $renderer = $this->rendererInterface;
             $html = $renderer->render($viewModel);
 
-            //todo: russian translation should be here but json can't encode russian characters.
             $response->setContent(\Zend\Json\Json::encode(
                 array(
                     'response' => true,
@@ -391,45 +399,45 @@ class TaskController extends AbstractActionController
             ));
         }
 
-
         return $response;
-
     }
 
 
     /**
-     * Add time log ajax action
+     * Добавить time log
      *
-     * @return \Zend\Http\Response|\Zend\Stdlib\ResponseInterface
+     * @return \Zend\Stdlib\ResponseInterface
      */
     public function addtimelogAction(){
         $response = $this->getResponse();
 
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();
             $taskId = $data['task_id'];
 
+            // Поиск задачи
             $task = $this->entityManager->getRepository(Task::class)
                 ->find($taskId);
 
+            // Поиск текущего пользователя
             $currentUser = $this->entityManager->getRepository(User::class)
                 ->findOneByEmail($this->authService->getIdentity());
 
             try {
-
                 $timeLogData = ['spent_time' => $data['spent_time']];
 
                 $timeLog = $this->timeLogManager->addTimeLog($timeLogData, $task, $currentUser);
 
+                // Рендер time log формы
                 $viewModel = new ViewModel(
                     ['timeLog' => $timeLog]
                 );
                 $viewModel->setTemplate('time_log');
                 $renderer = $this->rendererInterface;
                 $html = $renderer->render($viewModel);
-
 
                 $timeLogs = $task->getTimeLogs();
                 $spentTime = 0;
@@ -443,7 +451,7 @@ class TaskController extends AbstractActionController
                 $spentTimeViewModel->setTemplate('spent_time');
                 $spentTimeHtml = $renderer->render($spentTimeViewModel);
 
-                //todo: russian translation should be here but json can't encode russian characters.
+
                 $response->setContent(\Zend\Json\Json::encode(
                     array(
                         'response' => true,
@@ -464,16 +472,23 @@ class TaskController extends AbstractActionController
 
     }
 
+    /**
+     * Редактирование затраченого времени
+     *
+     * @return \Zend\Stdlib\ResponseInterface
+     */
     public function edittimelogAction(){
         $response = $this->getResponse();
 
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();
             $timeLogId = $data['time_log_id'];
 
             try {
+                // Поиск time log entity в БД
                 $timeLog = $this->entityManager->getRepository(TimeLog::class)
                     ->find($timeLogId);
 
@@ -484,19 +499,22 @@ class TaskController extends AbstractActionController
                     return $response;
                 }
 
+                // Проверка полномочий
                 if (!$this->access('comments.manage.own', ['comment' => $timeLog])) {
                     $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'You are not allowed to manage this comment')));
                     return $response;
                 }
+
+                // Обновление данных в БД
                 $this->timeLogManager->updateTimeLog($timeLog, $data);
 
+                // Рендер шаблона time log
                 $viewModel = new ViewModel(
                     ['timeLog' => $timeLog]
                 );
                 $viewModel->setTemplate('time_log');
                 $renderer = $this->rendererInterface;
                 $html = $renderer->render($viewModel);
-
 
                 $allTimeLogs = $task->getTimeLogs();
                 $spentTime = 0;
@@ -510,7 +528,7 @@ class TaskController extends AbstractActionController
                 $spentTimeViewModel->setTemplate('spent_time');
                 $spentTimeHtml = $renderer->render($spentTimeViewModel);
 
-                //todo: russian translation should be here but json can't encode russian characters.
+
                 $response->setContent(\Zend\Json\Json::encode(
                     array(
                         'response' => true,

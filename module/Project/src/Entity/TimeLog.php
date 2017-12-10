@@ -2,21 +2,11 @@
 
 namespace Project\Entity;
 
-use Project\Service\TaskManager;
-use Project\Service\TimeLogManager;
-
 use Doctrine\ORM\Mapping as ORM;
 
-use Project\Entity\Project;
-
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\InvokableFactory;
-use Zend\ServiceManager\ServiceManager;
-
-use stdClass;
-
 /**
- * This class represents a registered task.
+ * —ущность представл€юща€ затраченные части времени (logs)
+ *
  * @ORM\Entity()
  * @ORM\Table(name="time_log")
  */
@@ -39,6 +29,7 @@ class TimeLog
 
     /**
      * @param Task $task
+     * @return $this
      */
     public function setTask(\Project\Entity\Task $task)
     {

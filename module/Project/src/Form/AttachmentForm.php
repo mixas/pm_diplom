@@ -15,7 +15,6 @@ class AttachmentForm extends Form
 
     public function addElements()
     {
-        // File Input
         $file = new Element\File('attachment');
         $file->setLabel('Attach file')
             ->setAttribute('id', 'attachment');

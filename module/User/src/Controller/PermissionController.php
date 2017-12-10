@@ -7,8 +7,10 @@ use User\Entity\Permission;
 use User\Form\PermissionForm;
 
 /**
- * This controller is responsible for permission management (adding, editing, 
- * viewing, deleting).
+ * Контроллер отвечает за управлениями полномочиями
+ *
+ * Class PermissionController
+ * @package User\Controller
  */
 class PermissionController extends AbstractActionController 
 {
@@ -24,69 +26,71 @@ class PermissionController extends AbstractActionController
      */
     private $permissionManager;
     
-    /**
-     * Constructor. 
-     */
     public function __construct($entityManager, $permissionManager)
     {
         $this->entityManager = $entityManager;
         $this->permissionManager = $permissionManager;
     }
-    
+
     /**
-     * This is the default "index" action of the controller. It displays the 
-     * list of permission.
+     * Список всех полномочий
+     *
+     * @return ViewModel
      */
     public function indexAction() 
     {
+        // Выбрать все полномочия в БД
         $permissions = $this->entityManager->getRepository(Permission::class)
                 ->findBy([], ['name'=>'ASC']);
-        
+
+        // Рендер шаблона
         return new ViewModel([
             'permissions' => $permissions
         ]);
-    } 
-    
+    }
+
     /**
-     * This action displays a page allowing to add a new permission.
+     * Добавить новое полномочие
+     *
+     * @return \Zend\Http\Response|ViewModel
      */
     public function addAction()
     {
-        // Create form
+        // Создать форму
         $form = new PermissionForm('create', $this->entityManager);
-        
-        // Check if user has submitted the form
+
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
-            
-            // Fill in the form with POST data
+
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();            
             
             $form->setData($data);
-            
-            // Validate form
+
+            // Валидация формы
             if($form->isValid()) {
                 
-                // Get filtered and validated data
                 $data = $form->getData();
                 
-                // Add permission.
+                // Добавить полномочие в БД
                 $this->permissionManager->addPermission($data);
                 
-                // Add a flash message.
                 $this->flashMessenger()->addSuccessMessage('Added new permission.');
                 
-                // Redirect to "index" page
-                return $this->redirect()->toRoute('permissions', ['action'=>'index']);                
+                return $this->redirect()->toRoute('permissions', ['action'=>'index']);
             }               
-        } 
-        
+        }
+
+        // Рендер шаблона
         return new ViewModel([
                 'form' => $form
             ]);
     }
-    
+
     /**
-     * The "view" action displays a page allowing to view permission's details.
+     * Отображение информации для полномочий
+     *
+     * @return void|ViewModel
      */
     public function viewAction() 
     {
@@ -95,8 +99,8 @@ class PermissionController extends AbstractActionController
             $this->getResponse()->setStatusCode(404);
             return;
         }
-        
-        // Find a permission with such ID.
+
+        // Найти полномочие в БД по ID
         $permission = $this->entityManager->getRepository(Permission::class)
                 ->find($id);
         
@@ -104,14 +108,17 @@ class PermissionController extends AbstractActionController
             $this->getResponse()->setStatusCode(404);
             return;
         }
-                
+
+        // Рендер шаблона
         return new ViewModel([
             'permission' => $permission
         ]);
     }
-    
+
     /**
-     * This action displays a page allowing to edit an existing permission.
+     * Редактирование полномочий
+     *
+     * @return void|\Zend\Http\Response|ViewModel
      */
     public function editAction()
     {
@@ -120,7 +127,8 @@ class PermissionController extends AbstractActionController
             $this->getResponse()->setStatusCode(404);
             return;
         }
-        
+
+        // Найти полномочие по ID
         $permission = $this->entityManager->getRepository(Permission::class)
                 ->find($id);
         
@@ -128,32 +136,29 @@ class PermissionController extends AbstractActionController
             $this->getResponse()->setStatusCode(404);
             return;
         }
-        
-        // Create form
+
+        // Создать форму
         $form = new PermissionForm('update', $this->entityManager, $permission);
-        
-        // Check if user has submitted the form
+
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
-            
-            // Fill in the form with POST data
+
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();            
             
             $form->setData($data);
-            
-            // Validate form
+
+            // Валидация формы
             if($form->isValid()) {
                 
-                // Get filtered and validated data
                 $data = $form->getData();
                 
-                // Update permission.
+                // Обновить полномочие в БД
                 $this->permissionManager->updatePermission($permission, $data);
                 
-                // Add a flash message.
                 $this->flashMessenger()->addSuccessMessage('Updated the permission.');
                 
-                // Redirect to "index" page
-                return $this->redirect()->toRoute('permissions', ['action'=>'index']);                
+                return $this->redirect()->toRoute('permissions', ['action'=>'index']);
             }               
         } else {
             $form->setData(array(
@@ -161,15 +166,18 @@ class PermissionController extends AbstractActionController
                     'description'=>$permission->getDescription()     
                 ));
         }
-        
+
+        // Рендер шаблона
         return new ViewModel([
                 'form' => $form,
                 'permission' => $permission
             ]);
     }
-    
+
     /**
-     * This action deletes a permission.
+     * Удавить полномочие
+     *
+     * @return void|\Zend\Http\Response
      */
     public function deleteAction()
     {
@@ -178,7 +186,8 @@ class PermissionController extends AbstractActionController
             $this->getResponse()->setStatusCode(404);
             return;
         }
-        
+
+        // Найти полномочие в БД по ID
         $permission = $this->entityManager->getRepository(Permission::class)
                 ->find($id);
         
@@ -187,14 +196,12 @@ class PermissionController extends AbstractActionController
             return;
         }
         
-        // Delete permission.
+        // Удалить полномочие в БД
         $this->permissionManager->deletePermission($permission);
         
-        // Add a flash message.
         $this->flashMessenger()->addSuccessMessage('Deleted the permission.');
 
-        // Redirect to "index" page
-        return $this->redirect()->toRoute('permissions', ['action'=>'index']); 
+        return $this->redirect()->toRoute('permissions', ['action'=>'index']);
     }
 }
 

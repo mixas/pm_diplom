@@ -14,6 +14,8 @@ use Interop\Container\ContainerInterface;
 class PriorityAbstract
 {
 
+    protected $type;
+
     /**
      * Doctrine entity manager.
      * @var Doctrine\ORM\EntityManager
@@ -21,15 +23,21 @@ class PriorityAbstract
     protected $entityManager;
 
     /**
-     * Constructs the service.
+     * @param $entityManager
      */
     public function __construct($entityManager)
     {
         $this->entityManager = $entityManager;
     }
 
+    /**
+     * Метод должен быть реализован в наследующих классах
+     * Реализация должна зависеть от типа(роли) пользователей
+     *
+     * @param $userType
+     */
     public function process($userType){
-        return 'abstract!';
+        return;
     }
 
 }

@@ -5,7 +5,8 @@ namespace Project\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * This class represents a registered project.
+ * —ущность представл€юща€ статусы дл€ задач
+ *
  * @ORM\Entity()
  * @ORM\Table(name="task_status")
  */
@@ -42,8 +43,8 @@ class TaskStatus
     }
 
     /**
-     * Sets status ID.
-     * @param int $id
+     * @param $id
+     * @return $this
      */
     public function setId($id)
     {
@@ -74,7 +75,6 @@ class TaskStatus
     }
 
     /**
-     * Returns possible statuses as array.
      * @return array
      */
     public static function getStatusList() 

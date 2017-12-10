@@ -5,9 +5,6 @@ use Zend\Form\Form;
 use Zend\InputFilter\InputFilter;
 use User\Validator\RoleExistsValidator;
 
-/**
- * The form for collecting information about Role.
- */
 class RoleForm extends Form
 {
     private $scenario;
@@ -16,9 +13,6 @@ class RoleForm extends Form
     
     private $role;
     
-    /**
-     * Constructor.     
-     */
     public function __construct($scenario='create', $entityManager = null, $taskManager = null, $role = null)
     {
         $this->scenario = $scenario;
@@ -26,23 +20,17 @@ class RoleForm extends Form
         $this->taskManager = $taskManager;
         $this->role = $role;
         
-        // Define form name
         parent::__construct('role-form');
      
-        // Set POST method for this form
         $this->setAttribute('method', 'post');
         
         $this->addElements();
         $this->addInputFilter();          
     }
     
-    /**
-     * This method adds elements to form (input fields and submit button).
-     */
-    protected function addElements() 
+    protected function addElements()
     {
-        // Add "name" field
-        $this->add([           
+        $this->add([
             'type'  => 'text',
             'name' => 'name',
             'attributes' => [
@@ -53,8 +41,7 @@ class RoleForm extends Form
             ],
         ]);
         
-        // Add "description" field
-        $this->add([            
+        $this->add([
             'type'  => 'textarea',
             'name' => 'description',
             'attributes' => [
@@ -65,8 +52,7 @@ class RoleForm extends Form
             ],
         ]);
         
-        // Add "inherit_roles" field
-        $this->add([            
+        $this->add([
             'type'  => 'select',
             'name' => 'inherit_roles[]',
             'attributes' => [
@@ -80,7 +66,6 @@ class RoleForm extends Form
 
         $statuses = $this->taskManager->getStatusList();
 
-        // Add "status" field
         $this->add([
             'type' => 'select',
             'name' => 'default_status_filter',
@@ -90,7 +75,6 @@ class RoleForm extends Form
             ],
         ]);
                         
-        // Add the Submit button
         $this->add([
             'type'  => 'submit',
             'name' => 'submit',
@@ -100,7 +84,6 @@ class RoleForm extends Form
             ],
         ]);
         
-        // Add the CSRF field
         $this->add([
             'type' => 'csrf',
             'name' => 'csrf',
@@ -112,16 +95,11 @@ class RoleForm extends Form
         ]);
     }
     
-    /**
-     * This method creates input filter (used for form filtering/validation).
-     */
-    private function addInputFilter() 
+    private function addInputFilter()
     {
-        // Create input filter
-        $inputFilter = new InputFilter();        
+        $inputFilter = new InputFilter();
         $this->setInputFilter($inputFilter);
         
-        // Add input for "name" field
         $inputFilter->add([
                 'name'     => 'name',
                 'required' => true,
@@ -146,7 +124,6 @@ class RoleForm extends Form
                 ],
             ]);                          
         
-        // Add input for "description" field
         $inputFilter->add([
                 'name'     => 'description',
                 'required' => true,
@@ -164,7 +141,6 @@ class RoleForm extends Form
                 ],
             ]);                  
         
-        // Add input for "inherit_roles" field
         $inputFilter->add([
                 'name'     => 'inherit_roles[]',
                 'required' => false,

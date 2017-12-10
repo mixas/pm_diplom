@@ -4,19 +4,10 @@ namespace Project\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
-use Project\Entity\Task;
-use Project\Entity\TechnicalAssignment;
-
-
-
-use Doctrine\ORM\Mapping\Entity;
-use Doctrine\ORM\Mapping\Table;
-use Doctrine\ORM\Mapping\Id;
-use Doctrine\ORM\Mapping\Column;
-use Doctrine\ORM\Mapping\GeneratedValue;
 
 /**
- * This class represents a registered project.
+ * Сущность представляющая проекты
+ *
  * @ORM\Entity()
  * @ORM\Table(name="project")
  */
@@ -45,9 +36,7 @@ class Project
     }
 
     /**
-     * Возвращает таски проекта.
-     *
-     * @return array
+     * @return ArrayCollection
      */
     public function getTasks()
     {
@@ -55,8 +44,6 @@ class Project
     }
 
     /**
-     * Adds a new task to this post.
-     *
      * @param $task
      */
     public function addTask($task)
@@ -131,7 +118,8 @@ class Project
     }
 
     /**
-     * @param mixed $code
+     * @param $code
+     * @return $this
      */
     public function setCode($code)
     {
@@ -148,7 +136,8 @@ class Project
     }
 
     /**
-     * @param mixed $name
+     * @param $name
+     * @return $this
      */
     public function setName($name)
     {
@@ -157,8 +146,7 @@ class Project
     }
 
     /**
-     * Returns user ID.
-     * @return integer
+     * @return mixed
      */
     public function getId() 
     {
@@ -166,8 +154,8 @@ class Project
     }
 
     /**
-     * Sets user ID. 
-     * @param int $id    
+     * @param $id
+     * @return $this
      */
     public function setId($id) 
     {
@@ -195,10 +183,9 @@ class Project
             self::STATUS_ACTIVE => 'Active',
             self::STATUS_RETIRED => 'Retired'
         ];
-    }    
-    
+    }
+
     /**
-     * Returns user status as string.
      * @return string
      */
     public function getStatusAsString()
@@ -208,22 +195,21 @@ class Project
             return $list[$this->status];
         
         return 'Unknown';
-    }    
-    
+    }
+
     /**
-     * Sets status.
-     * @param int $status     
+     * @param $status
+     * @return $this
      */
     public function setStatus($status) 
     {
         $this->status = $status;
         return $this;
-    }   
+    }
 
-    
+
     /**
-     * Returns the date of user creation.
-     * @return string     
+     * @return mixed
      */
     public function getDateCreated() 
     {
@@ -241,8 +227,7 @@ class Project
     }
 
     /**
-     * Returns the array of users allowed to this projects.
-     * @return array
+     * @return ArrayCollection
      */
     public function getUsers()
     {
@@ -250,10 +235,6 @@ class Project
     }
 
 
-    /**
-     * One Customer has One Cart.
-     * @ORM\OneToOne(targetEntity="Project\Entity\TechnicalAssignment", mappedBy="project")
-     */
     protected $technicalAssignment;
 
     /**

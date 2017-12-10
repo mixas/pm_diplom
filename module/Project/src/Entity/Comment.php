@@ -2,12 +2,11 @@
 
 namespace Project\Entity;
 
-use Project\Service\TaskManager;
-
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * This class represents a registered task.
+ * —ущность представл€юща€ комментарии
+ *
  * @ORM\Entity()
  * @ORM\Table(name="comment")
  */
@@ -21,9 +20,7 @@ class Comment
     protected $task;
 
     /**
-     * Returns associated task
-     *
-     * @return \Project\Entity\Task
+     * @return mixed
      */
     public function getTask()
     {
@@ -31,9 +28,8 @@ class Comment
     }
 
     /**
-     * Sets associated test.
-     *
      * @param Task $task
+     * @return $this
      */
     public function setTask(\Project\Entity\Task $task)
     {
@@ -75,7 +71,8 @@ class Comment
     protected $id;
 
     /**
-     * @param mixed $id
+     * @param $id
+     * @return $this
      */
     public function setId($id)
     {
@@ -84,7 +81,8 @@ class Comment
     }
 
     /**
-     * @param mixed $commentText
+     * @param $commentText
+     * @return $this
      */
     public function setCommentText($commentText)
     {
@@ -93,7 +91,8 @@ class Comment
     }
 
     /**
-     * @param mixed $createdDate
+     * @param $createdDate
+     * @return $this
      */
     public function setCreatedDate($createdDate)
     {
@@ -102,7 +101,8 @@ class Comment
     }
 
     /**
-     * @param mixed $updatedDate
+     * @param $updatedDate
+     * @return $this
      */
     public function setUpdatedDate($updatedDate)
     {

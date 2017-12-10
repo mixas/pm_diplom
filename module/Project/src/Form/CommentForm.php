@@ -3,14 +3,13 @@
 namespace Project\Form;
 
 use Zend\Form\Form;
-use Zend\Form\Fieldset;
 use Zend\InputFilter\InputFilter;
-use Project\Entity\Comment;
 
 /**
- * This form is used to collect user's email, full name, password and status. The form
- * can work in two scenarios - 'create' and 'update'. In 'create' scenario, user
- * enters password, in 'update' scenario he/she doesn't enter password.
+ * Форма для комментариев
+ *
+ * Class CommentForm
+ * @package Project\Form
  */
 class CommentForm extends Form
 {
@@ -28,9 +27,6 @@ class CommentForm extends Form
 
     private $taskId = null;
 
-    /**
-     * Constructor.
-     */
     public function __construct($scenario = 'create', $entityManager = null, $taskId = null)
     {
         // Define form name
@@ -48,9 +44,6 @@ class CommentForm extends Form
         $this->addInputFilter();
     }
 
-    /**
-     * This method adds elements to form (input fields and submit button).
-     */
     protected function addElements()
     {
         $this->add([
@@ -87,32 +80,9 @@ class CommentForm extends Form
         ]);
     }
 
-    /**
-     * This method creates input filter (used for form filtering/validation).
-     */
     private function addInputFilter()
     {
-        // Create main input filter
         $inputFilter = new InputFilter();
         $this->setInputFilter($inputFilter);
-
-        // Add input for "full_name" field
-//        $inputFilter->add([
-//            'name' => 'comment_text',
-//            'required' => true,
-//            'filters' => [
-//                ['name' => 'StringTrim'],
-//            ],
-//            'validators' => [
-//                [
-//                    'name' => 'StringLength',
-//                    'options' => [
-//                        'min' => 1,
-////                        'max' => 255
-//                    ],
-//                ],
-//            ],
-//        ]);
-
     }
 }

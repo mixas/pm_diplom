@@ -5,9 +5,6 @@ use Zend\Form\Form;
 use Zend\InputFilter\InputFilter;
 use User\Validator\PermissionExistsValidator;
 
-/**
- * The form for collecting information about Permission.
- */
 class PermissionForm extends Form
 {
     private $scenario;
@@ -16,32 +13,23 @@ class PermissionForm extends Form
     
     private $permission;
     
-    /**
-     * Constructor.     
-     */
     public function __construct($scenario = 'create', $entityManager = null, $permission = null)
     {
         $this->scenario = $scenario;
         $this->entityManager = $entityManager;
         $this->permission = $permission;
         
-        // Define form name
         parent::__construct('permission-form');
      
-        // Set POST method for this form
         $this->setAttribute('method', 'post');
         
         $this->addElements();
         $this->addInputFilter();          
     }
     
-    /**
-     * This method adds elements to form (input fields and submit button).
-     */
-    protected function addElements() 
+    protected function addElements()
     {
-        // Add "name" field
-        $this->add([           
+        $this->add([
             'type'  => 'text',
             'name' => 'name',
             'attributes' => [
@@ -52,8 +40,7 @@ class PermissionForm extends Form
             ],
         ]);
         
-        // Add "description" field
-        $this->add([            
+        $this->add([
             'type'  => 'textarea',
             'name' => 'description',
             'attributes' => [
@@ -64,7 +51,6 @@ class PermissionForm extends Form
             ],
         ]);
         
-        // Add the Submit button
         $this->add([
             'type'  => 'submit',
             'name' => 'submit',
@@ -74,7 +60,6 @@ class PermissionForm extends Form
             ],
         ]);
         
-        // Add the CSRF field
         $this->add([
             'type' => 'csrf',
             'name' => 'csrf',
@@ -86,16 +71,11 @@ class PermissionForm extends Form
         ]);
     }
     
-    /**
-     * This method creates input filter (used for form filtering/validation).
-     */
-    private function addInputFilter() 
+    private function addInputFilter()
     {
-        // Create input filter
-        $inputFilter = new InputFilter();        
+        $inputFilter = new InputFilter();
         $this->setInputFilter($inputFilter);
         
-        // Add input for "name" field
         $inputFilter->add([
                 'name'     => 'name',
                 'required' => true,
@@ -120,7 +100,6 @@ class PermissionForm extends Form
                 ],
             ]);                          
         
-        // Add input for "description" field
         $inputFilter->add([
                 'name'     => 'description',
                 'required' => true,

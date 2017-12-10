@@ -5,7 +5,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
 /**
- * This class represents a permission.
+ * Класс отображает полномочие системы (сущность БД)
+ *
  * @ORM\Entity()
  * @ORM\Table(name="permission")
  */
@@ -42,10 +43,7 @@ class Permission
      */
     private $roles;
 
-    /**
-     * Constructor.
-     */
-    public function __construct() 
+    public function __construct()
     {
         $this->roles = new ArrayCollection();
     }

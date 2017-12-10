@@ -4,7 +4,7 @@ namespace User\Controller\Plugin;
 use Zend\Mvc\Controller\Plugin\AbstractPlugin;
 
 /**
- * This controller plugin is used for role-based access control (RBAC).
+ * ѕлагин дл€ проверки полномочий: role-based access control (RBAC).
  */
 class AccessPlugin extends AbstractPlugin
 {
@@ -16,9 +16,10 @@ class AccessPlugin extends AbstractPlugin
     }
     
     /**
-     * Checks whether the currently logged in user has the given permission.
+     * ѕроверка имеет ли текущий пользователь разрешение на действие
+     *
      * @param string $permission Permission name.
-     * @param array $params Optional params (used only if an assertion is associated with permission).
+     * @param array $params
      */
     public function __invoke($permission, $params = [])
     {

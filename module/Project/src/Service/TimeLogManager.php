@@ -2,17 +2,13 @@
 
 namespace Project\Service;
 
-use Project\Entity\Task;
 use Project\Entity\TimeLog;
-use Project\Entity\TaskStatus;
-use User\Entity\User;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Math\Rand;
-
-use Interop\Container\ContainerInterface;
 
 /**
- * This service is responsible for adding/editing tasks
+ * Класс для выполнения операций связанных с логами времени в БД
+ *
+ * Class TimeLogManager
+ * @package Project\Service
  */
 class TimeLogManager
 {
@@ -22,20 +18,22 @@ class TimeLogManager
      */
     private $entityManager;
 
-    /**
-     * Constructs the service.
-     */
-    public function __construct($entityManager) 
+    public function __construct($entityManager)
     {
         $this->entityManager = $entityManager;
     }
-    
+
     /**
-     * This method adds a new task to DB.
+     * Добавление логов времени в БД
+     *
+     * @param $data
+     * @param null $task
+     * @param null $user
+     * @return TimeLog
      */
     public function addTimeLog($data, $task = null, $user = null)
     {
-        // Create new Task entity.
+        // Создание новой сущности
         $timeLog = new TimeLog();
         $timeLog->setSpentTime($data['spent_time']);
         if($task){
@@ -46,25 +44,30 @@ class TimeLogManager
         }
         $currentDate = date('Y-m-d H:i:s');
         $timeLog->setDateCreated($currentDate);
-                
-        // Add the entity to the entity manager.
+
+        // Добавить сущность в entity manager.
         $this->entityManager->persist($timeLog);
-        
-        // Apply changes to database.
+
+        // Применить изменения в БД
         $this->entityManager->flush();
         
         return $timeLog;
     }
-    
+
+
     /**
-     * This method updates data of an existing user.
+     * Обновление логов времени в БД
+     *
+     * @param $timeLog
+     * @param $data
+     * @return bool
      */
     public function updateTimeLog($timeLog, $data)
     {
         if(isset($data['spent_time']))
             $timeLog->setSpentTime($data['spent_time']);
 
-        // Apply changes to database.
+        // Применить изменения в БД
         $this->entityManager->flush();
 
         return true;

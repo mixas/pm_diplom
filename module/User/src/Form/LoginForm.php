@@ -5,9 +5,6 @@ use Zend\Form\Form;
 use Zend\Form\Fieldset;
 use Zend\InputFilter\InputFilter;
 
-/**
- * This form is used to collect user's login, password and 'Remember Me' flag.
- */
 class LoginForm extends Form
 {
     /**
@@ -15,10 +12,8 @@ class LoginForm extends Form
      */
     public function __construct()
     {
-        // Define form name
         parent::__construct('login-form');
      
-        // Set POST method for this form
         $this->setAttribute('method', 'post');
                 
         $this->addElements();
@@ -30,8 +25,7 @@ class LoginForm extends Form
      */
     protected function addElements() 
     {
-        // Add "email" field
-        $this->add([            
+        $this->add([
             'type'  => 'text',
             'name' => 'email',
             'options' => [
@@ -39,8 +33,7 @@ class LoginForm extends Form
             ],
         ]);
         
-        // Add "password" field
-        $this->add([            
+        $this->add([
             'type'  => 'password',
             'name' => 'password',
             'options' => [
@@ -48,8 +41,7 @@ class LoginForm extends Form
             ],
         ]);
         
-        // Add "remember_me" field
-        $this->add([            
+        $this->add([
             'type'  => 'checkbox',
             'name' => 'remember_me',
             'options' => [
@@ -57,13 +49,11 @@ class LoginForm extends Form
             ],
         ]);
         
-        // Add "redirect_url" field
-        $this->add([            
+        $this->add([
             'type'  => 'hidden',
             'name' => 'redirect_url'
         ]);
         
-        // Add the CSRF field
         $this->add([
             'type' => 'csrf',
             'name' => 'csrf',
@@ -74,7 +64,6 @@ class LoginForm extends Form
             ],
         ]);
         
-        // Add the Submit button
         $this->add([
             'type'  => 'submit',
             'name' => 'submit',
@@ -85,16 +74,11 @@ class LoginForm extends Form
         ]);
     }
     
-    /**
-     * This method creates input filter (used for form filtering/validation).
-     */
-    private function addInputFilter() 
+    private function addInputFilter()
     {
-        // Create main input filter
-        $inputFilter = new InputFilter();        
+        $inputFilter = new InputFilter();
         $this->setInputFilter($inputFilter);
                 
-        // Add input for "email" field
         $inputFilter->add([
                 'name'     => 'email',
                 'required' => true,
@@ -112,7 +96,6 @@ class LoginForm extends Form
                 ],
             ]);     
         
-        // Add input for "password" field
         $inputFilter->add([
                 'name'     => 'password',
                 'required' => true,
@@ -129,7 +112,6 @@ class LoginForm extends Form
                 ],
             ]);     
         
-        // Add input for "remember_me" field
         $inputFilter->add([
                 'name'     => 'remember_me',
                 'required' => false,
@@ -145,7 +127,6 @@ class LoginForm extends Form
                 ],
             ]);
         
-        // Add input for "redirect_url" field
         $inputFilter->add([
                 'name'     => 'redirect_url',
                 'required' => false,

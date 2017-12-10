@@ -2,12 +2,11 @@
 
 namespace Project\Entity;
 
-use Project\Service\TaskManager;
-
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * This class represents a registered task.
+ * —ущность представл€юща€ прикрепленные файлы
+ *
  * @ORM\Entity()
  * @ORM\Table(name="attachment")
  */
@@ -49,9 +48,7 @@ class Attachment
     protected $task;
 
     /**
-     * Returns associated task
-     *
-     * @return \Project\Entity\Task
+     * @return mixed
      */
     public function getTask()
     {
@@ -67,8 +64,6 @@ class Attachment
         $this->task = $task;
         return $this;
     }
-
-
 
     /**
      * @ORM\Id

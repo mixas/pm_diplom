@@ -5,21 +5,13 @@ namespace Project\Controller;
 use DoctrineORMModule\Proxy\__CG__\Project\Entity\TechnicalAssignment;
 use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
-use Project\Entity\Comment;
 use Project\Entity\Task;
 use Project\Entity\Project;
 use Project\Entity\Attachment;
 use Project\Form\AttachmentForm;
-use User\Entity\User;
-use Project\Service\TaskManager;
-use Project\Form\TaskForm;
-use Project\Form\CommentForm;
-//use User\Form\PasswordChangeForm;
-//use User\Form\PasswordResetForm;
 
 /**
- * This controller is responsible for user management (adding, editing,
- * viewing users and changing user's password).
+ * Системный контроллер, предназначеный для обработки запросов, связанных с основной бизнес логикой приложения
  */
 class SystemController extends AbstractActionController
 {
@@ -55,9 +47,6 @@ class SystemController extends AbstractActionController
 
     private $serviceManager;
 
-    /**
-     * Constructor.
-     */
     public function __construct($entityManager, $taskManager, $attachmentManager, $authService, $solutionProcessor, $rendererInterface)
     {
         $this->entityManager = $entityManager;
@@ -69,9 +58,16 @@ class SystemController extends AbstractActionController
     }
 
 
+    /**
+     * Выбор пользователя системой автоматически (выбор кто наиболее подходит для выполнения задачи)
+     * (Ajax action)
+     *
+     * @return \Zend\Stdlib\ResponseInterface
+     */
     public function chooseUserAutomaticallyAction(){
         $response = $this->getResponse();
 
+        // Проверка исходных данных на существование
         $entityIdentifier = (int)$this->params()->fromRoute('id', -1);
         if ($entityIdentifier < 1) {
             $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'Task was not found')));
@@ -79,11 +75,10 @@ class SystemController extends AbstractActionController
         }
 
         if ($this->getRequest()->isPost()) {
-
             try {
-
                 $data = $this->params()->fromPost();
 
+                // Поиск проекта и задачи в БД
                 if(isset($data['is_new']) && $data['is_new']) {
                     $task = $this->entityManager->getRepository(Task::class)
                         ->find($entityIdentifier);
@@ -103,13 +98,14 @@ class SystemController extends AbstractActionController
                     return $response;
                 }
 
+                // Проверка полномочий
                 if (!$this->access('projects.manage.all') &&
                     !$this->access('projects.manage.own', ['project' => $project])) {
                     $response->setContent(\Zend\Json\Json::encode(array('response' => false, 'message' => 'You are not allowed to assign users')));
                     return $response;
-
                 }
 
+                // Запрос на выполнение основной логики (выбор пользователя для задачи)
                 $result = $this->solutionProcessor->fetchTheBestUserSolution($data);
 
                 $response->setContent(\Zend\Json\Json::encode(
@@ -128,6 +124,12 @@ class SystemController extends AbstractActionController
         return $response;
     }
 
+
+    /**
+     * Загрузка файла
+     *
+     * @return void|\Zend\Http\Response|\Zend\Stdlib\ResponseInterface+
+     */
     public function uploadFileAction(){
         $response = $this->getResponse();
 
@@ -150,7 +152,6 @@ class SystemController extends AbstractActionController
 
         if ($this->getRequest()->isPost()) {
 
-            // Merge data thus
             $data = array_merge_recursive(
                 $this->getRequest()->getPost()->toArray(),
                 $this->getRequest()->getFiles()->toArray()
@@ -162,10 +163,8 @@ class SystemController extends AbstractActionController
 
                 $data = $form->getData();
 
-                // Upload path
                 $location = Attachment::FILES_LOCATION;
 
-                // A bit validation of uploaded file
                 $allowedExtension = array('jpg', 'jpeg', 'png', 'txt', 'doc', 'pdf');
 
                 $extension = explode('.', $data['attachment']['name']);
@@ -173,7 +172,6 @@ class SystemController extends AbstractActionController
                 $fileName = $data['attachment']['name'];
                 $uniqueName = uniqid();
 
-                // Check if everything is OK!
                 if (0 === $data['attachment']['error'] && in_array($extension, $allowedExtension)) {
                     move_uploaded_file($data['attachment']['tmp_name'], $location . $uniqueName . '.' .$extension);
                 } else {
@@ -213,6 +211,11 @@ class SystemController extends AbstractActionController
         return $response;
     }
 
+    /**
+     * Загрузка файла по имени
+     *
+     * @return void|\Zend\Http\Response\Stream
+     */
     public function downloadFileAction(){
         $entityIdentifier = (int)$this->params()->fromRoute('id', -1);
         if ($entityIdentifier < 1) {
@@ -245,6 +248,11 @@ class SystemController extends AbstractActionController
         return $response;
     }
 
+    /**
+     * Удаление файла
+     *
+     * @return void|\Zend\Http\Response
+     */
     public function removeFileAction(){
         $entityIdentifier = (int)$this->params()->fromRoute('id', -1);
         if ($entityIdentifier < 1) {
@@ -260,10 +268,8 @@ class SystemController extends AbstractActionController
             return;
         }
 
-        // Delete role.
         $this->attachmentManager->deleteAttachment($attachment);
 
-        // Add a flash message.
         $this->flashMessenger()->addSuccessMessage('Attachment has been removed.');
 
         if($attachment->getAttachmentType() == Attachment::TYPE_TECHNICAL_ASSIGNMENT){
@@ -275,11 +281,6 @@ class SystemController extends AbstractActionController
             $project = $task->getProject();
             return $this->redirect()->toRoute('projects', ['action'=>'viewTechnicalAssignment', 'project' => $project->getCode(), 'task' => $task->getId()]);
         }
-
-
-
-
-
     }
 
 }

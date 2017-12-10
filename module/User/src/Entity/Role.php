@@ -6,7 +6,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Project\Entity\TaskStatus;
 
 /**
- * This class represents a role.
+ * Êëàññ îòîáğàæàåò ğîëü ñèñòåìû (ñóùíîñòü ÁÄ)
+ *
  * @ORM\Entity()
  * @ORM\Table(name="role")
  */
@@ -75,10 +76,7 @@ class Role
      */
     private $users;
     
-    /**
-     * Constructor.
-     */
-    public function __construct() 
+    public function __construct()
     {
         $this->parentRoles = new ArrayCollection();
         $this->childRoles = new ArrayCollection();
@@ -90,20 +88,12 @@ class Role
         return $this->users;
     }
     
-    /**
-     * Returns role ID.
-     * @return integer
-     */
-    public function getId() 
+    public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * Sets role ID. 
-     * @param int $id    
-     */
-    public function setId($id) 
+    public function setId($id)
     {
         $this->id = $id;
     }

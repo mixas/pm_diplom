@@ -6,12 +6,12 @@ use Zend\Mvc\Controller\AbstractActionController;
 use Zend\View\Model\ViewModel;
 use Project\Entity\TaskStatus;
 use Project\Form\TaskStatusForm;
-//use User\Form\PasswordChangeForm;
-//use User\Form\PasswordResetForm;
 
 /**
- * This controller is responsible for user management (adding, editing,
- * viewing users and changing user's password).
+ * Контроллер для управления статусами проектов
+ *
+ * Class TaskStatusController
+ * @package Project\Controller
  */
 class TaskStatusController extends AbstractActionController
 {
@@ -27,9 +27,7 @@ class TaskStatusController extends AbstractActionController
      */
     private $taskStatusManager;
 
-    /**
-     * Constructor.
-     */
+
     public function __construct($entityManager, $taskStatusManager)
     {
         $this->entityManager = $entityManager;
@@ -37,57 +35,63 @@ class TaskStatusController extends AbstractActionController
     }
 
     /**
-     * This is the default "index" action of the controller. It displays the
-     * list of users.
+     * Отображение все статусов
+     *
+     * @return ViewModel
      */
     public function indexAction()
     {
+        // Поиск всех статусов
         $taskStatuses = $this->entityManager->getRepository(TaskStatus::class)
             ->findBy([], ['id'=>'ASC']);
 
+        // рендер шаблона
         return new ViewModel([
             'statuses' => $taskStatuses
         ]);
     }
 
     /**
-     * This action displays a page allowing to add a new user.
+     * Добавление нового статуса
+     *
+     * @return \Zend\Http\Response|ViewModel
      */
     public function addAction()
     {
-        // Create user form
+        // Создание формы
         $form = new TaskStatusForm('create', $this->entityManager);
 
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();
 
             $form->setData($data);
 
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
 
-                // Get filtered and validated data
                 $data = $form->getData();
 
-                // Add status.
-                $taskStatus = $this->taskStatusManager->addTaskStatus($data);
+                // Добавление статуса в БД
+                $this->taskStatusManager->addTaskStatus($data);
 
-                // Redirect to "view" page
                 return $this->redirect()->toRoute('statuses',
                     ['action'=>'index']);
             }
         }
 
+        // Рендер формы
         return new ViewModel([
             'form' => $form
         ]);
     }
 
     /**
-     * The "edit" action displays a page allowing to edit user.
+     * Редактирование статуса
+     *
+     * @return void|\Zend\Http\Response|ViewModel
      */
     public function editAction()
     {
@@ -97,6 +101,7 @@ class TaskStatusController extends AbstractActionController
             return;
         }
 
+        // Поиск статуса по ID
         $taskStatus = $this->entityManager->getRepository(TaskStatus::class)
             ->find($id);
 
@@ -105,27 +110,25 @@ class TaskStatusController extends AbstractActionController
             return;
         }
 
-        // Create task form
+        // Создание формы
         $form = new TaskStatusForm('update', $this->entityManager, $taskStatus);
 
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
 
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();
 
             $form->setData($data);
 
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
 
-                // Get filtered and validated data
                 $data = $form->getData();
 
-                // Update the user.
+                // Обновление статуса в БД
                 $this->taskStatusManager->updateTaskStatus($taskStatus, $data);
 
-                // Redirect to "view" page
                 return $this->redirect()->toRoute('statuses',
                     ['action'=>'index']);
             }
@@ -135,6 +138,7 @@ class TaskStatusController extends AbstractActionController
             ));
         }
 
+        // Рендер формы
         return new ViewModel(array(
             'status' => $taskStatus,
             'form' => $form
@@ -143,7 +147,9 @@ class TaskStatusController extends AbstractActionController
 
 
     /**
-     * This action deletes a task.
+     * Удаление статуса
+     *
+     * @return void|\Zend\Http\Response
      */
     public function deleteAction()
     {
@@ -153,6 +159,7 @@ class TaskStatusController extends AbstractActionController
             return;
         }
 
+        // Поиск статуса по ID
         $taskStatus = $this->entityManager->getRepository(TaskStatus::class)
             ->find($id);
 
@@ -161,13 +168,11 @@ class TaskStatusController extends AbstractActionController
             return;
         }
 
-        // Delete role.
+        // Удаление статуса в БД
         $this->taskStatusManager->deleteTaskStatus($taskStatus);
 
-        // Add a flash message.
         $this->flashMessenger()->addSuccessMessage('Status has been removed.');
 
-        // Redirect to "index" page
         return $this->redirect()->toRoute('statuses', ['action'=>'index']);
     }
 

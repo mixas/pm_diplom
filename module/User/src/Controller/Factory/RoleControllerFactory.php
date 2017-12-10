@@ -7,10 +7,6 @@ use User\Controller\RoleController;
 use User\Service\RoleManager;
 use Project\Service\TaskManager;
 
-/**
- * This is the factory for RoleController. Its purpose is to instantiate the
- * controller and inject dependencies into it.
- */
 class RoleControllerFactory implements FactoryInterface
 {
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)

@@ -2,21 +2,12 @@
 
 namespace Project\Entity;
 
-use Project\Service\TaskManager;
-
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Project\Entity\Project;
-
-use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\InvokableFactory;
-use Zend\ServiceManager\ServiceManager;
-
-use stdClass;
-
 /**
- * This class represents a registered task.
+ * —ущность представл€юща€ задачи
+ *
  * @ORM\Entity()
  * @ORM\Table(name="task")
  */
@@ -30,9 +21,7 @@ class Task
     protected $project;
 
     /**
-     * Returns associated project
-     *
-     * @return \Project\Entity\Project
+     * @return mixed
      */
     public function getProject()
     {
@@ -45,7 +34,6 @@ class Task
     public function setProject(\Project\Entity\Project $project)
     {
         $this->project = $project;
-//        $project->addTask($this);
     }
 
 
@@ -117,8 +105,6 @@ class Task
     }
 
     /**
-     * Adds a new task to this post.
-     *
      * @param $timeLog
      */
     public function addTimeLog($timeLog)
@@ -181,8 +167,6 @@ class Task
     }
 
     /**
-     * Returns priorities classes names.
-     *
      * @return array
      */
     public static function getPriorityClassesConformity()
@@ -291,7 +275,8 @@ class Task
     }
 
     /**
-     * @param mixed $estimate
+     * @param $estimate
+     * @return $this
      */
     public function setEstimate($estimate)
     {
@@ -314,7 +299,8 @@ class Task
     }
 
     /**
-     * @param mixed $description
+     * @param $description
+     * @return $this
      */
     public function setDescription($description)
     {
@@ -331,7 +317,8 @@ class Task
     }
 
     /**
-     * @param mixed $taskTitle
+     * @param $taskTitle
+     * @return $this
      */
     public function setTaskTitle($taskTitle)
     {
@@ -349,8 +336,8 @@ class Task
     }
 
     /**
-     * Sets user ID. 
-     * @param int $id    
+     * @param $id
+     * @return $this
      */
     public function setId($id) 
     {
@@ -380,34 +367,16 @@ class Task
     }
 
     /**
-     * Returns possible statuses as array.
-     * @return array
-     */
-//    public function getStatusList()
-//    {
-//        $taskStatuses = $this->getStatusEntity();
-//        return [
-//            self::STATUS_TO_DO => 'To do',
-//            self::STATUS_IN_PROCESS => 'In process',
-//            self::STATUS_TO_BE_CHECKED => 'To be checked',
-//            self::STATUS_IN_QA => 'In QA',
-//            self::STATUS_CHECKED => 'Checked',
-//            self::STATUS_DONE => 'Done'
-//        ];
-//    }
-
-    /**
-     * Returns the date of user creation.
-     * @return string     
+     * @return mixed
      */
     public function getDateCreated() 
     {
         return $this->dateCreated;
     }
-    
+
     /**
-     * Sets the date when this user was created.
-     * @param string $dateCreated     
+     * @param $dateCreated
+     * @return $this
      */
     public function setDateCreated($dateCreated) 
     {

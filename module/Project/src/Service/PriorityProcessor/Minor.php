@@ -3,29 +3,14 @@
 namespace Project\Service\PriorityProcessor;
 
 use Project\Entity\Task;
-use Project\Entity\TaskStatus;
 use User\Entity\User;
 use User\Entity\Role;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Math\Rand;
-
-
-use Interop\Container\ContainerInterface;
 
 class Minor extends PriorityAbstract
 {
 
     protected $type;
 
-    /**
-     * Doctrine entity manager.
-     * @var Doctrine\ORM\EntityManager
-     */
-    protected $entityManager;
-
-    /**
-     * Constructs the service.
-     */
     public function __construct($entityManager)
     {
         parent::__construct($entityManager);
@@ -33,26 +18,43 @@ class Minor extends PriorityAbstract
     }
 
     /**
-     * The main auto assign logic for Minor tasks
+     * Основная логика для автоматического назначения пользователей для задач с приоритетом Minor
+     * За основу берется коэффициент экономической эффективности
      *
      * @param $userType
      * @return array
      * @throws \Exception
      */
     public function process($userType){
+        // Нахождение роли в БД на основе переданного типа
         $userRole = $this->entityManager->getRepository(Role::class)
             ->findOneById($userType, ['name'=>'ASC']);
         if(!$userRole){
             throw new \Exception("User type (role) is undefined");
         }
 
+        // Нахождение всех пользователей роли
         $roleUsers = $userRole->getUsers();
         $roleUsers->initialize();
 
         $roleId = $userRole->getId();
-
         $type = $this->type;
 
+        // Расчет средней з/п для пользователей определенной роли
+        $queryBuilder = $this->entityManager->createQueryBuilder();
+        $queryBuilder
+            ->select('avg(u.salary_rate) salary_rate')
+            ->from('user', 'u')
+            ->leftJoin('user_role', 'ur', 'ON', 'u.id = ur.user_id')
+            ->where("ur.role_id = $roleId");
+        $query = $queryBuilder->getQuery();
+        $stmt = $this->entityManager->getConnection()->prepare($query->getDQL());
+        $stmt->execute();
+        $averageSalaryResult = $stmt->fetch();
+        $averageSalary = $averageSalaryResult['salary_rate'];
+
+        // Финальный коэффициент экономической эффективности (основной показатель для сравнения)
+        // Будет расчитываться на основе коэффициента з/п и коэффициента эффективности труда
         $economicEffectivityCoefficientArray = [];
 
         foreach ($roleUsers as $user) {
@@ -61,25 +63,11 @@ class Minor extends PriorityAbstract
             }
             $userId = $user->getId();
 
-
-            //calculate average salary
-            $queryBuilder = $this->entityManager->createQueryBuilder();
-            $queryBuilder
-                ->select('avg(u.salary_rate) salary_rate')
-                ->from('user', 'u')
-                ->leftJoin('user_role', 'ur', 'ON', 'u.id = ur.user_id')
-                ->where("ur.role_id = $roleId");
-
-            $query = $queryBuilder->getQuery();
-            $stmt = $this->entityManager->getConnection()->prepare($query->getDQL());
-            $stmt->execute();
-            $averageSalaryResult = $stmt->fetch();
-            $averageSalary = $averageSalaryResult['salary_rate'];
-
+            // Коэффициент з/п для пользователя
             $salaryCoefficient = $averageSalary / (float)$user->getSalaryRate();
 
+            // Выборка всех задач для пользователя для дальнейшего подсчета коэффициента эффективности труда
             $queryBuilder = $this->entityManager->createQueryBuilder();
-
             $queryBuilder
                 ->select('t.id', 't.assigned_user_id', 'ur.role_id', 't.estimate', 'sum(tl.spent_time) real_spent_time')
                 ->from('task', 't')
@@ -89,13 +77,12 @@ class Minor extends PriorityAbstract
                 ->andWhere("t.priority = $type")
                 ->andWhere("t.assigned_user_id = $userId")
                 ->groupBy("tl.task_id");
-
             $query = $queryBuilder->getQuery();
-
             $stmt = $this->entityManager->getConnection()->prepare($query->getDQL());
             $stmt->execute();
             $allTasksForParticularRole = $stmt->fetchAll();
 
+            //Расчет общего затраченого времени + общего оценочного времени(estimate)
             $estimateSum = 0;
             $spentTimeSum = 0;
             foreach ($allTasksForParticularRole as $task) {
@@ -103,14 +90,17 @@ class Minor extends PriorityAbstract
                 $spentTimeSum += $task['real_spent_time'];
             }
 
+            // Если данных недостаточно - возвращаем ошибку
             if($spentTimeSum == 0 || $estimateSum == 0){
                 throw new \Exception("There are few data to define the most effective user");
             }
 
+            // Расчет общего коэффициента экономической эффективности
             $economicEffectivityCoefficientArray[$userId] = $estimateSum / $spentTimeSum * $salaryCoefficient;
 
         }
 
+        // Формирование данных для ответа
         if(!empty($economicEffectivityCoefficientArray)) {
             $maxCoefficient = max($economicEffectivityCoefficientArray);
             $theMostEffectiveUserId = array_keys($economicEffectivityCoefficientArray, $maxCoefficient);

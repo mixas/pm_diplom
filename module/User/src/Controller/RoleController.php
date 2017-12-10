@@ -9,8 +9,10 @@ use User\Form\RoleForm;
 use User\Form\RolePermissionsForm;
 
 /**
- * This controller is responsible for role management (adding, editing, 
- * viewing, deleting).
+ * Управление ролями
+ *
+ * Class RoleController
+ * @package User\Controller
  */
 class RoleController extends AbstractActionController 
 {
@@ -28,38 +30,41 @@ class RoleController extends AbstractActionController
      */
     private $roleManager;
     
-    /**
-     * Constructor. 
-     */
+
     public function __construct($entityManager, $roleManager, $taskManager)
     {
         $this->entityManager = $entityManager;
         $this->roleManager = $roleManager;
         $this->taskManager = $taskManager;
     }
-    
+
     /**
-     * This is the default "index" action of the controller. It displays the 
-     * list of roles.
+     * Отображение всех ролей
+     *
+     * @return ViewModel
      */
     public function indexAction() 
     {
+        // Извлечь все роли
         $roles = $this->entityManager->getRepository(Role::class)
                 ->findBy([], ['id'=>'ASC']);
-        
+
+        // Рендер формы
         return new ViewModel([
             'roles' => $roles
         ]);
-    } 
-    
+    }
+
     /**
-     * This action displays a page allowing to add a new role.
+     * Добавление новой роли
+     *
+     * @return \Zend\Http\Response|ViewModel
      */
     public function addAction()
     {
-        // Create form
+        // Создать форму
         $form = new RoleForm('create', $this->entityManager, $this->taskManager);
-        
+
         $roleList = [];
         $roles = $this->entityManager->getRepository(Role::class)
                 ->findBy([], ['name'=>'ASC']);
@@ -68,48 +73,49 @@ class RoleController extends AbstractActionController
         }
         $form->get('inherit_roles[]')->setValueOptions($roleList);
         
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
             
-            // Fill in the form with POST data
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();            
             
             $form->setData($data);
             
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
-                
-                // Get filtered and validated data
+
                 $data = $form->getData();
                 
-                // Add role.
+                // Добавить роль в БД
                 $this->roleManager->addRole($data);
                 
-                // Add a flash message.
                 $this->flashMessenger()->addSuccessMessage('Added new role.');
                 
-                // Redirect to "index" page
-                return $this->redirect()->toRoute('roles', ['action'=>'index']);                
+                return $this->redirect()->toRoute('roles', ['action'=>'index']);
             }               
-        } 
-        
+        }
+
+        // Рендер формы
         return new ViewModel([
                 'form' => $form
             ]);
     }
-    
+
     /**
-     * The "view" action displays a page allowing to view role's details.
+     * Просмотр данныъ роли
+     *
+     * @return void|ViewModel
      */
     public function viewAction() 
     {
+        // Извлечение данных из запроса
         $id = (int)$this->params()->fromRoute('id', -1);
         if ($id<1) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
-        
-        // Find a role with such ID.
+
+        // Поиск роли по ID
         $role = $this->entityManager->getRepository(Role::class)
                 ->find($id);
         
@@ -122,25 +128,30 @@ class RoleController extends AbstractActionController
                 ->findBy([], ['name'=>'ASC']);
         
         $effectivePermissions = $this->roleManager->getEffectivePermissions($role);
-                
+
+        // Рендер формы
         return new ViewModel([
             'role' => $role,
             'allPermissions' => $allPermissions,
             'effectivePermissions' => $effectivePermissions
         ]);
     }
-    
+
     /**
-     * This action displays a page allowing to edit an existing role.
+     * Редактировать роль
+     *
+     * @return void|\Zend\Http\Response|ViewModel
      */
     public function editAction()
     {
+        // Извлечение данных из запроса
         $id = (int)$this->params()->fromRoute('id', -1);
         if ($id<1) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
-        
+
+        // Поиск роли по ID
         $role = $this->entityManager->getRepository(Role::class)
                 ->find($id);
         
@@ -149,7 +160,7 @@ class RoleController extends AbstractActionController
             return;
         }
         
-        // Create form
+        // Создание формы
         $form = new RoleForm('update', $this->entityManager, $this->taskManager, $role);
         
         $roleList = [];
@@ -160,28 +171,25 @@ class RoleController extends AbstractActionController
         }
         $form->get('inherit_roles[]')->setValueOptions($roleList);
         
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
-            
-            // Fill in the form with POST data
+
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();            
             
             $form->setData($data);
             
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
                 
-                // Get filtered and validated data
                 $data = $form->getData();
                 
-                // Update permission.
+                // Обновление роли в БД
                 $this->roleManager->updateRole($role, $data);
                 
-                // Add a flash message.
                 $this->flashMessenger()->addSuccessMessage('Updated the role.');
                 
-                // Redirect to "index" page
-                return $this->redirect()->toRoute('roles', ['action'=>'index']);                
+                return $this->redirect()->toRoute('roles', ['action'=>'index']);
             }               
         } else {
             $form->setData(array(
@@ -189,24 +197,29 @@ class RoleController extends AbstractActionController
                     'description'=>$role->getDescription()     
                 ));
         }
-        
+
+        // Рендер формы
         return new ViewModel([
                 'form' => $form,
                 'role' => $role
             ]);
     }
-    
+
     /**
-     * The "editPermissions" action allows to edit permissions assigned to the given role.
+     * Редактировать полномочие
+     *
+     * @return void|\Zend\Http\Response|ViewModel
      */
     public function editPermissionsAction()
     {
+        // Извлечение данных из запроса
         $id = (int)$this->params()->fromRoute('id', -1);
         if ($id<1) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
-        
+
+        // Нахождение роли по ID
         $role = $this->entityManager->getRepository(Role::class)
                 ->find($id);
         
@@ -220,7 +233,7 @@ class RoleController extends AbstractActionController
         
         $effectivePermissions = $this->roleManager->getEffectivePermissions($role);
             
-        // Create form
+        // Создание формы
         $form = new RolePermissionsForm($this->entityManager);
         foreach ($allPermissions as $permission) {
             $label = $permission->getName();
@@ -232,28 +245,25 @@ class RoleController extends AbstractActionController
             $form->addPermissionField($permission->getName(), $label, $isDisabled);
         }
         
-        // Check if user has submitted the form
+        // Проверка отправлена ли форма
         if ($this->getRequest()->isPost()) {
-            
-            // Fill in the form with POST data
+
+            // Извлечение данных из запроса
             $data = $this->params()->fromPost();            
             
             $form->setData($data);
             
-            // Validate form
+            // Валидация формы
             if($form->isValid()) {
                 
-                // Get filtered and validated data
                 $data = $form->getData();
                 
-                // Update permissions.
+                // Обновить полномочия в БД
                 $this->roleManager->updateRolePermissions($role, $data);
                 
-                // Add a flash message.
                 $this->flashMessenger()->addSuccessMessage('Updated permissions for the role.');
                 
-                // Redirect to "index" page
-                return $this->redirect()->toRoute('roles', ['action'=>'view', 'id'=>$role->getId()]);                
+                return $this->redirect()->toRoute('roles', ['action'=>'view', 'id'=>$role->getId()]);
             }
         } else {
         
@@ -266,7 +276,8 @@ class RoleController extends AbstractActionController
         }
         
         $errors = $form->getMessages();
-        
+
+        // Рендер формы
         return new ViewModel([
                 'form' => $form,
                 'role' => $role,
@@ -276,16 +287,20 @@ class RoleController extends AbstractActionController
     }
 
     /**
-     * This action deletes a permission.
+     * Удалить полномочие (permission)
+     *
+     * @return void|\Zend\Http\Response
      */
     public function deleteAction()
     {
+        // Извлечение данных из запроса
         $id = (int)$this->params()->fromRoute('id', -1);
         if ($id<1) {
             $this->getResponse()->setStatusCode(404);
             return;
         }
-        
+
+        // Найти роль по ID
         $role = $this->entityManager->getRepository(Role::class)
                 ->find($id);
         
@@ -294,14 +309,12 @@ class RoleController extends AbstractActionController
             return;
         }
         
-        // Delete role.
+        // Удалить роль в БД
         $this->roleManager->deleteRole($role);
-        
-        // Add a flash message.
+
         $this->flashMessenger()->addSuccessMessage('Deleted the role.');
 
-        // Redirect to "index" page
-        return $this->redirect()->toRoute('roles', ['action'=>'index']); 
+        return $this->redirect()->toRoute('roles', ['action'=>'index']);
     }
 }
 

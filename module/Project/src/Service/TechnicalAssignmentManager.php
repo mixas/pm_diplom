@@ -2,17 +2,13 @@
 
 namespace Project\Service;
 
-use Project\Entity\Task;
 use Project\Entity\TechnicalAssignment;
-use Project\Entity\TaskStatus;
-use User\Entity\User;
-use Zend\Crypt\Password\Bcrypt;
-use Zend\Math\Rand;
-
-use Interop\Container\ContainerInterface;
 
 /**
- * This service is responsible for adding/editing tasks
+ * Класс для выполнения операций связанных с техническим заданием в БД
+ *
+ * Class TechnicalAssignmentManager
+ * @package Project\Service
  */
 class TechnicalAssignmentManager
 {
@@ -22,20 +18,21 @@ class TechnicalAssignmentManager
      */
     private $entityManager;
 
-    /**
-     * Constructs the service.
-     */
-    public function __construct($entityManager) 
+    public function __construct($entityManager)
     {
         $this->entityManager = $entityManager;
     }
-    
+
     /**
-     * This method adds a new task to DB.
+     * Добавление ТЗ в БД
+     *
+     * @param $data
+     * @param null $project
+     * @return TechnicalAssignment
      */
     public function addTechnicalAssignment($data, $project = null)
     {
-        // Create new Task entity.
+        // Создание новой сущности
         $technicalAssignment = new TechnicalAssignment();
         $technicalAssignment->setDeadlineDate($data['deadline_date']);
         $technicalAssignment->setDescription($data['description']);
@@ -47,24 +44,29 @@ class TechnicalAssignmentManager
                 
         // Add the entity to the entity manager.
         $this->entityManager->persist($technicalAssignment);
-        
-        // Apply changes to database.
+
+        // Применить изменения в БД
         $this->entityManager->flush();
         
         return $technicalAssignment;
     }
-    
+
     /**
-     * This method updates data of an existing user.
+     * Обвновление ТЗ в БД
+     *
+     * @param $technicalAssignment
+     * @param $data
+     * @return bool
      */
     public function updateTechnicalAssignment($technicalAssignment, $data)
     {
+        // Установка новых данных
         $technicalAssignment->setDeadlineDate($data['deadline_date']);
         $technicalAssignment->setDescription($data['description']);
         $currentDate = date('Y-m-d H:i:s');
         $technicalAssignment->getDateUpdated($currentDate);
 
-        // Apply changes to database.
+        // Применить изменения в БД
         $this->entityManager->flush();
 
         return true;

@@ -1,16 +1,18 @@
 <?php
-
+/**
+ * Основной файл конфигурации для модуля Project модуля. Модуль предназначен для реализации управления проектами,
+ * задачами, комментариями, а также основной логики приложения - расчета оптимального пользователя для выполнения
+ * различных видом задач
+ */
 namespace Project;
 
 
-use Zend\Router\Http\Literal;
 use Zend\Router\Http\Segment;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Project\Entity\Task;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
 return [
-
+    /* Настройка автоматического создания контроллеров с помощью фабрик */
     'controllers' => [
         'factories' => [
             Controller\ProjectController::class => Controller\Factory\ProjectControllerFactory::class,
@@ -22,19 +24,11 @@ return [
         ],
     ],
 
-    // The 'access_filter' key is used by the User module to restrict or permit
-    // access to certain controller actions for unauthorized visitors.
+    /* Настройка ограничений доступа */
     'access_filter' => [
         'options' => [
-            // The access filter can work in 'restrictive' (recommended) or 'permissive'
-            // mode. In restrictive mode all controller actions must be explicitly listed
-            // under the 'access_filter' config key, and access is denied to any not listed
-            // action for not logged in users. In permissive mode, if an action is not listed
-            // under the 'access_filter' key, access to it is permitted to anyone (even for
-            // not logged in users. Restrictive mode is more secure and recommended to use.
             'mode' => 'restrictive'
         ],
-        //TODO:: We should add dynamic assertions for editPermissions action
         'controllers' => [
             Controller\ProjectController::class => [
                 ['actions' => ['index', 'view', 'edit', 'add', 'delete', 'createTechnicalAssignment', 'editTechnicalAssignment', 'viewTechnicalAssignment', 'assignUsers'], 'allow' => '+projects.view'],
@@ -42,7 +36,6 @@ return [
             ],
             Controller\TaskController::class => [
                 ['actions' => ['index', 'view', 'edit', 'add', 'delete', 'reassign', 'addtimelog', 'edittimelog'], 'allow' => '+projects.view'],
-//                ['actions' => ['edit', 'add'], 'allow' => '+projects.manage.all']
             ],
             Controller\TaskStatusController::class => [
                 ['actions' => ['index', 'view', 'edit', 'add', 'delete'], 'allow' => '+status.manage'],
@@ -59,12 +52,12 @@ return [
         ]
     ],
 
-    // This key stores configuration for RBAC manager.
+    /* RBAC manager позволяет проверять полномочия пользователей.*/
     'rbac_manager' => [
         'assertions' => [Service\RbacProjectAssertionManager::class],
     ],
 
-    // This key stores configuration for RBAC manager.
+    /* маршрутизация запросов */
     'router' => [
         'routes' => [
             'projects' => [
@@ -153,18 +146,8 @@ return [
             ],
         ],
     ],
-//    'access_filter' => [
-//        'controllers' => [
-//            Controller\ProjectController::class => [
-//                // Give access to "resetPassword", "message" and "setPassword" actions
-//                // to anyone.
-//                ['actions' => ['resetPassword', 'message', 'setPassword'], 'allow' => '*'],
-//                // Give access to "index", "add", "edit", "view", "changePassword" actions to authorized users only.
-//                ['actions' => ['index', 'add', 'edit', 'view'], 'allow' => '@']
-//            ],
-//        ]
-//    ],
 
+    /* Секция для настройки doctrine (ORM, прослойка для работы с БД) */
     'doctrine' => [
         'driver' => [
             __NAMESPACE__ . '_driver' => [
@@ -180,6 +163,7 @@ return [
         ]
     ],
 
+    /* Настройка рендера шаблонов */
     'view_manager' => [
         'template_path_stack' => [
             'test' => __DIR__ . '/../view',
@@ -194,6 +178,7 @@ return [
         ]
     ],
 
+    /* Настройка автоматического создания сервисов с помощью фабрик, сервисы - это один из видов моделей */
     'service_manager' => [
         'factories' => [
             Service\ProjectManager::class => Service\Factory\ProjectManagerFactory::class,
@@ -209,12 +194,8 @@ return [
             Service\PriorityProcessor\PriorityAbstract::class => Service\PriorityProcessor\Factory\PriorityAbstractFactory::class,
         ],
     ],
-    'entity_manager' => [
-        'factories' => [
-            'Project\Entity\Task' => 'Project\Entity\Factory\TaskFactory',
-        ],
-    ],
 
+    /* Настройка автоматического создания view helper с помощью фабрик, это вспомогательные функции */
     'view_helpers' => [
         'factories' => [
             View\Helper\Project::class => InvokableFactory::class,

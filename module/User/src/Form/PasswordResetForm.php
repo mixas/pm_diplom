@@ -4,20 +4,12 @@ namespace User\Form;
 use Zend\Form\Form;
 use Zend\InputFilter\InputFilter;
 
-/**
- * This form is used to collect user's E-mail address (used to recover password).
- */
 class PasswordResetForm extends Form
 {
-    /**
-     * Constructor.     
-     */
     public function __construct()
     {
-        // Define form name
         parent::__construct('password-reset-form');
      
-        // Set POST method for this form
         $this->setAttribute('method', 'post');
                 
         $this->addElements();
@@ -29,8 +21,7 @@ class PasswordResetForm extends Form
      */
     protected function addElements() 
     {
-        // Add "email" field
-        $this->add([            
+        $this->add([
             'type'  => 'email',
             'name' => 'email',
             'options' => [
@@ -38,7 +29,6 @@ class PasswordResetForm extends Form
             ],
         ]);
         
-        // Add the CAPTCHA field
         $this->add([
             'type' => 'captcha',
             'name' => 'captcha',
@@ -61,7 +51,6 @@ class PasswordResetForm extends Form
             ],
         ]);
         
-        // Add the CSRF field
         $this->add([
             'type' => 'csrf',
             'name' => 'csrf',
@@ -72,7 +61,6 @@ class PasswordResetForm extends Form
             ],
         ]);
         
-        // Add the Submit button
         $this->add([
             'type'  => 'submit',
             'name' => 'submit',
@@ -83,16 +71,11 @@ class PasswordResetForm extends Form
         ]);       
     }
     
-    /**
-     * This method creates input filter (used for form filtering/validation).
-     */
-    private function addInputFilter() 
+    private function addInputFilter()
     {
-        // Create main input filter
-        $inputFilter = new InputFilter();        
+        $inputFilter = new InputFilter();
         $this->setInputFilter($inputFilter);
                 
-        // Add input for "email" field
         $inputFilter->add([
                 'name'     => 'email',
                 'required' => true,
