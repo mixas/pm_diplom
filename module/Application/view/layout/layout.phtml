@@ -1,5 +1,4 @@
 <?= $this->doctype() ?>
-
 <html lang="en">
     <head>
         <meta charset="utf-8">
@@ -10,7 +9,7 @@
             ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
         ?>
 
-        <!-- Le styles -->
+        <!-- Styles -->
         <?= $this->headLink(['rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/img/favicon.ico'])
             ->prependStylesheet($this->basePath('css/style.css'))
             ->prependStylesheet($this->basePath('css/bootstrap-theme.min.css'))
@@ -30,12 +29,6 @@
     </head>
     <body>
         <div class="container">
-<!--            <div class="row">-->
-                <!-- Page header -->
-<!--                <div class="col-md-4">-->
-<!--                    <div class="app-caption">User Demo</div>-->
-<!--                </div>                -->
-<!--            </div>-->
             <div class="row">
                 <div class="col-md-12">
                     <img class="top-banner" src="<?php echo $this->basePath() . '/img/top-banner.jpg'; ?>" alt="">
@@ -45,13 +38,9 @@
                 <div class="col-md-12">
                     <!-- Navigation bar -->
                     <?php
-                    // Check if the activeMenuItemId passed to layout view model
-                    // and if so, use it for setting active navbar item.
                     if (isset($activeMenuItemId)) {
                         $this->mainMenu()->setActiveItemId($activeMenuItemId);
                     }
-
-                    // Render the navbar
                     echo $this->mainMenu()->render();
                     ?>
                 </div>
@@ -66,12 +55,9 @@
                 <div class="col-md-12">
                     <!-- Notifications -->
                     <div class="application-messages-wrapper" id="application-messages-wrapper">
-<!--                    <div class="alert alert-success">-->
                         <?= $this->flashMessenger()->render('error', ['alert', 'alert-warning']); ?>
                         <?= $this->flashMessenger()->render('success', ['alert', 'alert-success', 'fade', 'in', 'alert-dismissable']); ?>
                         <?= $this->flashMessenger()->render('info', ['alert', 'alert-info']); ?>
-<!--                        <strong>Success!</strong> Indicates a successful or positive action.-->
-<!--                    </div>-->
                     </div>
                     <!-- Page content placeholder -->
                     <?= $this->content; ?>

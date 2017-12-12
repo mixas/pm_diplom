@@ -25,7 +25,8 @@ $this->pageBreadcrumbs()->setItems([
         <th>Full Name</th>
         <th>Role(s)</th>        
         <th>Date Created</th>
-        <th>Status</th>        
+        <th>Salary rate (per hour)</th>
+        <th>Status</th>
         <th>Actions</th>        
     </tr>
     
@@ -44,6 +45,7 @@ $this->pageBreadcrumbs()->setItems([
             <?= $this->escapeHtml($user->getRolesAsString()); ?></a> 
         </td>
         <td><nobr><?= $this->escapeHtml($user->getDateCreated()); ?></nobr></td>        
+        <td><nobr><?= $this->escapeHtml($user->getSalaryRate()); ?></nobr></td>
         <td><?= $this->escapeHtml($user->getStatusAsString()); ?></td>
         <td>
             <a class="btn btn-info" href="<?= $this->url('users', 
