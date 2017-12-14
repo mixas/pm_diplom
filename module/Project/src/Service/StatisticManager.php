@@ -108,12 +108,16 @@ class StatisticManager
                         if ($estimatedExpenses == 0 || $realExpenses == 0) {
 
                         } else {
-                            $effectivityCoefficientArray[$userRole->getId()][$priority][$userId] = [$user->getFullName(), $estimatedExpenses, $realExpenses];
+                            $finalCoefficient = $estimateSum / $spentTimeSum * $salaryCoefficient;
+                            $effectivityCoefficientArray[$userRole->getId()][$priority]['result'][$userId] = [$user->getFullName(), $estimatedExpenses, $realExpenses];
+                            $effectivityCoefficientArray[$userRole->getId()][$priority]['coefficient'][$userId] = [$user->getFullName(), $finalCoefficient];
                         }
                     }else{
                         if ($spentTimeSum == 0 || $estimateSum == 0) {
                         } else {
-                            $effectivityCoefficientArray[$userRole->getId()][$priority][$userId] = [$user->getFullName(), $estimateSum, $spentTimeSum];
+                            $finalCoefficient = $estimateSum / $spentTimeSum;
+                            $effectivityCoefficientArray[$userRole->getId()][$priority]['result'][$userId] = [$user->getFullName(), $estimateSum, $spentTimeSum];
+                            $effectivityCoefficientArray[$userRole->getId()][$priority]['coefficient'][$userId] = [$user->getFullName(), $finalCoefficient];
                         }
                     }
 

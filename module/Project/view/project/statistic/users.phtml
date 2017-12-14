@@ -42,37 +42,44 @@ $this->pageBreadcrumbs()->setItems([
         <?php $minorDataExists = false; ?>
         <?php $minorData = false; ?>
         <?php if(isset($statistic[$role->getId()][\Project\Entity\Task::PRIORITY_MINOR])): ?>
-            <?php $minorData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_MINOR]; ?>
+            <?php $minorData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_MINOR]['result']; ?>
+            <?php $minorDataCoefficientData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_MINOR]['coefficient']; ?>
         <?php endif; ?>
         <?php if(is_array($minorData)): ?>
             <?php $minorDataExists = true; ?>
-            <?php $header = [['User', 'Estimated Value', 'Actual Value']]; ?>
+            <?php $header = [['User', 'Estimated Value(minutes)', 'Actual Value(minutes)']]; ?>
+            <?php $headerCoefficient = [['User', 'Economic coefficient']]; ?>
             <?php $minorData = array_merge($header, $minorData); ?>
+            <?php $minorDataCoefficientData = array_merge($headerCoefficient, $minorDataCoefficientData); ?>
         <?php endif; ?>
 
         <?php $criticalDataExists = false; ?>
         <?php $criticalData = false; ?>
         <?php if(isset($statistic[$role->getId()][\Project\Entity\Task::PRIORITY_CRITICAL])): ?>
-            <?php $criticalData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_CRITICAL]; ?>
+            <?php $criticalData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_CRITICAL]['result']; ?>
+            <?php $criticalDataCoefficientsData = $statistic[$role->getId()][\Project\Entity\Task::PRIORITY_CRITICAL]['coefficient']; ?>
         <?php endif; ?>
         <?php if(is_array($criticalData)): ?>
             <?php $criticalDataExists = true; ?>
-            <?php $header = [['User', 'Estimated Value', 'Actual Value']]; ?>
+            <?php $header = [['User', 'Estimated Value(minutes)', 'Actual Value(minutes)']]; ?>
+            <?php $headerCoefficient = [['User', 'Effectivity coefficient']]; ?>
             <?php $criticalData = array_merge($header, $criticalData); ?>
+            <?php $criticalDataCoefficientData = array_merge($headerCoefficient, $criticalDataCoefficientsData); ?>
         <?php endif; ?>
 
     <div id="tabs-<?php echo $role->getId(); ?>">
         <script type="text/javascript">
             google.charts.load('current', {'packages':['bar']});
             <?php if($minorDataExists): ?>
-                google.charts.setOnLoadCallback(drawMinorChart<?php echo $role->getId(); ?>);
+                google.charts.setOnLoadCallback(drawMinorChart<?php echo $role->getId(); ?>main);
+                google.charts.setOnLoadCallback(drawMinorChart<?php echo $role->getId(); ?>coefficient);
 
-                function drawMinorChart<?php echo $role->getId(); ?>() {
+                function drawMinorChart<?php echo $role->getId(); ?>main() {
                     var data = google.visualization.arrayToDataTable(<?php echo json_encode($minorData); ?>);
 
                     var options = {
                         chart: {
-                            title: 'Users performance coefficient for minor tasks',
+                            title: 'Users Economic Index For Minor Tasks',
                             width:900,
                             height:500
     //                        subtitle: 'Sales, Expenses, and Profit: 2014-2017',
@@ -80,7 +87,27 @@ $this->pageBreadcrumbs()->setItems([
                         bars: 'horizontal' // Required for Material Bar Charts.
                     };
 
-                    var chart = new google.charts.Bar(document.getElementById('barchart_material_minor_<?php echo $role->getId(); ?>'));
+                    var chart = new google.charts.Bar(document.getElementById('barchart_material_minor_<?php echo $role->getId(); ?>_main'));
+
+                    totalCharts++;
+                    google.visualization.events.addListener(chart, 'ready', lastChartReadyHandler);
+
+                    chart.draw(data, google.charts.Bar.convertOptions(options));
+                }
+                function drawMinorChart<?php echo $role->getId(); ?>coefficient() {
+                    var data = google.visualization.arrayToDataTable(<?php echo json_encode($minorDataCoefficientData); ?>);
+
+                    var options = {
+                        chart: {
+                            title: 'Users Economic Coefficient For Minor Tasks',
+                            width:900,
+                            height:500
+    //                        subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+                        },
+                        bars: 'horizontal' // Required for Material Bar Charts.
+                    };
+
+                    var chart = new google.charts.Bar(document.getElementById('barchart_material_minor_<?php echo $role->getId(); ?>_coefficient'));
 
                     totalCharts++;
                     google.visualization.events.addListener(chart, 'ready', lastChartReadyHandler);
@@ -90,12 +117,13 @@ $this->pageBreadcrumbs()->setItems([
             <?php endif; ?>
             <?php if($criticalDataExists): ?>
                 google.charts.setOnLoadCallback(drawCriticalChart<?php echo $role->getId(); ?>);
+                google.charts.setOnLoadCallback(drawCriticalChart<?php echo $role->getId(); ?>coefficient);
                 function drawCriticalChart<?php echo $role->getId(); ?>() {
                     var data = google.visualization.arrayToDataTable(<?php echo json_encode($criticalData); ?>);
 
                     var options = {
                         chart: {
-                            title: 'Users performance coefficient for critical tasks',
+                            title: 'Users Estimated And Spent Time For Critical Tasks',
                             width:900,
                             height:500
     //                        subtitle: 'Sales, Expenses, and Profit: 2014-2017',
@@ -103,7 +131,28 @@ $this->pageBreadcrumbs()->setItems([
                         bars: 'horizontal' // Required for Material Bar Charts.
                     };
 
-                    var chart = new google.charts.Bar(document.getElementById('barchart_material_critical_<?php echo $role->getId(); ?>'));
+                    var chart = new google.charts.Bar(document.getElementById('barchart_material_critical_<?php echo $role->getId(); ?>_main'));
+
+                    totalCharts++;
+
+                    google.visualization.events.addListener(chart, 'ready', lastChartReadyHandler);
+
+                    chart.draw(data, google.charts.Bar.convertOptions(options));
+                }
+                function drawCriticalChart<?php echo $role->getId(); ?>coefficient() {
+                    var data = google.visualization.arrayToDataTable(<?php echo json_encode($criticalDataCoefficientsData); ?>);
+
+                    var options = {
+                        chart: {
+                            title: 'Users Performance Coefficient For Critical Tasks',
+                            width:900,
+                            height:500
+    //                        subtitle: 'Sales, Expenses, and Profit: 2014-2017',
+                        },
+                        bars: 'horizontal' // Required for Material Bar Charts.
+                    };
+
+                    var chart = new google.charts.Bar(document.getElementById('barchart_material_critical_<?php echo $role->getId(); ?>_coefficient'));
 
                     totalCharts++;
 
@@ -120,8 +169,10 @@ $this->pageBreadcrumbs()->setItems([
             }
         </script>
 
-        <div class="chart-wrapper" id="barchart_material_minor_<?php echo $role->getId(); ?>" style="width: 900px; height: 500px;"></div>
-        <div class="chart-wrapper" id="barchart_material_critical_<?php echo $role->getId(); ?>" style="width: 900px; height: 500px;"></div>
+        <div class="chart-wrapper" id="barchart_material_minor_<?php echo $role->getId(); ?>_main" style="width: 900px; height: 500px;"></div>
+        <div class="chart-wrapper" id="barchart_material_minor_<?php echo $role->getId(); ?>_coefficient" style="width: 900px; height: 500px;"></div>
+        <div class="chart-wrapper" id="barchart_material_critical_<?php echo $role->getId(); ?>_main" style="width: 900px; height: 500px;"></div>
+        <div class="chart-wrapper" id="barchart_material_critical_<?php echo $role->getId(); ?>_coefficient" style="width: 900px; height: 500px;"></div>
     </div>
 
         <?php endif; ?>
