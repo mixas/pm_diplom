@@ -108,16 +108,16 @@ class StatisticManager
                         if ($estimatedExpenses == 0 || $realExpenses == 0) {
 
                         } else {
-                            $finalCoefficient = $estimateSum / $spentTimeSum * $salaryCoefficient;
+                            $finalCoefficient = round($estimateSum / $spentTimeSum * $salaryCoefficient, 3);
                             $effectivityCoefficientArray[$userRole->getId()][$priority]['result'][$userId] = [$user->getFullName(), $estimatedExpenses, $realExpenses];
-                            $effectivityCoefficientArray[$userRole->getId()][$priority]['coefficient'][$userId] = [$user->getFullName(), $finalCoefficient];
+                            $effectivityCoefficientArray[$userRole->getId()][$priority]['coefficient'][$userId] = [$user->getFullName()." ($finalCoefficient)", $finalCoefficient];
                         }
                     }else{
                         if ($spentTimeSum == 0 || $estimateSum == 0) {
                         } else {
-                            $finalCoefficient = $estimateSum / $spentTimeSum;
+                            $finalCoefficient = round($estimateSum / $spentTimeSum, 3);
                             $effectivityCoefficientArray[$userRole->getId()][$priority]['result'][$userId] = [$user->getFullName(), $estimateSum, $spentTimeSum];
-                            $effectivityCoefficientArray[$userRole->getId()][$priority]['coefficient'][$userId] = [$user->getFullName(), $finalCoefficient];
+                            $effectivityCoefficientArray[$userRole->getId()][$priority]['coefficient'][$userId] = [$user->getFullName()." ($finalCoefficient)", $finalCoefficient];
                         }
                     }
 
