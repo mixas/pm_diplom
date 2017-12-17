@@ -48,16 +48,6 @@ return [
                     ],
                 ],
             ],
-            'help' => [
-                'type' => Literal::class,
-                'options' => [
-                    'route'    => '/help',
-                    'defaults' => [
-                        'controller' => Controller\IndexController::class,
-                        'action'     => 'help',
-                    ],
-                ],
-            ],
         ],
     ],
     /* Настройка автоматического создания контроллеров с помощью фабрик */

@@ -55,12 +55,6 @@ class NavManager
             'link'  => $url('about')
         ];
 
-        $items[] = [
-            'id' => 'help',
-            'label' => 'Help',
-            'link'  => $url('help')
-        ];
-
         if ($this->rbacManager->isGranted(null, 'projects.view')) {
             $items[] = [
                 'id' => 'projects',
