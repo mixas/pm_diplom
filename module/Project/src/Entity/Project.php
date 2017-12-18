@@ -234,7 +234,10 @@ class Project
         return $this->users;
     }
 
-
+    /**
+     * One Customer has One Cart.
+     * @ORM\OneToOne(targetEntity="Project\Entity\TechnicalAssignment", mappedBy="project")
+     */
     protected $technicalAssignment;
 
     /**
